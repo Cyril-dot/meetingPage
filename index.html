@@ -1770,7 +1770,10 @@
                 // Update meeting info
                 document.getElementById('displayMeetingId').textContent = meetingId;
                 document.getElementById('displayCallId').textContent = credentials.callId;
-                document.getElementById('displayMeetingLink').textContent = credentials.meetingLink || 'N/A';
+                
+                // Create shareable meeting link with the GitHub Pages URL
+                const shareableLink = `https://cyril-dot.github.io/meetingPage/?meetingId=${meetingId}`;
+                document.getElementById('displayMeetingLink').textContent = shareableLink;
                 document.getElementById('headerInfo').innerHTML = `
                     <span class="status-indicator"></span>
                     <span>In meeting: ${credentials.callId}</span>
@@ -2311,6 +2314,16 @@
         // Initialize
         console.log('GetStream Video Meeting App Initialized');
         console.log('Keyboard shortcuts: M = mute, V = video, S = screen share, ESC = stop sharing');
+        
+        // Auto-fill meeting ID from URL parameter if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const meetingIdFromUrl = urlParams.get('meetingId');
+        if (meetingIdFromUrl) {
+            document.getElementById('meetingId').value = meetingIdFromUrl;
+            // Switch to join tab
+            switchTab('join');
+            console.log('Meeting ID auto-filled from URL:', meetingIdFromUrl);
+        }
         
         // Add demo participants for testing
         window.addDemoParticipant = function() {
