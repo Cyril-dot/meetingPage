@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetStream Video Meeting</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stream-io/video-client@latest/dist/index.umd.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            --primary-color: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary-color: #7C3AED;
+            --success-color: #10B981;
+            --danger-color: #EF4444;
+            --warning-color: #F59E0B;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F9FAFB;
+            --bg-tertiary: #F3F4F6;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+           HEADER
+        ============================================ */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+        }
+
+        .header h1 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header .logo {
+            font-size: 28px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            50% { 
+                opacity: 0.8; 
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ============================================
+           LOGIN SECTION
+        ============================================ */
+        .login-container {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 48px;
+            animation: slideUp var(--transition-slow) ease-out;
+            border: 1px solid rgba(229, 231, 235, 0.8);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container h2 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            background: var(--bg-secondary);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 24px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all var(--transition-base);
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab i {
+            font-size: 18px;
+        }
+
+        .tab.active {
+            background: var(--bg-primary);
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(79, 70, 229, 0.05);
+            color: var(--text-primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn var(--transition-base);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group small {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            font-size: 15px;
+            transition: all var(--transition-fast);
+            background: var(--bg-primary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 24px;
+            margin: 28px 0;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 500;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid transparent;
+            transition: all var(--transition-fast);
+        }
+
+        .checkbox-group label:hover {
+            border-color: var(--border-color);
+            background: var(--bg-tertiary);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        button.primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 18px 32px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            width: 100%;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        button.primary:active {
+            transform: translateY(0);
+        }
+
+        button.primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 18px 20px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            display: none;
+            font-size: 15px;
+            font-weight: 500;
+            animation: slideDown var(--transition-base);
+            align-items: flex-start;
+            gap: 14px;
+            line-height: 1.5;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.active {
+            display: flex;
+        }
+
+        .alert.info {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #1E40AF;
+        }
+
+        .alert.success {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #047857;
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #991B1B;
+        }
+
+        .alert i {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ============================================
+           LOADING
+        ============================================ */
+        .loading {
+            text-align: center;
+            padding: 80px;
+            color: white;
+            display: none;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+            margin: 40px auto;
+            max-width: 500px;
+        }
+
+        .loading.active {
+            display: block;
+            animation: fadeIn var(--transition-base);
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+        }
+
+        /* ============================================
+           MEETING INFO
+        ============================================ */
+        .meeting-info {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            display: none;
+            box-shadow: var(--shadow-md);
+            animation: slideUp var(--transition-base);
+            border: 1px solid var(--border-color);
+        }
+
+        .meeting-info.active {
+            display: block;
+        }
+
+        .meeting-info h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .info-item {
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+
+        .info-item:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-item strong {
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item span {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ============================================
+           VIDEO CONTAINER - ADVANCED LAYOUT
+        ============================================ */
+        .video-container {
+            display: none;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            margin-top: 20px;
+            animation: slideUp var(--transition-slow);
+            border: 1px solid rgba(229, 231, 235, 0.3);
+        }
+
+        .video-container.active {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 180px);
+            min-height: 700px;
+        }
+
+        #video-wrapper {
+            flex: 1;
+            display: flex;
+            background: #0F172A;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-slow);
+        }
+
+        /* MAIN SCREEN AREA */
+        #main-screen {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-slow);
+            overflow: hidden;
+        }
+
+        #main-screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            transition: all var(--transition-base);
+        }
+
+        #main-screen .main-placeholder {
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+            flex-direction: column;
+            gap: 24px;
+            padding: 40px;
+        }
+
+        #main-screen .main-placeholder.active {
+            display: flex;
+            animation: fadeIn var(--transition-base);
+        }
+
+        #main-screen .main-placeholder .main-avatar {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 72px;
+            font-weight: 800;
+            font-family: 'Manrope', sans-serif;
+            box-shadow: 0 20px 60px rgba(79, 70, 229, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #main-screen .main-placeholder .main-name {
+            color: white;
+            font-size: 36px;
+            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+            text-align: center;
+        }
+
+        #main-screen .main-placeholder .main-status {
+            color: #94A3B8;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* PRESENTER PICTURE-IN-PICTURE (when screen sharing) */
+        #presenter-pip {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            width: 280px;
+            height: 160px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid var(--primary-color);
+            background: #1E293B;
+            z-index: 20;
+            opacity: 0;
+            transform: scale(0.8) translateY(-10px);
+            transition: all var(--transition-base);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        #presenter-pip.active {
+            display: block;
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        #presenter-pip video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #presenter-pip .pip-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #presenter-pip .pip-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #presenter-pip .pip-label {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* PARTICIPANTS SIDEBAR */
+        #participants-sidebar {
+            width: 320px;
+            background: #0F172A;
+            border-left: 1px solid #1E293B;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 16px;
+            overflow-y: auto;
+            transition: all var(--transition-base);
+            position: relative;
+        }
+
+        .screen-sharing #participants-sidebar {
+            width: 280px;
+        }
+
+        #participants-sidebar .sidebar-header {
+            color: #94A3B8;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1E293B;
+        }
+
+        #participants-sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #participants-sidebar::-webkit-scrollbar-track {
+            background: #1E293B;
+            border-radius: 4px;
+        }
+
+        #participants-sidebar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        #participants-sidebar::-webkit-scrollbar-thumb:hover {
+            background: #64748B;
+        }
+
+        .participant-tile {
+            position: relative;
+            background: #1E293B;
+            border-radius: 16px;
+            overflow: hidden;
+            height: 200px;
+            border: 2px solid transparent;
+            transition: all var(--transition-base);
+            cursor: pointer;
+        }
+
+        .participant-tile:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .participant-tile.active-speaker {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { border-color: var(--success-color); }
+            50% { border-color: rgba(16, 185, 129, 0.5); }
+        }
+
+        .participant-tile.is-host {
+            border-color: var(--warning-color);
+        }
+
+        .participant-tile.you {
+            border-color: var(--primary-color);
+        }
+
+        .participant-tile video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all var(--transition-base);
+        }
+
+        .participant-tile .video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #334155 0%, #1E293B 100%);
+        }
+
+        .participant-tile .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .participant-tile .participant-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .participant-tile .participant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .participant-tile .participant-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .participant-tile .participant-status {
+            color: #94A3B8;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .participant-tile .status-icon {
+            font-size: 10px;
+        }
+
+        .participant-tile .audio-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--danger-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+        }
+
+        .participant-tile .audio-indicator.active {
+            background: var(--success-color);
+        }
+
+        /* GRID LAYOUT FOR PARTICIPANTS */
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .grid-tile {
+            background: #1E293B;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all var(--transition-base);
+        }
+
+        .grid-tile.active-speaker {
+            border-color: var(--success-color);
+        }
+
+        .grid-tile.is-host {
+            border-color: var(--warning-color);
+        }
+
+        .grid-tile video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ============================================
+           CONTROLS
+        ============================================ */
+        .controls {
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+            backdrop-filter: blur(10px);
+            padding: 24px 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 22px;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-btn.mute.active,
+        .control-btn.video.active {
+            background: var(--danger-color);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .control-btn.screenshare.active {
+            background: var(--primary-color);
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.2);
+            animation: pulse-shadow 2s infinite;
+        }
+
+        @keyframes pulse-shadow {
+            0%, 100% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.2); }
+            50% { box-shadow: 0 0 0 12px rgba(79, 70, 229, 0.1); }
+        }
+
+        .control-btn.leave {
+            background: var(--danger-color);
+            color: white;
+            width: 68px;
+            height: 68px;
+            font-size: 24px;
+        }
+
+        .control-btn.leave:hover {
+            background: #DC2626;
+            transform: scale(1.1);
+        }
+
+        .control-label {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-fast);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-btn:hover .control-label {
+            opacity: 1;
+        }
+
+        .control-shortcut {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-left: 4px;
+        }
+
+        /* ============================================
+           PARTICIPANTS LIST
+        ============================================ */
+        .participants-list {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            padding: 28px;
+            margin-top: 24px;
+            display: none;
+            box-shadow: var(--shadow-md);
+            animation: slideUp var(--transition-base);
+            border: 1px solid var(--border-color);
+        }
+
+        .participants-list.active {
+            display: block;
+        }
+
+        .participants-list h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .participants-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .participants-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .participants-container::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        .participants-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .participant-item {
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all var(--transition-fast);
+            border: 1px solid transparent;
+        }
+
+        .participant-item:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+        .participant-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            font-family: 'Manrope', sans-serif;
+            flex-shrink: 0;
+        }
+
+        .participant-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .participant-info .name {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .participant-info .status {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .participant-status-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .participant-status-icon.muted {
+            background: var(--danger-color);
+        }
+
+        .participant-status-icon.host {
+            background: var(--warning-color);
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+        ============================================ */
+        @media (max-width: 1200px) {
+            #participants-sidebar {
+                width: 260px;
+            }
+            
+            .screen-sharing #participants-sidebar {
+                width: 240px;
+            }
+            
+            #presenter-pip {
+                width: 240px;
+                height: 135px;
+            }
+            
+            .grid-tile {
+                aspect-ratio: 4/3;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .video-container.active {
+                height: calc(100vh - 140px);
+            }
+            
+            #video-wrapper {
+                flex-direction: column;
+            }
+            
+            #main-screen {
+                height: 60%;
+            }
+            
+            #participants-sidebar {
+                width: 100%;
+                height: 40%;
+                border-left: none;
+                border-top: 1px solid #1E293B;
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 16px;
+            }
+            
+            .participant-tile {
+                min-width: 180px;
+                height: 100%;
+            }
+            
+            .screen-sharing #participants-sidebar {
+                width: 100%;
+                height: 30%;
+            }
+            
+            #presenter-pip {
+                width: 200px;
+                height: 112px;
+                top: 16px;
+                left: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .login-container {
+                padding: 32px 24px;
+                margin: 20px auto;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                padding: 20px 16px;
+                gap: 16px;
+            }
+            
+            .control-btn {
+                width: 52px;
+                height: 52px;
+                font-size: 20px;
+            }
+            
+            .control-btn.leave {
+                width: 56px;
+                height: 56px;
+            }
+            
+            .checkbox-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                width: 100%;
+            }
+            
+            #main-screen .main-placeholder .main-avatar {
+                width: 140px;
+                height: 140px;
+                font-size: 56px;
+            }
+            
+            #main-screen .main-placeholder .main-name {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            
+            .header .info {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .login-container h2 {
+                font-size: 28px;
+            }
+            
+            .alert {
+                padding: 16px;
+                font-size: 14px;
+            }
+            
+            #presenter-pip {
+                width: 160px;
+                height: 90px;
+                top: 12px;
+                left: 12px;
+            }
+            
+            .control-label {
+                display: none;
+            }
+        }
+
+        /* ============================================
+           ACCESSIBILITY
+        ============================================ */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Focus styles for keyboard navigation */
+        button:focus-visible,
+        input:focus-visible {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.2);
+        }
+
+        /* ============================================
+           ANIMATIONS & UTILITIES
+        ============================================ */
+        .fade-in {
+            animation: fadeIn var(--transition-base);
+        }
+
+        .slide-up {
+            animation: slideUp var(--transition-base);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .shimmer {
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* ============================================
+           SCREEN SHARING LAYOUT STATES
+        ============================================ */
+        .screen-sharing #main-screen {
+            background: #000;
+        }
+
+        .screen-sharing .participant-tile {
+            height: 160px;
+        }
+
+        /* Active speaker highlight */
+        .active-speaker-highlight {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 20px;
+            border: 4px solid var(--success-color);
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            animation: highlight-pulse 2s infinite;
+        }
+
+        @keyframes highlight-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Screen sharing badge */
+        .screen-share-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 5;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <span class="logo"><i class="fas fa-video"></i></span>
+            <span>GetStream Video Meeting</span>
+        </h1>
+        <div class="info" id="headerInfo">
+            <span class="status-indicator"></span>
+            <span>Ready to connect</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Login Section -->
+        <div class="login-container" id="loginSection">
+            <h2>Join a Meeting</h2>
+            <p class="subtitle">Create a new meeting or join an existing one. Experience professional video conferencing with real-time collaboration.</p>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('create')" aria-label="Create Meeting Tab">
+                    <i class="fas fa-plus-circle"></i>
+                    Create Meeting
+                </button>
+                <button class="tab" onclick="switchTab('join')" aria-label="Join Meeting Tab">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Join Meeting
+                </button>
+            </div>
+
+            <!-- Authentication (shared) -->
+            <div class="input-group">
+                <label for="jwtToken">
+                    <i class="fas fa-key"></i>
+                    JWT Token
+                </label>
+                <input type="password" id="jwtToken" placeholder="Paste your JWT token here..." autocomplete="off">
+                <small>Get this from your authentication response or backend API</small>
+            </div>
+
+            <!-- Create Tab -->
+            <div class="tab-content active" id="createTab">
+                <div class="alert info active">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>Create a new instant meeting and get a Meeting ID to share with others. All meetings are encrypted and secure.</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="meetingTitle">
+                        <i class="fas fa-heading"></i>
+                        Meeting Title
+                    </label>
+                    <input type="text" id="meetingTitle" placeholder="e.g., Daily Standup, Team Sync, Client Review" value="Quick Meeting">
+                </div>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="waitingRoom">
+                        <span>
+                            <i class="fas fa-door-closed"></i>
+                            Enable Waiting Room
+                        </span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="recording">
+                        <span>
+                            <i class="fas fa-record-vinyl"></i>
+                            Enable Recording
+                        </span>
+                    </label>
+                </div>
+
+                <button class="primary" onclick="createMeeting()">
+                    <i class="fas fa-video"></i>
+                    Create & Join Meeting
+                </button>
+            </div>
+
+            <!-- Join Tab -->
+            <div class="tab-content" id="joinTab">
+                <div class="alert info active">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>Enter the numeric Meeting ID to join an existing meeting. You'll need permission from the host if waiting room is enabled.</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="meetingId">
+                        <i class="fas fa-hashtag"></i>
+                        Meeting ID (Number)
+                    </label>
+                    <input type="number" id="meetingId" placeholder="e.g., 12345">
+                    <small>This is the numeric ID provided by the meeting creator, not the meeting title</small>
+                </div>
+
+                <button class="primary" onclick="joinMeeting()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Join Meeting
+                </button>
+            </div>
+
+            <!-- Error/Success Messages -->
+            <div class="alert error" id="errorAlert"></div>
+            <div class="alert success" id="successAlert"></div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loadingSection">
+            <div class="spinner"></div>
+            <p>Establishing secure connection...</p>
+        </div>
+
+        <!-- Meeting Info -->
+        <div class="meeting-info" id="meetingInfo">
+            <h3><i class="fas fa-info-circle"></i> Meeting Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div>
+                        <strong><i class="fas fa-hashtag"></i> Meeting ID:</strong>
+                        <span id="displayMeetingId">-</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('displayMeetingId')">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+                <div class="info-item">
+                    <div>
+                        <strong><i class="fas fa-phone-alt"></i> Call ID:</strong>
+                        <span id="displayCallId">-</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('displayCallId')">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+                <div class="info-item">
+                    <div>
+                        <strong><i class="fas fa-link"></i> Meeting Link:</strong>
+                        <span id="displayMeetingLink" style="font-size: 12px;">-</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('displayMeetingLink')">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Container -->
+        <div class="video-container" id="videoContainer">
+            <div id="video-wrapper">
+                <!-- Main Screen (shows active speaker or screen share) -->
+                <div id="main-screen">
+                    <video id="main-video" autoplay playsinline></video>
+                    <div id="main-placeholder" class="main-placeholder">
+                        <div class="main-avatar"></div>
+                        <div class="main-name"></div>
+                        <div class="main-status">Waiting for participants...</div>
+                    </div>
+                    
+                    <!-- Presenter PIP (shown when screen sharing) -->
+                    <div id="presenter-pip">
+                        <video id="pip-video" autoplay muted playsinline></video>
+                        <div class="pip-overlay">
+                            <div class="pip-name">
+                                <i class="fas fa-user"></i>
+                                <span id="pip-name">You</span>
+                            </div>
+                            <div class="pip-label">Presenting</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Participants Sidebar -->
+                <div id="participants-sidebar">
+                    <div class="sidebar-header">
+                        <span>Participants</span>
+                        <span id="participantCount">0</span>
+                    </div>
+                    <!-- Participant tiles will be added here dynamically -->
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <button class="control-btn mute" id="muteBtn" onclick="toggleMute()" aria-label="Toggle Microphone">
+                    <i class="fas fa-microphone"></i>
+                    <span class="control-label">Mute <span class="control-shortcut">(M)</span></span>
+                </button>
+                <button class="control-btn video" id="videoBtn" onclick="toggleVideo()" aria-label="Toggle Camera">
+                    <i class="fas fa-video"></i>
+                    <span class="control-label">Video <span class="control-shortcut">(V)</span></span>
+                </button>
+                <button class="control-btn screenshare" id="screenBtn" onclick="toggleScreenShare()" aria-label="Share Screen">
+                    <i class="fas fa-desktop"></i>
+                    <span class="control-label">Share Screen <span class="control-shortcut">(S)</span></span>
+                </button>
+                <button class="control-btn leave" onclick="leaveMeeting()" aria-label="Leave Meeting">
+                    <i class="fas fa-phone-slash"></i>
+                    <span class="control-label">Leave</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Participants List -->
+        <div class="participants-list" id="participantsList">
+            <h3>
+                <i class="fas fa-users"></i>
+                <span>Participants (<span id="participantCountList">0</span>)</span>
+            </h3>
+            <div class="participants-container" id="participantsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // CORRECTED API CONFIGURATION
+        const API_BASE_URL = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev';
+        
+        // State management
+        let streamClient = null;
+        let call = null;
+        let localStream = null;
+        let screenStream = null;
+        let isMuted = false;
+        let isVideoOff = false;
+        let isScreenSharing = false;
+        let currentMeetingId = null;
+        let currentUserId = null;
+        let currentUserName = null;
+        let participants = new Map(); // userId -> participant data
+        let activeSpeakerId = null;
+        let currentPresenterId = null;
+
+        // UI state
+        let layoutMode = 'normal'; // 'normal' or 'screen-sharing'
+
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'create') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('createTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('joinTab').classList.add('active');
+            }
+
+            hideAlerts();
+        }
+
+        async function createMeeting() {
+            const token = document.getElementById('jwtToken').value;
+            const title = document.getElementById('meetingTitle').value;
+            const waitingRoom = document.getElementById('waitingRoom').checked;
+            const recording = document.getElementById('recording').checked;
+
+            if (!token) {
+                showError('Please enter your JWT token');
+                return;
+            }
+
+            showLoading(true);
+            hideAlerts();
+
+            try {
+                // CORRECTED: Send data in request body, not as query params
+                const response = await fetch(`${API_BASE_URL}/api/meetings/instant`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'  // Skip ngrok warning page
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        waitingRoomEnabled: waitingRoom,
+                        recordingEnabled: recording
+                    })
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to create meeting';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.message || errorMsg;
+                    } catch (e) {
+                        const text = await response.text();
+                        errorMsg = text || `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                const data = await response.json();
+                console.log('Meeting created:', data);
+
+                showSuccess(`Meeting created successfully! ID: ${data.meetingId}`);
+
+                currentMeetingId = data.meetingId;
+                await initializeMeeting(data.callCredentials, data.meetingId);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function joinMeeting() {
+            const token = document.getElementById('jwtToken').value;
+            const meetingId = document.getElementById('meetingId').value;
+
+            if (!token) {
+                showError('Please enter your JWT token');
+                return;
+            }
+
+            if (!meetingId) {
+                showError('Please enter a meeting ID');
+                return;
+            }
+
+            if (isNaN(meetingId) || meetingId.includes(' ')) {
+                showError('Meeting ID must be a number');
+                return;
+            }
+
+            showLoading(true);
+            hideAlerts();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/meetings/${meetingId}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to join meeting';
+                    try {
+                        const error = await response.json();
+                        errorMsg = error.message || errorMsg;
+                    } catch (e) {
+                        const text = await response.text();
+                        errorMsg = text || `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                const data = await response.json();
+                console.log('Joined meeting:', data);
+
+                if (!data.callCredentials) {
+                    throw new Error('No call credentials received');
+                }
+
+                currentMeetingId = meetingId;
+                await initializeMeeting(data.callCredentials, meetingId);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function initializeMeeting(credentials, meetingId) {
+            try {
+                // Get local media
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                // Store current user info
+                currentUserId = credentials.userId;
+                currentUserName = credentials.userName || 'You';
+
+                // Initialize participants map with current user
+                participants.set(currentUserId, {
+                    id: currentUserId,
+                    name: currentUserName,
+                    isLocal: true,
+                    isHost: true,
+                    stream: localStream,
+                    isMuted: false,
+                    isVideoOff: false,
+                    isPresenting: false
+                });
+
+                // Update UI
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('videoContainer').classList.add('active');
+                document.getElementById('participantsList').classList.add('active');
+                document.getElementById('meetingInfo').classList.add('active');
+
+                // Update meeting info
+                document.getElementById('displayMeetingId').textContent = meetingId;
+                document.getElementById('displayCallId').textContent = credentials.callId;
+                document.getElementById('displayMeetingLink').textContent = credentials.meetingLink || 'N/A';
+                document.getElementById('headerInfo').innerHTML = `
+                    <span class="status-indicator"></span>
+                    <span>In meeting: ${credentials.callId}</span>
+                `;
+
+                // Set initial layout (host as active speaker)
+                activeSpeakerId = currentUserId;
+                updateLayout();
+
+                // Start active speaker detection simulation
+                startActiveSpeakerSimulation();
+
+                console.log('Video meeting initialized successfully');
+                
+            } catch (error) {
+                console.error('Error initializing video:', error);
+                showError('Failed to access camera/microphone: ' + error.message);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // LAYOUT MANAGEMENT
+        // ============================================
+
+        function updateLayout() {
+            const mainVideo = document.getElementById('main-video');
+            const mainPlaceholder = document.getElementById('main-placeholder');
+            const mainAvatar = mainPlaceholder.querySelector('.main-avatar');
+            const mainName = mainPlaceholder.querySelector('.main-name');
+            const pipVideo = document.getElementById('pip-video');
+            const presenterPip = document.getElementById('presenter-pip');
+            const pipName = document.getElementById('pip-name');
+            const participantsSidebar = document.getElementById('participants-sidebar');
+            const videoContainer = document.getElementById('videoContainer');
+            const participantCount = document.getElementById('participantCount');
+            const participantCountList = document.getElementById('participantCountList');
+
+            // Update counts
+            participantCount.textContent = participants.size;
+            participantCountList.textContent = participants.size;
+
+            // Clear sidebar
+            participantsSidebar.innerHTML = `
+                <div class="sidebar-header">
+                    <span>Participants</span>
+                    <span id="participantCount">${participants.size}</span>
+                </div>
+            `;
+
+            if (isScreenSharing) {
+                // SCREEN SHARING MODE
+                layoutMode = 'screen-sharing';
+                videoContainer.classList.add('screen-sharing');
+                currentPresenterId = currentUserId;
+                
+                // Main screen shows the screen share
+                if (screenStream) {
+                    mainVideo.srcObject = screenStream;
+                    mainVideo.muted = true;
+                    mainVideo.style.display = 'block';
+                    mainPlaceholder.classList.remove('active');
+                    
+                    // Add screen share badge
+                    if (!document.querySelector('.screen-share-badge')) {
+                        const badge = document.createElement('div');
+                        badge.className = 'screen-share-badge';
+                        badge.innerHTML = '<i class="fas fa-desktop"></i> Screen Sharing';
+                        mainVideo.parentElement.appendChild(badge);
+                    }
+                }
+
+                // Show presenter in PIP
+                presenterPip.classList.add('active');
+                pipVideo.srcObject = localStream;
+                pipName.textContent = currentUserName;
+
+                // All other participants in sidebar
+                participants.forEach((participant, userId) => {
+                    if (userId !== currentUserId) {
+                        addParticipantToSidebar(participant);
+                    }
+                });
+
+            } else {
+                // NORMAL MODE
+                layoutMode = 'normal';
+                videoContainer.classList.remove('screen-sharing');
+                presenterPip.classList.remove('active');
+                currentPresenterId = null;
+                
+                // Remove screen share badge
+                const badge = document.querySelector('.screen-share-badge');
+                if (badge) badge.remove();
+
+                // Main screen shows active speaker (or host if no active speaker)
+                const activeSpeaker = participants.get(activeSpeakerId) || participants.get(currentUserId);
+                if (activeSpeaker) {
+                    if (activeSpeaker.stream && !activeSpeaker.isVideoOff) {
+                        // Show video
+                        mainVideo.srcObject = activeSpeaker.stream;
+                        mainVideo.muted = activeSpeaker.isLocal;
+                        mainVideo.style.display = 'block';
+                        mainPlaceholder.classList.remove('active');
+                        
+                        // Add active speaker highlight
+                        if (!activeSpeaker.isLocal) {
+                            const highlight = document.createElement('div');
+                            highlight.className = 'active-speaker-highlight';
+                            mainVideo.parentElement.appendChild(highlight);
+                        }
+                    } else {
+                        // Show placeholder with name and avatar
+                        mainVideo.style.display = 'none';
+                        mainPlaceholder.classList.add('active');
+                        mainAvatar.textContent = activeSpeaker.name.charAt(0).toUpperCase();
+                        mainName.textContent = activeSpeaker.name + (activeSpeaker.isLocal ? ' (You)' : '');
+                        
+                        // Remove highlight if exists
+                        const highlight = document.querySelector('.active-speaker-highlight');
+                        if (highlight) highlight.remove();
+                    }
+                }
+
+                // All other participants in sidebar
+                participants.forEach((participant, userId) => {
+                    if (userId !== activeSpeakerId) {
+                        addParticipantToSidebar(participant);
+                    }
+                });
+            }
+
+            // Update participants list
+            updateParticipantsList();
+        }
+
+        function addParticipantToSidebar(participant) {
+            const sidebar = document.getElementById('participants-sidebar');
+            
+            const tile = document.createElement('div');
+            tile.className = 'participant-tile';
+            tile.id = `participant-${participant.id}`;
+            
+            if (participant.id === activeSpeakerId) {
+                tile.classList.add('active-speaker');
+            }
+            if (participant.isHost) {
+                tile.classList.add('is-host');
+            }
+            if (participant.isLocal) {
+                tile.classList.add('you');
+            }
+
+            // Video or placeholder
+            if (participant.stream && !participant.isVideoOff) {
+                const video = document.createElement('video');
+                video.autoplay = true;
+                video.playsinline = true;
+                video.muted = participant.isLocal;
+                video.srcObject = participant.stream;
+                tile.appendChild(video);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'video-placeholder';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar';
+                avatar.textContent = participant.name.charAt(0).toUpperCase();
+                
+                placeholder.appendChild(avatar);
+                tile.appendChild(placeholder);
+            }
+
+            // Participant overlay with info
+            const overlay = document.createElement('div');
+            overlay.className = 'participant-overlay';
+            
+            const info = document.createElement('div');
+            info.className = 'participant-info';
+            
+            const name = document.createElement('div');
+            name.className = 'participant-name';
+            name.innerHTML = `
+                <i class="fas fa-user"></i>
+                <span>${participant.name}${participant.isLocal ? ' (You)' : ''}</span>
+            `;
+            
+            const status = document.createElement('div');
+            status.className = 'participant-status';
+            status.innerHTML = `
+                <span class="status-icon">${participant.isMuted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>'}</span>
+                <span>${participant.isHost ? 'Host' : 'Participant'}</span>
+            `;
+            
+            info.appendChild(name);
+            info.appendChild(status);
+            overlay.appendChild(info);
+            
+            // Audio indicator
+            const audioIndicator = document.createElement('div');
+            audioIndicator.className = `audio-indicator ${participant.isMuted ? '' : 'active'}`;
+            audioIndicator.innerHTML = participant.isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+            overlay.appendChild(audioIndicator);
+            
+            tile.appendChild(overlay);
+
+            // Host badge
+            if (participant.isHost) {
+                const badge = document.createElement('div');
+                badge.className = 'host-badge';
+                badge.innerHTML = '<i class="fas fa-crown"></i> HOST';
+                tile.appendChild(badge);
+            }
+
+            // Click to make active speaker (only in normal mode)
+            if (!isScreenSharing) {
+                tile.addEventListener('click', () => {
+                    if (participant.id !== activeSpeakerId) {
+                        activeSpeakerId = participant.id;
+                        updateLayout();
+                    }
+                });
+            }
+
+            sidebar.appendChild(tile);
+        }
+
+        function updateParticipantsList() {
+            const container = document.getElementById('participantsContainer');
+            container.innerHTML = '';
+
+            participants.forEach(participant => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'participant-avatar';
+                avatar.textContent = participant.name.charAt(0).toUpperCase();
+                
+                const info = document.createElement('div');
+                info.className = 'participant-info';
+                
+                const name = document.createElement('div');
+                name.className = 'name';
+                name.innerHTML = `
+                    ${participant.name}${participant.isLocal ? ' (You)' : ''}
+                    ${participant.isHost ? '<i class="fas fa-crown" style="color: #F59E0B;"></i>' : ''}
+                `;
+                
+                const status = document.createElement('div');
+                status.className = 'status';
+                status.innerHTML = `
+                    <span class="participant-status-icon ${participant.isMuted ? 'muted' : ''} ${participant.isHost ? 'host' : ''}"></span>
+                    <span>${participant.isMuted ? 'Muted' : 'Speaking'} • ${participant.isVideoOff ? 'Camera off' : 'Camera on'}</span>
+                `;
+                
+                info.appendChild(name);
+                info.appendChild(status);
+                
+                item.appendChild(avatar);
+                item.appendChild(info);
+                container.appendChild(item);
+            });
+        }
+
+        // ============================================
+        // ACTIVE SPEAKER DETECTION SIMULATION
+        // ============================================
+
+        function startActiveSpeakerSimulation() {
+            // This simulates active speaker detection
+            // In a real app, this would come from the video SDK
+            setInterval(() => {
+                if (!isScreenSharing && participants.size > 1) {
+                    // Randomly switch active speaker (excluding yourself sometimes)
+                    const participantArray = Array.from(participants.keys());
+                    const otherParticipants = participantArray.filter(id => id !== currentUserId);
+                    
+                    if (otherParticipants.length > 0 && Math.random() > 0.7) {
+                        const newSpeaker = otherParticipants[Math.floor(Math.random() * otherParticipants.length)];
+                        if (newSpeaker !== activeSpeakerId) {
+                            activeSpeakerId = newSpeaker;
+                            updateLayout();
+                        }
+                    }
+                }
+            }, 5000);
+        }
+
+        // ============================================
+        // MEDIA CONTROLS
+        // ============================================
+
+        function toggleMute() {
+            if (!localStream) return;
+
+            const audioTrack = localStream.getAudioTracks()[0];
+            if (audioTrack) {
+                isMuted = !isMuted;
+                audioTrack.enabled = !isMuted;
+                
+                const btn = document.getElementById('muteBtn');
+                btn.classList.toggle('active', isMuted);
+                btn.querySelector('i').className = isMuted ? 'fas fa-microphone-slash' : 'fas fa-microphone';
+
+                // Update participant data
+                const localParticipant = participants.get(currentUserId);
+                if (localParticipant) {
+                    localParticipant.isMuted = isMuted;
+                    updateLayout();
+                }
+            }
+        }
+
+        function toggleVideo() {
+            if (!localStream) return;
+
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                isVideoOff = !isVideoOff;
+                videoTrack.enabled = !isVideoOff;
+                
+                const btn = document.getElementById('videoBtn');
+                btn.classList.toggle('active', isVideoOff);
+                btn.querySelector('i').className = isVideoOff ? 'fas fa-video-slash' : 'fas fa-video';
+
+                // Update participant data
+                const localParticipant = participants.get(currentUserId);
+                if (localParticipant) {
+                    localParticipant.isVideoOff = isVideoOff;
+                    updateLayout();
+                }
+            }
+        }
+
+        async function toggleScreenShare() {
+            try {
+                if (!isScreenSharing) {
+                    // Start screen sharing
+                    screenStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: {
+                            cursor: 'always',
+                            displaySurface: 'monitor',
+                            logicalSurface: true
+                        },
+                        audio: false
+                    });
+                    
+                    isScreenSharing = true;
+                    document.getElementById('screenBtn').classList.add('active');
+                    
+                    // Handle when user stops sharing via browser UI
+                    screenStream.getVideoTracks()[0].onended = () => {
+                        stopScreenShare();
+                    };
+
+                    updateLayout();
+                    
+                } else {
+                    stopScreenShare();
+                }
+            } catch (error) {
+                console.error('Screen share error:', error);
+                if (error.name !== 'NotAllowedError') {
+                    showError('Failed to share screen: ' + error.message);
+                }
+            }
+        }
+
+        function stopScreenShare() {
+            if (screenStream) {
+                screenStream.getTracks().forEach(track => track.stop());
+                screenStream = null;
+            }
+            
+            isScreenSharing = false;
+            document.getElementById('screenBtn').classList.remove('active');
+            updateLayout();
+        }
+
+        async function leaveMeeting() {
+            // Stop all media
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (screenStream) {
+                screenStream.getTracks().forEach(track => track.stop());
+            }
+
+            // Notify backend
+            if (currentMeetingId) {
+                const token = document.getElementById('jwtToken').value;
+                try {
+                    await fetch(`${API_BASE_URL}/api/meetings/${currentMeetingId}/leave`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'ngrok-skip-browser-warning': 'true'
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error leaving meeting:', error);
+                }
+            }
+
+            // Reset state
+            localStream = null;
+            screenStream = null;
+            currentMeetingId = null;
+            currentUserId = null;
+            currentUserName = null;
+            participants.clear();
+            activeSpeakerId = null;
+            currentPresenterId = null;
+            isMuted = false;
+            isVideoOff = false;
+            isScreenSharing = false;
+            layoutMode = 'normal';
+
+            // Reset UI
+            document.getElementById('videoContainer').classList.remove('active', 'screen-sharing');
+            document.getElementById('meetingInfo').classList.remove('active');
+            document.getElementById('participantsList').classList.remove('active');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('headerInfo').innerHTML = `
+                <span class="status-indicator"></span>
+                <span>Ready to connect</span>
+            `;
+
+            // Reset controls
+            document.getElementById('muteBtn').classList.remove('active');
+            document.getElementById('muteBtn').querySelector('i').className = 'fas fa-microphone';
+            document.getElementById('videoBtn').classList.remove('active');
+            document.getElementById('videoBtn').querySelector('i').className = 'fas fa-video';
+            document.getElementById('screenBtn').classList.remove('active');
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function copyText(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('Copied to clipboard!');
+            }).catch(err => {
+                showError('Failed to copy');
+            });
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingSection').classList.toggle('active', show);
+            if (show) {
+                document.getElementById('loginSection').style.display = 'none';
+            } else {
+                if (!document.getElementById('videoContainer').classList.contains('active')) {
+                    document.getElementById('loginSection').style.display = 'block';
+                }
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorAlert');
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i><div>${message}</div>`;
+            errorDiv.classList.add('active');
+            
+            setTimeout(() => {
+                errorDiv.classList.remove('active');
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successAlert');
+            successDiv.innerHTML = `<i class="fas fa-check-circle"></i><div>${message}</div>`;
+            successDiv.classList.add('active');
+            
+            setTimeout(() => {
+                successDiv.classList.remove('active');
+            }, 3000);
+        }
+
+        function hideAlerts() {
+            document.getElementById('errorAlert').classList.remove('active');
+            document.getElementById('successAlert').classList.remove('active');
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        document.getElementById('jwtToken').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab.id === 'createTab') {
+                    document.getElementById('meetingTitle').focus();
+                } else {
+                    document.getElementById('meetingId').focus();
+                }
+            }
+        });
+
+        document.getElementById('meetingTitle').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') createMeeting();
+        });
+
+        document.getElementById('meetingId').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') joinMeeting();
+        });
+
+        // Keyboard shortcuts (when in meeting)
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('videoContainer').classList.contains('active')) return;
+            
+            // Prevent shortcuts when typing in input fields
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            switch(e.key.toLowerCase()) {
+                case 'm':
+                    toggleMute();
+                    e.preventDefault();
+                    break;
+                case 'v':
+                    toggleVideo();
+                    e.preventDefault();
+                    break;
+                case 's':
+                    toggleScreenShare();
+                    e.preventDefault();
+                    break;
+                case 'escape':
+                    if (isScreenSharing) {
+                        stopScreenShare();
+                    }
+                    break;
+            }
+        });
+
+        // Initialize
+        console.log('GetStream Video Meeting App Initialized');
+        console.log('Keyboard shortcuts: M = mute, V = video, S = screen share, ESC = stop sharing');
+        
+        // Add demo participants for testing
+        window.addDemoParticipant = function() {
+            const demoId = 'demo-' + Date.now();
+            const names = ['Alex Johnson', 'Sam Wilson', 'Taylor Smith', 'Jordan Lee', 'Casey Brown'];
+            const name = names[Math.floor(Math.random() * names.length)];
+            
+            participants.set(demoId, {
+                id: demoId,
+                name: name,
+                isLocal: false,
+                isHost: false,
+                stream: null,
+                isMuted: Math.random() > 0.5,
+                isVideoOff: Math.random() > 0.5,
+                isPresenting: false
+            });
+            
+            updateLayout();
+            showSuccess(`Demo participant "${name}" joined`);
+        };
+    </script>
+</body>
+</html>
