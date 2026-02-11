@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Video Meeting - WebRTC Direct</title>
+    <title>Video Meeting - Complete</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -196,16 +196,125 @@
             flex-direction: column;
         }
 
+        /* NEW: Main content area - splits into presentation and participants */
+        .video-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        /* NEW: Screen share main stage */
+        .screen-share-stage {
+            display: none;
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .screen-share-stage.active {
+            display: block;
+        }
+
+        .screen-share-stage video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* NEW: Picture-in-Picture presenter overlay */
+        .pip-overlay {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 240px;
+            height: 180px;
+            background: #1E293B;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border: 3px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+
+        .pip-overlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pip-overlay .video-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+
+        .pip-overlay .video-overlay {
+            padding: 8px;
+        }
+
+        .pip-overlay .video-name {
+            font-size: 12px;
+        }
+
+        .pip-overlay .video-status i {
+            font-size: 12px;
+        }
+
+        /* Modified: Participants strip below screen share */
+        .participants-strip {
+            display: none;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 4px 0;
+            height: 140px;
+        }
+
+        .participants-strip.active {
+            display: flex;
+        }
+
+        .participants-strip .video-tile {
+            min-width: 180px;
+            max-width: 180px;
+            height: 130px;
+            flex-shrink: 0;
+        }
+
+        .participants-strip .video-avatar {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        .participants-strip .video-overlay {
+            padding: 8px;
+        }
+
+        .participants-strip .video-name {
+            font-size: 11px;
+        }
+
+        .participants-strip .video-status i {
+            font-size: 11px;
+        }
+
+        /* Original grid - shows when no screen share */
         #video-grid {
             flex: 1;
             display: grid;
             gap: 8px;
-            padding: 16px;
             overflow-y: auto;
             background: #1E293B;
+            min-height: 0;
         }
 
-        /* Responsive grid - adjusts based on participant count */
         #video-grid.participants-1 {
             grid-template-columns: 1fr;
         }
@@ -235,7 +344,7 @@
 
         .video-tile {
             position: relative;
-            background: #334155;
+            background: #1E293B;
             border-radius: 12px;
             overflow: hidden;
             display: flex;
@@ -295,13 +404,136 @@
             font-size: 14px;
         }
 
+        .screen-share-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #EF4444;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 5;
+        }
+
+        /* ENHANCED: More realistic reactions */
+        .reaction-overlay {
+            position: absolute;
+            font-size: 80px;
+            pointer-events: none;
+            z-index: 15;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        }
+
+        .reaction-float {
+            animation: reactionFloat 3s ease-out forwards;
+        }
+
+        .reaction-burst {
+            animation: reactionBurst 2s ease-out forwards;
+        }
+
+        .reaction-bounce {
+            animation: reactionBounce 2.5s ease-out forwards;
+        }
+
+        .reaction-spin {
+            animation: reactionSpin 2s ease-out forwards;
+        }
+
+        @keyframes reactionFloat {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                transform: translate(-50%, -50%) scale(1.3) rotate(10deg);
+                opacity: 1;
+            }
+            20% {
+                transform: translate(-50%, -50%) scale(1.1) rotate(-5deg);
+            }
+            100% {
+                transform: translate(-50%, -150%) scale(1) rotate(0deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes reactionBurst {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            15% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 1;
+            }
+            30% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes reactionBounce {
+            0% {
+                transform: translate(-50%, -200%) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            40% {
+                transform: translate(-50%, -80%) scale(1);
+            }
+            55% {
+                transform: translate(-50%, -60%) scale(1.1);
+            }
+            70% {
+                transform: translate(-50%, -70%) scale(1);
+            }
+            85% {
+                transform: translate(-50%, -65%) scale(1.05);
+            }
+            100% {
+                transform: translate(-50%, -70%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes reactionSpin {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            15% {
+                transform: translate(-50%, -50%) scale(1.3) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -120%) scale(1) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         .controls {
             background: #0F172A;
             padding: 16px;
             display: flex;
             justify-content: center;
-            gap: 16px;
+            align-items: center;
+            gap: 12px;
             border-top: 1px solid #334155;
+            flex-wrap: wrap;
         }
 
         .control-btn {
@@ -317,6 +549,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .control-btn:hover {
@@ -333,6 +566,41 @@
 
         .control-btn.leave {
             background: #EF4444;
+        }
+
+        .emoji-picker {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            gap: 8px;
+            flex-wrap: wrap;
+            max-width: 280px;
+        }
+
+        .emoji-picker.active {
+            display: flex;
+        }
+
+        .emoji-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: transparent;
+            font-size: 28px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .emoji-btn:hover {
+            background: #F3F4F6;
+            transform: scale(1.1);
         }
 
         .meeting-info {
@@ -409,10 +677,29 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Mobile optimizations */
         @media (max-width: 768px) {
-            #video-grid {
+            .video-content {
                 padding: 8px;
+            }
+
+            .pip-overlay {
+                width: 160px;
+                height: 120px;
+                top: 8px;
+                right: 8px;
+            }
+
+            .participants-strip {
+                height: 100px;
+            }
+
+            .participants-strip .video-tile {
+                min-width: 140px;
+                max-width: 140px;
+                height: 95px;
+            }
+
+            #video-grid {
                 gap: 6px;
             }
 
@@ -440,7 +727,11 @@
             }
 
             .controls {
-                gap: 12px;
+                gap: 8px;
+            }
+
+            .reaction-overlay {
+                font-size: 60px;
             }
         }
 
@@ -542,14 +833,45 @@
         </div>
 
         <div class="video-container" id="videoContainer">
-            <div id="video-grid" class="participants-1"></div>
+            <div class="video-content">
+                <!-- Screen share main stage -->
+                <div class="screen-share-stage" id="screenStage">
+                    <!-- Screen share video will be added here -->
+                    <!-- Presenter's face will be in PIP overlay -->
+                </div>
+
+                <!-- Participants strip (shown when screen sharing) -->
+                <div class="participants-strip" id="participantsStrip">
+                    <!-- Other participants shown here during screen share -->
+                </div>
+
+                <!-- Regular grid (shown when no screen share) -->
+                <div id="video-grid" class="participants-1"></div>
+            </div>
             
+            <div class="emoji-picker" id="emojiPicker">
+                <button class="emoji-btn" onclick="sendReaction('👍')">👍</button>
+                <button class="emoji-btn" onclick="sendReaction('❤️')">❤️</button>
+                <button class="emoji-btn" onclick="sendReaction('😂')">😂</button>
+                <button class="emoji-btn" onclick="sendReaction('😮')">😮</button>
+                <button class="emoji-btn" onclick="sendReaction('👏')">👏</button>
+                <button class="emoji-btn" onclick="sendReaction('🎉')">🎉</button>
+                <button class="emoji-btn" onclick="sendReaction('🔥')">🔥</button>
+                <button class="emoji-btn" onclick="sendReaction('✨')">✨</button>
+            </div>
+
             <div class="controls">
                 <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Mute">
                     <i class="fas fa-microphone"></i>
                 </button>
                 <button class="control-btn" id="videoBtn" onclick="toggleVideo()" title="Video">
                     <i class="fas fa-video"></i>
+                </button>
+                <button class="control-btn" id="screenBtn" onclick="toggleScreenShare()" title="Share Screen">
+                    <i class="fas fa-desktop"></i>
+                </button>
+                <button class="control-btn" id="emojiBtn" onclick="toggleEmojiPicker()" title="Reactions">
+                    <i class="fas fa-smile"></i>
                 </button>
                 <button class="control-btn leave" onclick="leaveMeeting()" title="Leave">
                     <i class="fas fa-phone-slash"></i>
@@ -573,7 +895,7 @@
         let localStream = null;
         let isMuted = false;
         let isVideoOff = false;
-        const participants = new Map(); // participantId -> { video, audio, stream }
+        let isScreenSharing = false;
 
         function log(msg, data = null) {
             console.log(`[APP] ${msg}`, data || '');
@@ -673,7 +995,6 @@
 
         async function initCall(credentials, meetingId) {
             try {
-                // Wait for SDK
                 await new Promise(resolve => {
                     if (window.sdkLoaded) resolve();
                     else setTimeout(resolve, 2000);
@@ -685,26 +1006,23 @@
 
                 log('Getting local media...');
                 
-                // Get local media FIRST
                 localStream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30 },
                         facingMode: 'user'
                     },
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        autoGainControl: true
+                        autoGainControl: true,
+                        sampleRate: 48000
                     }
                 });
 
-                log('Local media obtained', {
-                    video: localStream.getVideoTracks().length,
-                    audio: localStream.getAudioTracks().length
-                });
+                log('✅ Local media obtained');
 
-                // Create client
                 const { apiKey, userId, userName, token, callId } = credentials;
                 
                 log('Creating client...');
@@ -720,24 +1038,24 @@
                 log('Joining call...');
                 await call.join({ create: true });
                 
-                log('✅ Joined call successfully');
+                log('✅ Joined call');
 
-                // Enable local media
+                log('Enabling camera...');
                 await call.camera.enable();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                log('Enabling microphone...');
                 await call.microphone.enable();
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 log('✅ Media enabled');
 
-                // Setup event listeners
                 setupEventListeners();
 
-                // Wait for streams to stabilize
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 3000));
 
-                // Render initial participants
                 renderAllParticipants();
 
-                // Show UI
                 showVideoUI(meetingId);
 
             } catch (err) {
@@ -750,48 +1068,36 @@
         function setupEventListeners() {
             log('Setting up listeners...');
 
-            // Participant list changes
             call.state.participants$.subscribe((participantList) => {
-                log('Participants changed', { count: participantList.length });
-                
-                // Delay to allow streams to attach
-                setTimeout(() => {
-                    renderAllParticipants();
-                }, 1000);
-            });
-
-            // Track published
-            call.on('track.published', (event) => {
-                log('Track published', event);
+                log('📊 Participants changed', { count: participantList.length });
                 setTimeout(() => renderAllParticipants(), 1000);
             });
 
-            // Track unpublished
+            call.on('track.published', (event) => {
+                log('📹 Track published', event);
+                setTimeout(() => renderAllParticipants(), 1000);
+            });
+
             call.on('track.unpublished', (event) => {
                 log('Track unpublished', event);
                 setTimeout(() => renderAllParticipants(), 500);
             });
 
-            // Participant joined
             call.on('participant.joined', (event) => {
-                log('Participant joined', event.participant);
-                setTimeout(() => renderAllParticipants(), 1500);
+                log('✅ Participant joined', event.participant?.name);
+                setTimeout(() => renderAllParticipants(), 2000);
             });
 
-            // Participant left
             call.on('participant.left', (event) => {
-                log('Participant left', event.participant);
-                
-                // Cleanup
-                const id = event.participant?.userId;
-                if (participants.has(id)) {
-                    const p = participants.get(id);
-                    if (p.video) p.video.srcObject = null;
-                    if (p.audio) p.audio.srcObject = null;
-                    participants.delete(id);
-                }
-                
+                log('❌ Participant left', event.participant?.name);
                 renderAllParticipants();
+            });
+
+            call.on('custom', (event) => {
+                if (event.type === 'reaction') {
+                    log('😊 Reaction received', event);
+                    showReaction(event.user.id, event.custom.emoji);
+                }
             });
 
             log('✅ Event listeners setup');
@@ -800,24 +1106,138 @@
         function renderAllParticipants() {
             if (!call) return;
 
-            const grid = document.getElementById('video-grid');
             const participantList = Array.from(call.state.participants.values());
             
-            log('Rendering participants', { 
-                count: participantList.length,
-                participants: participantList.map(p => ({
-                    id: p.userId,
-                    name: p.name,
-                    isLocal: p.isLocalParticipant,
-                    hasVideo: !!p.videoStream,
-                    hasAudio: !!p.audioStream
-                }))
+            log('🎨 Rendering participants', { count: participantList.length });
+
+            // Check if anyone is screen sharing
+            const screenSharers = participantList.filter(p => {
+                const stream = p.screenShareStream;
+                return stream && 
+                       stream.getVideoTracks().length > 0 &&
+                       stream.getVideoTracks()[0].enabled &&
+                       stream.getVideoTracks()[0].readyState === 'live';
             });
+
+            const isAnyoneScreenSharing = screenSharers.length > 0;
+
+            if (isAnyoneScreenSharing) {
+                renderScreenShareLayout(participantList, screenSharers[0]);
+            } else {
+                renderGridLayout(participantList);
+            }
+        }
+
+        function renderScreenShareLayout(participantList, screenSharer) {
+            log('🖥️ Rendering screen share layout');
+
+            const stage = document.getElementById('screenStage');
+            const strip = document.getElementById('participantsStrip');
+            const grid = document.getElementById('video-grid');
+
+            // Show screen share layout
+            stage.classList.add('active');
+            strip.classList.add('active');
+            grid.style.display = 'none';
+
+            // Clear previous content
+            stage.innerHTML = '';
+            strip.innerHTML = '';
+
+            // Add screen share to stage
+            const screenStream = screenSharer.screenShareStream;
+            const screenVideo = document.createElement('video');
+            screenVideo.autoplay = true;
+            screenVideo.playsInline = true;
+            screenVideo.muted = true;
+            screenVideo.srcObject = screenStream;
+            screenVideo.style.objectFit = 'contain';
+            stage.appendChild(screenVideo);
+
+            screenVideo.play().catch(err => log('Screen play failed', err));
+
+            // Add badge
+            const badge = document.createElement('div');
+            badge.className = 'screen-share-badge';
+            badge.innerHTML = `<i class="fas fa-desktop"></i> ${screenSharer.name || 'User'} is presenting`;
+            stage.appendChild(badge);
+
+            // Add presenter's video as PIP overlay
+            const presenterVideo = screenSharer.videoStream;
+            const hasPresenterVideo = presenterVideo && 
+                                     presenterVideo.getVideoTracks().length > 0 &&
+                                     presenterVideo.getVideoTracks()[0].enabled &&
+                                     presenterVideo.getVideoTracks()[0].readyState === 'live';
+
+            if (hasPresenterVideo) {
+                const pip = document.createElement('div');
+                pip.className = 'pip-overlay';
+
+                const pipVideo = document.createElement('video');
+                pipVideo.autoplay = true;
+                pipVideo.playsInline = true;
+                pipVideo.muted = screenSharer.isLocalParticipant;
+                pipVideo.srcObject = presenterVideo;
+                pip.appendChild(pipVideo);
+
+                pipVideo.play().catch(err => log('PIP video failed', err));
+
+                // Add overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'video-overlay';
+                overlay.innerHTML = `<div class="video-name">${screenSharer.name || 'User'}</div>`;
+                pip.appendChild(overlay);
+
+                stage.appendChild(pip);
+            } else {
+                // Show avatar in PIP
+                const pip = document.createElement('div');
+                pip.className = 'pip-overlay';
+
+                const avatar = document.createElement('div');
+                avatar.className = 'video-avatar';
+                const initial = (screenSharer.name || 'U').charAt(0).toUpperCase();
+                avatar.textContent = initial;
+                pip.appendChild(avatar);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'video-overlay';
+                overlay.innerHTML = `<div class="video-name">${screenSharer.name || 'User'}</div>`;
+                pip.appendChild(overlay);
+
+                stage.appendChild(pip);
+            }
+
+            // Add all other participants to strip
+            participantList.forEach(participant => {
+                // Skip screen sharer's screen share tile
+                if (participant.userId === screenSharer.userId) {
+                    return; // Already in PIP
+                }
+
+                const tile = createStripTile(participant);
+                strip.appendChild(tile);
+            });
+
+            log('✅ Screen share layout rendered');
+        }
+
+        function renderGridLayout(participantList) {
+            log('🎨 Rendering grid layout');
+
+            const stage = document.getElementById('screenStage');
+            const strip = document.getElementById('participantsStrip');
+            const grid = document.getElementById('video-grid');
+
+            // Show grid layout
+            stage.classList.remove('active');
+            strip.classList.remove('active');
+            grid.style.display = 'grid';
 
             // Clear grid
             grid.innerHTML = '';
 
-            // Update grid class for responsive layout
+            // Update grid class
             grid.className = `participants-${Math.min(participantList.length, 9)}`;
 
             // Render each participant
@@ -826,7 +1246,76 @@
                 grid.appendChild(tile);
             });
 
-            log(`✅ Rendered ${participantList.length} participants`);
+            log(`✅ Grid rendered with ${participantList.length} participants`);
+        }
+
+        function createStripTile(participant) {
+            const tile = document.createElement('div');
+            tile.className = 'video-tile';
+            tile.id = `strip-tile-${participant.userId}`;
+
+            const name = participant.name || participant.userId || 'Guest';
+            const initial = name.charAt(0).toUpperCase();
+            const isLocal = participant.isLocalParticipant;
+
+            const videoStream = participant.videoStream;
+            const hasVideo = videoStream && 
+                            videoStream.getVideoTracks().length > 0 &&
+                            videoStream.getVideoTracks()[0].enabled &&
+                            videoStream.getVideoTracks()[0].readyState === 'live';
+
+            const audioStream = participant.audioStream;
+            const hasAudio = audioStream && 
+                            audioStream.getAudioTracks().length > 0 &&
+                            audioStream.getAudioTracks()[0].enabled &&
+                            audioStream.getAudioTracks()[0].readyState === 'live';
+
+            if (hasVideo) {
+                const video = document.createElement('video');
+                video.autoplay = true;
+                video.playsInline = true;
+                video.muted = isLocal;
+                video.srcObject = videoStream;
+                tile.appendChild(video);
+
+                video.onloadedmetadata = () => {
+                    video.play().catch(err => setTimeout(() => video.play(), 500));
+                };
+            } else {
+                const avatar = document.createElement('div');
+                avatar.className = 'video-avatar';
+                avatar.textContent = initial;
+                tile.appendChild(avatar);
+            }
+
+            if (hasAudio && !isLocal) {
+                const audio = document.createElement('audio');
+                audio.autoplay = true;
+                audio.srcObject = audioStream;
+                tile.appendChild(audio);
+                audio.play().catch(err => log('Audio failed', err));
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'video-overlay';
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'video-name';
+            nameDiv.textContent = name + (isLocal ? ' (You)' : '');
+
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'video-status';
+
+            const micIcon = document.createElement('i');
+            micIcon.className = hasAudio ? 'fas fa-microphone' : 'fas fa-microphone-slash';
+            if (!hasAudio) micIcon.style.color = '#EF4444';
+            statusDiv.appendChild(micIcon);
+
+            overlay.appendChild(nameDiv);
+            overlay.appendChild(statusDiv);
+            tile.appendChild(overlay);
+
+            return tile;
         }
 
         function createParticipantTile(participant) {
@@ -838,47 +1327,41 @@
             const initial = name.charAt(0).toUpperCase();
             const isLocal = participant.isLocalParticipant;
 
-            // Get streams
             const videoStream = participant.videoStream;
-            const audioStream = participant.audioStream;
-
             const hasVideo = videoStream && 
                             videoStream.getVideoTracks().length > 0 &&
                             videoStream.getVideoTracks()[0].enabled &&
                             videoStream.getVideoTracks()[0].readyState === 'live';
 
+            const audioStream = participant.audioStream;
             const hasAudio = audioStream && 
                             audioStream.getAudioTracks().length > 0 &&
                             audioStream.getAudioTracks()[0].enabled &&
                             audioStream.getAudioTracks()[0].readyState === 'live';
 
-            log(`Creating tile for ${name}`, { hasVideo, hasAudio, isLocal });
-
-            // VIDEO element
             if (hasVideo) {
                 const video = document.createElement('video');
                 video.autoplay = true;
                 video.playsInline = true;
-                video.muted = isLocal; // Mute local to prevent echo
+                video.muted = isLocal;
                 video.srcObject = videoStream;
                 video.id = `video-${participant.userId}`;
                 
                 tile.appendChild(video);
 
-                video.play().catch(err => {
-                    log('Video play failed', err);
-                });
-
-                log(`✅ Video added for ${name}`);
+                video.onloadedmetadata = () => {
+                    video.play().catch(err => {
+                        log('Video play failed, retrying...', err);
+                        setTimeout(() => video.play(), 500);
+                    });
+                };
             } else {
-                // Show avatar
                 const avatar = document.createElement('div');
                 avatar.className = 'video-avatar';
                 avatar.textContent = initial;
                 tile.appendChild(avatar);
             }
 
-            // AUDIO element - SEPARATE, only for REMOTE participants
             if (hasAudio && !isLocal) {
                 const audio = document.createElement('audio');
                 audio.autoplay = true;
@@ -889,19 +1372,14 @@
 
                 audio.play().catch(err => {
                     log('Audio play failed', err);
-                    
-                    // Retry on user interaction
-                    const retryPlay = () => {
+                    const retry = () => {
                         audio.play().catch(e => log('Audio retry failed', e));
-                        document.removeEventListener('click', retryPlay);
+                        document.removeEventListener('click', retry);
                     };
-                    document.addEventListener('click', retryPlay, { once: true });
+                    document.addEventListener('click', retry, { once: true });
                 });
-
-                log(`✅ Audio added for ${name}`);
             }
 
-            // Overlay with name and status
             const overlay = document.createElement('div');
             overlay.className = 'video-overlay';
 
@@ -912,13 +1390,11 @@
             const statusDiv = document.createElement('div');
             statusDiv.className = 'video-status';
 
-            // Mic icon
             const micIcon = document.createElement('i');
             micIcon.className = hasAudio ? 'fas fa-microphone' : 'fas fa-microphone-slash';
             if (!hasAudio) micIcon.style.color = '#EF4444';
             statusDiv.appendChild(micIcon);
 
-            // Video icon
             if (hasVideo) {
                 const vidIcon = document.createElement('i');
                 vidIcon.className = 'fas fa-video';
@@ -980,15 +1456,102 @@
             }
         }
 
+        async function toggleScreenShare() {
+            if (!call || !call.screenShare) {
+                showError('Screen sharing not available');
+                return;
+            }
+
+            try {
+                if (isScreenSharing) {
+                    await call.screenShare.disable();
+                    isScreenSharing = false;
+                    document.getElementById('screenBtn').classList.remove('active');
+                    log('Screen share stopped');
+                    showSuccess('Stopped sharing screen');
+                } else {
+                    await call.screenShare.enable();
+                    isScreenSharing = true;
+                    document.getElementById('screenBtn').classList.add('active');
+                    log('Screen share started');
+                    showSuccess('Sharing your screen');
+                }
+
+                setTimeout(() => renderAllParticipants(), 1000);
+            } catch (err) {
+                log('Screen share failed', err);
+                if (err.name !== 'NotAllowedError') {
+                    showError('Failed to share screen');
+                }
+            }
+        }
+
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            picker.classList.toggle('active');
+        }
+
+        async function sendReaction(emoji) {
+            if (!call) return;
+
+            try {
+                await call.sendCustomEvent({
+                    type: 'reaction',
+                    emoji: emoji
+                });
+
+                log('Sent reaction', emoji);
+
+                const localParticipant = Array.from(call.state.participants.values())
+                    .find(p => p.isLocalParticipant);
+                if (localParticipant) {
+                    showReaction(localParticipant.userId, emoji);
+                }
+
+                document.getElementById('emojiPicker').classList.remove('active');
+            } catch (err) {
+                log('Send reaction failed', err);
+            }
+        }
+
+        function showReaction(userId, emoji) {
+            // Find the tile - could be in grid, strip, or stage (PIP)
+            let tile = document.getElementById(`tile-${userId}`) ||
+                      document.getElementById(`strip-tile-${userId}`);
+            
+            // If user is presenting, show on the stage
+            if (!tile) {
+                const stage = document.getElementById('screenStage');
+                if (stage.classList.contains('active')) {
+                    tile = stage;
+                }
+            }
+
+            if (!tile) return;
+
+            const reaction = document.createElement('div');
+            reaction.className = 'reaction-overlay';
+            reaction.textContent = emoji;
+
+            // Randomize animation type
+            const animations = ['reaction-float', 'reaction-burst', 'reaction-bounce', 'reaction-spin'];
+            const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+            reaction.classList.add(randomAnim);
+
+            // Random position variation
+            const randomX = 30 + Math.random() * 40; // 30-70%
+            const randomY = 30 + Math.random() * 40; // 30-70%
+            reaction.style.left = `${randomX}%`;
+            reaction.style.top = `${randomY}%`;
+
+            tile.appendChild(reaction);
+
+            // Remove after animation
+            setTimeout(() => reaction.remove(), 3000);
+        }
+
         async function leaveMeeting() {
             log('Leaving meeting...');
-
-            // Cleanup
-            participants.forEach((p) => {
-                if (p.video) p.video.srcObject = null;
-                if (p.audio) p.audio.srcObject = null;
-            });
-            participants.clear();
 
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
@@ -998,7 +1561,6 @@
                 await call.leave();
             }
 
-            // Reset UI
             document.getElementById('videoContainer').classList.remove('active');
             document.getElementById('meetingInfo').classList.remove('active');
             document.getElementById('loginBox').style.display = 'block';
@@ -1030,7 +1592,7 @@
             document.getElementById('loading').classList.toggle('active', show);
             if (show) {
                 document.getElementById('loginBox').style.display = 'none';
-            } else {
+            } else if (!document.getElementById('videoContainer').classList.contains('active')) {
                 document.getElementById('loginBox').style.display = 'block';
             }
         }
@@ -1065,6 +1627,15 @@
             switchTab('join');
             log('Auto-filled meeting ID', meetingId);
         }
+
+        // Close emoji picker on outside click
+        document.addEventListener('click', (e) => {
+            const picker = document.getElementById('emojiPicker');
+            const emojiBtn = document.getElementById('emojiBtn');
+            if (!picker.contains(e.target) && !emojiBtn.contains(e.target)) {
+                picker.classList.remove('active');
+            }
+        });
 
         log('✅ App initialized');
     </script>
