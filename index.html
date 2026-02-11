@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GetStream Video Meeting - Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,12 +42,13 @@
             min-height: 100vh;
             color: var(--text-primary);
             line-height: 1.5;
+            overflow-x: hidden;
         }
 
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 16px 24px;
+            padding: 12px 16px;
             box-shadow: var(--shadow-md);
             display: flex;
             justify-content: space-between;
@@ -60,30 +61,30 @@
 
         .header h1 {
             font-family: 'Manrope', sans-serif;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 800;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         .header .logo {
-            font-size: 28px;
+            font-size: 22px;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .header .info {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            gap: 6px;
+            padding: 6px 12px;
             background: var(--bg-secondary);
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 500;
             border: 1px solid var(--border-color);
         }
@@ -110,16 +111,16 @@
         .container {
             max-width: 1600px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 16px;
         }
 
         .login-container {
             background: var(--bg-primary);
-            border-radius: 24px;
+            border-radius: 20px;
             box-shadow: var(--shadow-xl);
             max-width: 600px;
-            margin: 40px auto;
-            padding: 48px;
+            margin: 20px auto;
+            padding: 32px 24px;
             animation: slideUp var(--transition-slow) ease-out;
             border: 1px solid rgba(229, 231, 235, 0.8);
         }
@@ -137,7 +138,7 @@
 
         .login-container h2 {
             font-family: 'Manrope', sans-serif;
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 800;
             color: var(--text-primary);
             margin-bottom: 8px;
@@ -148,41 +149,40 @@
 
         .subtitle {
             color: var(--text-secondary);
-            font-size: 15px;
-            margin-bottom: 32px;
+            font-size: 14px;
+            margin-bottom: 24px;
             line-height: 1.6;
         }
 
         .tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
+            gap: 6px;
+            margin-bottom: 24px;
             background: var(--bg-secondary);
-            padding: 6px;
-            border-radius: 14px;
+            padding: 4px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
         }
 
         .tab {
             flex: 1;
-            padding: 14px 24px;
+            padding: 12px 16px;
             background: transparent;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             transition: all var(--transition-base);
             border-radius: 10px;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .tab i {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .tab.active {
@@ -190,11 +190,6 @@
             color: var(--primary-color);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
-        }
-
-        .tab:hover:not(.active) {
-            background: rgba(79, 70, 229, 0.05);
-            color: var(--text-primary);
         }
 
         .tab-content {
@@ -212,12 +207,12 @@
         }
 
         .input-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: var(--text-primary);
             font-weight: 600;
             font-size: 14px;
@@ -229,16 +224,16 @@
         .input-group small {
             display: block;
             color: var(--text-secondary);
-            font-size: 13px;
-            margin-top: 8px;
+            font-size: 12px;
+            margin-top: 6px;
             line-height: 1.5;
         }
 
         .input-group input {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: 2px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 12px;
             font-size: 15px;
             transition: all var(--transition-fast);
             background: var(--bg-primary);
@@ -253,34 +248,31 @@
 
         .checkbox-group {
             display: flex;
-            gap: 24px;
-            margin: 28px 0;
+            gap: 12px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
 
         .checkbox-group label {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
             color: var(--text-primary);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
-            padding: 10px 16px;
+            padding: 10px 14px;
             background: var(--bg-secondary);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid transparent;
             transition: all var(--transition-fast);
-        }
-
-        .checkbox-group label:hover {
-            border-color: var(--border-color);
-            background: var(--bg-tertiary);
+            flex: 1;
+            min-width: 140px;
         }
 
         .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             accent-color: var(--primary-color);
         }
@@ -289,48 +281,40 @@
             background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: 18px 32px;
-            border-radius: 14px;
-            font-size: 16px;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all var(--transition-base);
             width: 100%;
             box-shadow: var(--shadow-md);
-            position: relative;
-            overflow: hidden;
             font-family: 'Inter', sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-        }
-
-        button.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            gap: 10px;
         }
 
         button.primary:active {
-            transform: translateY(0);
+            transform: scale(0.98);
         }
 
         button.primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            transform: none;
         }
 
         .alert {
-            padding: 18px 20px;
-            border-radius: 14px;
-            margin-bottom: 24px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             display: none;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             animation: slideDown var(--transition-base);
             align-items: flex-start;
-            gap: 14px;
+            gap: 12px;
             line-height: 1.5;
         }
 
@@ -368,19 +352,19 @@
         }
 
         .alert i {
-            font-size: 20px;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
         .loading {
             text-align: center;
-            padding: 80px;
+            padding: 60px 20px;
             color: white;
             display: none;
             background: rgba(15, 23, 42, 0.8);
-            border-radius: 24px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
-            margin: 40px auto;
+            margin: 20px auto;
             max-width: 500px;
         }
 
@@ -393,10 +377,10 @@
             border: 4px solid rgba(255, 255, 255, 0.1);
             border-top: 4px solid white;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 24px;
+            margin: 0 auto 20px;
             box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
         }
 
@@ -406,16 +390,16 @@
         }
 
         .loading p {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 500;
             color: white;
         }
 
         .meeting-info {
             background: var(--bg-primary);
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 24px;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
             display: none;
             box-shadow: var(--shadow-md);
             animation: slideUp var(--transition-base);
@@ -428,35 +412,28 @@
 
         .meeting-info h3 {
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 16px;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
 
         .info-item {
             background: var(--bg-secondary);
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
             border: 1px solid var(--border-color);
-            transition: all var(--transition-fast);
-        }
-
-        .info-item:hover {
-            background: var(--bg-tertiary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
         }
 
         .info-item strong {
@@ -464,45 +441,44 @@
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 14px;
         }
 
         .info-item span {
             font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            word-break: break-all;
         }
 
         .copy-btn {
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             transition: all var(--transition-fast);
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
         }
 
-        .copy-btn:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
-            box-shadow: var(--shadow-sm);
+        .copy-btn:active {
+            transform: scale(0.95);
         }
 
         .video-container {
             display: none;
-            border-radius: 24px;
+            border-radius: 16px;
             overflow: hidden;
             box-shadow: var(--shadow-xl);
-            margin-top: 20px;
+            margin-top: 16px;
             animation: slideUp var(--transition-slow);
             border: 1px solid rgba(229, 231, 235, 0.3);
         }
@@ -510,13 +486,14 @@
         .video-container.active {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 180px);
-            min-height: 700px;
+            height: calc(100vh - 140px);
+            min-height: 400px;
         }
 
         #video-wrapper {
             flex: 1;
             display: flex;
+            flex-direction: column;
             background: #0F172A;
             position: relative;
             overflow: hidden;
@@ -532,38 +509,34 @@
         }
 
         #participants-sidebar {
-            width: 320px;
+            width: 100%;
+            max-height: 180px;
             background: #0F172A;
-            border-left: 1px solid #1E293B;
+            border-top: 1px solid #1E293B;
             display: flex;
-            flex-direction: column;
-            padding: 20px;
-            gap: 16px;
-            overflow-y: auto;
+            flex-direction: row;
+            padding: 12px;
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         #participants-sidebar .sidebar-header {
-            color: #94A3B8;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #1E293B;
+            display: none;
         }
 
         .participant-tile {
             position: relative;
             background: #1E293B;
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
-            height: 200px;
+            min-width: 120px;
+            height: 150px;
             border: 2px solid transparent;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .participant-tile video {
@@ -573,14 +546,14 @@
         }
 
         .participant-avatar {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4F46E5, #7C3AED);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: white;
             text-transform: uppercase;
@@ -592,7 +565,7 @@
             left: 0;
             right: 0;
             background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            padding: 16px;
+            padding: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -600,38 +573,38 @@
 
         .participant-name {
             color: white;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
         }
 
         .participant-status {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .participant-status i {
-            font-size: 14px;
+            font-size: 12px;
             color: white;
         }
 
         .controls {
             background: linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
             backdrop-filter: blur(10px);
-            padding: 24px 32px;
+            padding: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .control-btn {
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            font-size: 22px;
+            font-size: 20px;
             transition: all var(--transition-base);
             display: flex;
             align-items: center;
@@ -641,9 +614,8 @@
             border: 2px solid transparent;
         }
 
-        .control-btn:hover {
-            transform: scale(1.1);
-            background: rgba(255, 255, 255, 0.2);
+        .control-btn:active {
+            transform: scale(0.9);
         }
 
         .control-btn.active {
@@ -652,55 +624,8 @@
 
         .control-btn.leave {
             background: var(--danger-color);
-            width: 68px;
-            height: 68px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            padding: 48px;
-            max-width: 500px;
-            text-align: center;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        .modal-content h2 {
-            margin-bottom: 16px;
-            font-size: 24px;
-            color: var(--text-primary);
-        }
-
-        .modal-content p {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        .waiting-spinner {
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 24px auto;
+            width: 60px;
+            height: 60px;
         }
 
         .main-video-container {
@@ -719,17 +644,280 @@
         }
 
         .main-participant-avatar {
-            width: 200px;
-            height: 200px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4F46E5, #7C3AED);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 96px;
+            font-size: 48px;
             font-weight: 700;
             color: white;
             text-transform: uppercase;
+        }
+
+        /* Desktop styles */
+        @media (min-width: 768px) {
+            .header {
+                padding: 16px 24px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header .logo {
+                font-size: 28px;
+            }
+
+            .header .info {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .container {
+                padding: 24px;
+            }
+
+            .login-container {
+                padding: 48px;
+                margin: 40px auto;
+            }
+
+            .login-container h2 {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+                margin-bottom: 32px;
+            }
+
+            .tabs {
+                gap: 8px;
+                margin-bottom: 32px;
+                padding: 6px;
+            }
+
+            .tab {
+                padding: 14px 24px;
+                font-size: 15px;
+            }
+
+            .tab i {
+                font-size: 18px;
+            }
+
+            .input-group {
+                margin-bottom: 24px;
+            }
+
+            .input-group input {
+                padding: 16px;
+            }
+
+            .checkbox-group {
+                gap: 24px;
+                margin: 28px 0;
+            }
+
+            .checkbox-group label {
+                font-size: 15px;
+                padding: 10px 16px;
+                flex: initial;
+            }
+
+            button.primary {
+                padding: 18px 32px;
+                font-size: 16px;
+            }
+
+            .alert {
+                padding: 18px 20px;
+                font-size: 15px;
+            }
+
+            .meeting-info {
+                padding: 28px;
+                margin-bottom: 24px;
+            }
+
+            .meeting-info h3 {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 16px;
+            }
+
+            .info-item {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .copy-btn {
+                width: auto;
+                padding: 10px 18px;
+            }
+
+            .video-container.active {
+                height: calc(100vh - 180px);
+                min-height: 700px;
+            }
+
+            #video-wrapper {
+                flex-direction: row;
+            }
+
+            #main-screen {
+                flex: 1;
+            }
+
+            #participants-sidebar {
+                width: 320px;
+                max-height: none;
+                border-left: 1px solid #1E293B;
+                border-top: none;
+                flex-direction: column;
+                padding: 20px;
+                gap: 16px;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            #participants-sidebar .sidebar-header {
+                display: flex;
+                color: #94A3B8;
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+                justify-content: space-between;
+                align-items: center;
+                padding-bottom: 12px;
+                border-bottom: 1px solid #1E293B;
+            }
+
+            .participant-tile {
+                min-width: auto;
+                width: 100%;
+                height: 200px;
+            }
+
+            .participant-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+
+            .participant-overlay {
+                padding: 16px;
+            }
+
+            .participant-name {
+                font-size: 14px;
+            }
+
+            .participant-status i {
+                font-size: 14px;
+            }
+
+            .controls {
+                padding: 24px 32px;
+                gap: 20px;
+            }
+
+            .control-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 22px;
+            }
+
+            .control-btn.leave {
+                width: 68px;
+                height: 68px;
+            }
+
+            .main-participant-avatar {
+                width: 200px;
+                height: 200px;
+                font-size: 96px;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 12px;
+            font-size: 20px;
+            color: var(--text-primary);
+        }
+
+        .modal-content p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .waiting-spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                padding: 48px;
+                max-width: 500px;
+            }
+
+            .modal-content h2 {
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
+
+            .modal-content p {
+                margin-bottom: 24px;
+                font-size: 15px;
+            }
+
+            .waiting-spinner {
+                margin: 24px auto;
+            }
         }
     </style>
 </head>
@@ -737,11 +925,11 @@
     <div class="header">
         <h1>
             <span class="logo"><i class="fas fa-video"></i></span>
-            <span>GetStream Video Meeting</span>
+            <span>Video Meeting</span>
         </h1>
         <div class="info" id="headerInfo">
             <span class="status-indicator"></span>
-            <span>Ready to connect</span>
+            <span>Ready</span>
         </div>
     </div>
 
@@ -753,11 +941,11 @@
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('create')">
                     <i class="fas fa-plus-circle"></i>
-                    Create Meeting
+                    Create
                 </button>
                 <button class="tab" onclick="switchTab('join')">
                     <i class="fas fa-sign-in-alt"></i>
-                    Join Meeting
+                    Join
                 </button>
             </div>
 
@@ -787,11 +975,11 @@
                 <div class="checkbox-group">
                     <label>
                         <input type="checkbox" id="waitingRoom">
-                        <span><i class="fas fa-door-closed"></i> Enable Waiting Room</span>
+                        <span><i class="fas fa-door-closed"></i> Waiting Room</span>
                     </label>
                     <label>
                         <input type="checkbox" id="recording">
-                        <span><i class="fas fa-record-vinyl"></i> Enable Recording</span>
+                        <span><i class="fas fa-record-vinyl"></i> Recording</span>
                     </label>
                 </div>
 
@@ -827,14 +1015,14 @@
 
         <div class="loading" id="loadingSection">
             <div class="spinner"></div>
-            <p>Establishing secure connection...</p>
+            <p>Connecting...</p>
         </div>
 
         <div class="meeting-info" id="meetingInfo">
-            <h3><i class="fas fa-info-circle"></i> Meeting Information</h3>
+            <h3><i class="fas fa-info-circle"></i> Meeting Info</h3>
             <div class="info-grid">
                 <div class="info-item">
-                    <div>
+                    <div style="flex: 1;">
                         <strong><i class="fas fa-hashtag"></i> Meeting ID:</strong>
                         <span id="displayMeetingId">-</span>
                     </div>
@@ -843,9 +1031,9 @@
                     </button>
                 </div>
                 <div class="info-item">
-                    <div>
+                    <div style="flex: 1;">
                         <strong><i class="fas fa-link"></i> Meeting Link:</strong>
-                        <span id="displayMeetingLink" style="font-size: 12px;">-</span>
+                        <span id="displayMeetingLink">-</span>
                     </div>
                     <button class="copy-btn" onclick="copyText('displayMeetingLink')">
                         <i class="fas fa-copy"></i> Copy
@@ -866,16 +1054,16 @@
             </div>
 
             <div class="controls">
-                <button class="control-btn" id="muteBtn" onclick="toggleMute()">
+                <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Mute/Unmute">
                     <i class="fas fa-microphone"></i>
                 </button>
-                <button class="control-btn" id="videoBtn" onclick="toggleVideo()">
+                <button class="control-btn" id="videoBtn" onclick="toggleVideo()" title="Camera On/Off">
                     <i class="fas fa-video"></i>
                 </button>
-                <button class="control-btn" id="screenBtn" onclick="toggleScreenShare()">
+                <button class="control-btn" id="screenBtn" onclick="toggleScreenShare()" title="Share Screen">
                     <i class="fas fa-desktop"></i>
                 </button>
-                <button class="control-btn leave" onclick="leaveMeeting()">
+                <button class="control-btn leave" onclick="leaveMeeting()" title="Leave Meeting">
                     <i class="fas fa-phone-slash"></i>
                 </button>
             </div>
@@ -894,13 +1082,8 @@
         </div>
     </div>
 
-    <!-- Logger Script - Must load first -->
+    <!-- Logger Script -->
     <script>
-/**
- * Comprehensive Logging System for GetStream Video Meeting App
- * Tracks initialization, errors, participant events, media states, and performance
- */
-
 class MeetingLogger {
     constructor(config = {}) {
         this.config = {
@@ -908,24 +1091,19 @@ class MeetingLogger {
             enableStorage: config.enableStorage !== false,
             maxStoredLogs: config.maxStoredLogs || 500,
             logLevel: config.logLevel || 'debug',
-            enableTimestamp: config.enableTimestamp !== false,
-            enableStackTrace: config.enableStackTrace !== false,
             categoryColors: {
                 init: '#4F46E5',
                 error: '#EF4444',
                 media: '#10B981',
                 participant: '#F59E0B',
                 network: '#3B82F6',
-                ui: '#8B5CF6',
-                performance: '#EC4899'
+                ui: '#8B5CF6'
             }
         };
 
         this.logs = [];
-        this.sessionId = this.generateSessionId();
+        this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         this.startTime = Date.now();
-        this.eventCounts = {};
-        this.errorCounts = {};
         
         this.logLevels = {
             debug: 0,
@@ -934,26 +1112,7 @@ class MeetingLogger {
             error: 3
         };
 
-        if (this.config.enableStorage) {
-            this.initStorage();
-        }
-
         this.log('init', 'Logger initialized', { sessionId: this.sessionId });
-    }
-
-    generateSessionId() {
-        return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-
-    initStorage() {
-        try {
-            const stored = localStorage.getItem('meetingLogs');
-            if (stored) {
-                this.logs = JSON.parse(stored).slice(-this.config.maxStoredLogs);
-            }
-        } catch (e) {
-            console.warn('Failed to load stored logs:', e);
-        }
     }
 
     shouldLog(level) {
@@ -970,16 +1129,10 @@ class MeetingLogger {
             level,
             message,
             data,
-            elapsed: Date.now() - this.startTime,
-            stackTrace: this.config.enableStackTrace ? this.getStackTrace() : null
+            elapsed: Date.now() - this.startTime
         };
 
         this.logs.push(logEntry);
-
-        this.eventCounts[category] = (this.eventCounts[category] || 0) + 1;
-        if (level === 'error') {
-            this.errorCounts[category] = (this.errorCounts[category] || 0) + 1;
-        }
 
         if (this.logs.length > this.config.maxStoredLogs) {
             this.logs = this.logs.slice(-this.config.maxStoredLogs);
@@ -989,20 +1142,12 @@ class MeetingLogger {
             this.logToConsole(logEntry);
         }
 
-        if (this.config.enableStorage) {
-            this.persistLogs();
-        }
-
         return logEntry;
     }
 
     logToConsole(entry) {
         const color = this.config.categoryColors[entry.category] || '#6B7280';
-        const timeStr = this.config.enableTimestamp 
-            ? `[${new Date(entry.timestamp).toLocaleTimeString()}]` 
-            : '';
-        
-        const prefix = `%c[${entry.category.toUpperCase()}]${timeStr}`;
+        const prefix = `%c[${entry.category.toUpperCase()}]`;
         const style = `color: ${color}; font-weight: bold;`;
 
         const consoleMethod = entry.level === 'error' ? 'error' : 
@@ -1015,22 +1160,6 @@ class MeetingLogger {
         }
     }
 
-    getStackTrace() {
-        try {
-            throw new Error();
-        } catch (e) {
-            return e.stack?.split('\n').slice(3, 6).join('\n') || null;
-        }
-    }
-
-    persistLogs() {
-        try {
-            localStorage.setItem('meetingLogs', JSON.stringify(this.logs));
-        } catch (e) {
-            console.warn('Failed to persist logs:', e);
-        }
-    }
-
     logInit(message, data) {
         return this.log('init', message, data, 'info');
     }
@@ -1039,7 +1168,6 @@ class MeetingLogger {
         const errorData = {
             message: error?.message || error,
             name: error?.name,
-            stack: error?.stack,
             ...context
         };
         return this.log('error', message, errorData, 'error');
@@ -1053,142 +1181,29 @@ class MeetingLogger {
         return this.log('participant', message, data, 'info');
     }
 
-    logNetwork(message, data) {
-        return this.log('network', message, data, 'info');
-    }
-
     logUI(message, data) {
         return this.log('ui', message, data, 'debug');
     }
-
-    logPerformance(message, timing) {
-        return this.log('performance', message, { timing, elapsed: Date.now() - this.startTime }, 'info');
-    }
-
-    logCallCreated(callId, participants) {
-        return this.logInit('Call created', { callId, participantCount: participants });
-    }
-
-    logCallJoined(callId, userId) {
-        return this.logInit('Successfully joined call', { callId, userId });
-    }
-
-    logCallError(error, context) {
-        return this.logError('Call error occurred', error, context);
-    }
-
-    logParticipantJoined(participant) {
-        return this.logParticipant('Participant joined', {
-            userId: participant.userId,
-            name: participant.name,
-            isLocal: participant.isLocalParticipant,
-            hasVideo: !!participant.videoStream,
-            hasAudio: !!participant.audioStream
-        });
-    }
-
-    logParticipantLeft(participant) {
-        return this.logParticipant('Participant left', {
-            userId: participant.userId,
-            name: participant.name
-        });
-    }
-
-    logMediaPermission(type, granted, error = null) {
-        if (granted) {
-            return this.logMedia(`${type} permission granted`, { type });
-        } else {
-            return this.logError(`${type} permission denied`, error, { type });
-        }
-    }
-
-    logTrackPublished(type, participantId) {
-        return this.logMedia(`Track published: ${type}`, { type, participantId });
-    }
-
-    logTrackUnpublished(type, participantId) {
-        return this.logMedia(`Track unpublished: ${type}`, { type, participantId });
-    }
-
-    logICEConnectionState(state, callId) {
-        return this.logNetwork('ICE connection state changed', { state, callId });
-    }
-
-    logDOMError(element, operation, error) {
-        return this.logError(`DOM error: ${operation}`, error, { 
-            element, 
-            elementExists: !!document.getElementById(element) 
-        });
-    }
-
-    getStats() {
-        const errorLogs = this.logs.filter(l => l.level === 'error');
-        
-        return {
-            sessionId: this.sessionId,
-            duration: Date.now() - this.startTime,
-            totalLogs: this.logs.length,
-            totalErrors: errorLogs.length,
-            categoryCounts: this.eventCounts,
-            errorCounts: this.errorCounts,
-            recentErrors: errorLogs.slice(-10).map(e => ({
-                timestamp: e.timestamp,
-                message: e.message,
-                category: e.category,
-                data: e.data
-            }))
-        };
-    }
-
-    exportLogs(format = 'json') {
-        const stats = this.getStats();
-        const exportData = {
-            stats,
-            logs: this.logs,
-            generatedAt: new Date().toISOString()
-        };
-
-        if (format === 'json') {
-            return JSON.stringify(exportData, null, 2);
-        }
-    }
-
-    downloadLogs(filename = null, format = 'json') {
-        const name = filename || `meeting-logs-${this.sessionId}.${format}`;
-        const content = this.exportLogs(format);
-        const blob = new Blob([content], { 
-            type: format === 'json' ? 'application/json' : 'text/csv' 
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = name;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-
-    toggleDashboard() {
-        console.log('Dashboard feature available - use Ctrl+Shift+L');
-    }
 }
 
-window.MeetingLogger = MeetingLogger;
 window.meetingLogger = new MeetingLogger({
     enableConsole: true,
-    enableStorage: true,
     logLevel: 'debug'
 });
 
-console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs', 
-            'color: #4F46E5; font-weight: bold; font-size: 14px;');
+console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: bold; font-size: 14px;');
     </script>
 
+    <!-- FIXED: Load GetStream SDK before main script -->
     <script type="module">
         import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1.9.1';
         
         window.StreamVideoClient = StreamVideoClient;
         window.getStreamLoaded = true;
-        window.meetingLogger.logInit('GetStream SDK loaded successfully via ES modules');
+        window.meetingLogger.logInit('GetStream SDK loaded successfully');
+        
+        // Trigger SDK ready event
+        window.dispatchEvent(new Event('sdkready'));
     </script>
 
     <script>
@@ -1203,6 +1218,21 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
         let isMuted = false;
         let isVideoOff = false;
         let isScreenSharing = false;
+
+        // FIXED: Wait for SDK to be ready before proceeding
+        function waitForSDK() {
+            return new Promise((resolve) => {
+                if (window.getStreamLoaded) {
+                    resolve();
+                } else {
+                    window.addEventListener('sdkready', resolve, { once: true });
+                    // Timeout fallback
+                    setTimeout(() => {
+                        if (window.getStreamLoaded) resolve();
+                    }, 5000);
+                }
+            });
+        }
 
         function switchTab(tab) {
             meetingLogger.logUI('Switching tab', { tab });
@@ -1227,13 +1257,12 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
             if (!token) {
                 showError('Please enter your JWT token');
-                meetingLogger.logError('Missing JWT token', new Error('Token required'));
                 return;
             }
 
             showLoading(true);
             hideAlerts();
-            meetingLogger.logInit('Creating meeting', { title, waitingRoom, recording });
+            meetingLogger.logInit('Creating meeting', { title });
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/meetings/instant`, {
@@ -1256,7 +1285,7 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 }
 
                 const data = await response.json();
-                meetingLogger.logInit('Meeting created successfully', { meetingId: data.meetingId });
+                meetingLogger.logInit('Meeting created', { meetingId: data.meetingId });
 
                 showSuccess(`Meeting created! ID: ${data.meetingId}`);
                 currentMeetingId = data.meetingId;
@@ -1264,14 +1293,12 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
                 await initializeGetStream(data.callCredentials);
                 
-                // FIXED: Use hash-based routing for GitHub Pages compatibility
                 const currentUrl = window.location.href.split('#')[0].split('?')[0];
                 const shareableLink = `${currentUrl}#meetingId=${data.meetingId}`;
                 
                 updateMeetingInfo({
                     meetingId: data.meetingId,
-                    meetingLink: shareableLink,
-                    callId: data.callCredentials.callId
+                    meetingLink: shareableLink
                 });
 
             } catch (error) {
@@ -1288,7 +1315,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
             if (!token || !meetingId) {
                 showError('Please enter both JWT token and Meeting ID');
-                meetingLogger.logError('Missing credentials', new Error('Token and Meeting ID required'));
                 return;
             }
 
@@ -1312,21 +1338,19 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 }
 
                 const data = await response.json();
-                meetingLogger.logInit('Joined meeting successfully', { meetingId });
+                meetingLogger.logInit('Joined meeting', { meetingId });
 
                 currentMeetingId = meetingId;
                 currentToken = token;
 
                 await initializeGetStream(data.callCredentials);
                 
-                // FIXED: Use hash-based routing for GitHub Pages compatibility
                 const currentUrl = window.location.href.split('#')[0].split('?')[0];
                 const shareableLink = `${currentUrl}#meetingId=${meetingId}`;
                 
                 updateMeetingInfo({
                     meetingId: meetingId,
-                    meetingLink: shareableLink,
-                    callId: data.callCredentials.callId
+                    meetingLink: shareableLink
                 });
 
             } catch (error) {
@@ -1339,35 +1363,36 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
         async function initializeGetStream(credentials) {
             try {
-                meetingLogger.logInit('Initializing GetStream', credentials);
-
-                let attempts = 0;
-                while (!window.getStreamLoaded && attempts < 50) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
-                }
-
-                if (!window.getStreamLoaded || !window.StreamVideoClient) {
-                    throw new Error('GetStream SDK not loaded. Please refresh the page.');
+                // FIXED: Wait for SDK to be ready
+                await waitForSDK();
+                
+                if (!window.StreamVideoClient) {
+                    throw new Error('GetStream SDK not available');
                 }
 
                 const { apiKey, userId, userName, token: userToken, callId } = credentials;
 
-                meetingLogger.logMedia('Requesting local media streams');
-                const localStream = await navigator.mediaDevices.getUserMedia({
+                // FIXED: Request media permissions with better constraints
+                meetingLogger.logMedia('Requesting media permissions');
+                
+                const mediaConstraints = {
                     video: {
                         width: { ideal: 1280 },
                         height: { ideal: 720 },
-                        frameRate: { ideal: 30 }
+                        frameRate: { ideal: 30 },
+                        facingMode: 'user'
                     },
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        autoGainControl: true
+                        autoGainControl: true,
+                        sampleRate: 48000
                     }
-                });
+                };
+
+                const localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
                 
-                meetingLogger.logMedia('Local media obtained', {
+                meetingLogger.logMedia('Media obtained', {
                     videoTracks: localStream.getVideoTracks().length,
                     audioTracks: localStream.getAudioTracks().length
                 });
@@ -1375,7 +1400,8 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 currentUserId = userId;
                 currentUserName = userName || 'You';
 
-                meetingLogger.logInit('Creating StreamVideoClient', { apiKey, userId, callId });
+                // Create GetStream client
+                meetingLogger.logInit('Creating StreamVideoClient');
                 streamClient = new window.StreamVideoClient({
                     apiKey: apiKey,
                     user: {
@@ -1385,38 +1411,41 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     token: userToken
                 });
 
-                meetingLogger.logInit('Client created, creating call');
+                // Create and join call
                 call = streamClient.call('default', callId);
-
-                meetingLogger.logInit('Joining call');
                 await call.join({ create: true });
-                meetingLogger.logCallJoined(callId, userId);
+                meetingLogger.logInit('Call joined', { callId, userId });
 
+                // Setup event listeners
                 setupEventListeners();
-                await enableMediaDevices(localStream);
+
+                // FIXED: Enable media devices properly
+                await enableMediaDevices();
+
                 showVideoUI();
 
             } catch (error) {
-                meetingLogger.logCallError(error, { step: 'initialization' });
+                meetingLogger.logError('Initialization failed', error);
                 showError('Failed to connect: ' + error.message);
                 throw error;
             }
         }
 
-        async function enableMediaDevices(localStream) {
+        async function enableMediaDevices() {
             try {
-                meetingLogger.logMedia('Enabling media devices with local stream');
+                meetingLogger.logMedia('Enabling camera and microphone');
                 
+                // Enable camera
                 await call.camera.enable();
-                meetingLogger.logMediaPermission('camera', true);
                 isVideoOff = false;
+                meetingLogger.logMedia('Camera enabled');
                 
+                // Enable microphone  
                 await call.microphone.enable();
-                meetingLogger.logMediaPermission('microphone', true);
                 isMuted = false;
+                meetingLogger.logMedia('Microphone enabled');
                 
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
+                // Update UI buttons
                 const muteBtn = document.getElementById('muteBtn');
                 const videoBtn = document.getElementById('videoBtn');
                 
@@ -1430,15 +1459,13 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     videoBtn.querySelector('i').className = 'fas fa-video';
                 }
                 
-                meetingLogger.logMedia('Media devices enabled successfully', { 
-                    camera: true, 
-                    microphone: true 
-                });
+                // Wait for tracks to stabilize
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 renderParticipants();
                 
             } catch (error) {
-                meetingLogger.logMediaPermission('media', false, error);
+                meetingLogger.logError('Media enable failed', error);
                 showError('Please allow camera and microphone access');
             }
         }
@@ -1448,32 +1475,17 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             
             call.state.participants$.subscribe((participants) => {
                 meetingLogger.logParticipant('Participants changed', { count: participants.length });
-                
-                if (isScreenSharing) {
-                    renderScreenSharingLayout();
-                } else {
-                    renderParticipants();
-                }
+                renderParticipants();
             });
 
             call.on('track.published', (event) => {
-                meetingLogger.logTrackPublished(event.type, event.participantId);
-                
-                if (isScreenSharing) {
-                    renderScreenSharingLayout();
-                } else {
-                    renderParticipants();
-                }
+                meetingLogger.logMedia('Track published', { type: event.type });
+                setTimeout(() => renderParticipants(), 500);
             });
 
             call.on('track.unpublished', (event) => {
-                meetingLogger.logTrackUnpublished(event.type, event.participantId);
-                
-                if (isScreenSharing) {
-                    renderScreenSharingLayout();
-                } else {
-                    renderParticipants();
-                }
+                meetingLogger.logMedia('Track unpublished', { type: event.type });
+                setTimeout(() => renderParticipants(), 500);
             });
         }
 
@@ -1481,11 +1493,7 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             const mainScreen = document.getElementById('main-screen');
             const sidebar = document.getElementById('participants-sidebar');
             
-            if (!mainScreen || !sidebar) {
-                meetingLogger.logDOMError('main-screen or participants-sidebar', 'render', 
-                    new Error('DOM elements not found'));
-                return;
-            }
+            if (!mainScreen || !sidebar || !call) return;
             
             const participants = Array.from(call.state.participants.values());
             meetingLogger.logUI('Rendering participants', { count: participants.length });
@@ -1531,55 +1539,45 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             const name = participant.name || participant.userId || 'Guest';
             const initial = name.charAt(0).toUpperCase();
 
+            // FIXED: Better video track detection
             const videoStream = participant.videoStream;
-            const hasVideoTrack = videoStream && videoStream.getVideoTracks && 
+            const hasVideoTrack = videoStream && 
+                                 videoStream.getVideoTracks &&
                                  videoStream.getVideoTracks().length > 0 &&
-                                 videoStream.getVideoTracks()[0].enabled;
+                                 videoStream.getVideoTracks()[0].enabled &&
+                                 videoStream.getVideoTracks()[0].readyState === 'live';
             
+            // FIXED: Better audio track detection
             const audioStream = participant.audioStream;
-            const hasAudioTrack = audioStream && audioStream.getAudioTracks &&
-                                 audioStream.getAudioTracks().length > 0;
-
-            meetingLogger.logUI('Creating video element', {
-                participant: name,
-                isMain,
-                hasVideoTrack,
-                hasAudioTrack,
-                isLocal: participant.isLocalParticipant,
-                videoStream: !!videoStream,
-                audioStream: !!audioStream
-            });
+            const hasAudioTrack = audioStream && 
+                                 audioStream.getAudioTracks &&
+                                 audioStream.getAudioTracks().length > 0 &&
+                                 audioStream.getAudioTracks()[0].enabled &&
+                                 audioStream.getAudioTracks()[0].readyState === 'live';
 
             if (hasVideoTrack) {
                 const video = document.createElement('video');
                 video.autoplay = true;
                 video.playsInline = true;
-                video.muted = participant.isLocalParticipant;
+                video.muted = participant.isLocalParticipant; // Mute local to avoid echo
                 video.style.width = '100%';
                 video.style.height = '100%';
                 video.style.objectFit = isMain ? 'contain' : 'cover';
                 video.style.backgroundColor = '#1E293B';
 
-                try {
-                    video.srcObject = videoStream;
-                    container.appendChild(video);
+                video.srcObject = videoStream;
+                container.appendChild(video);
 
-                    meetingLogger.logMedia('Video attached successfully', {
-                        participant: name,
-                        isLocal: participant.isLocalParticipant
-                    });
-                } catch (error) {
-                    meetingLogger.logError('Failed to attach video stream', error, {
-                        participant: name
-                    });
-                    const avatar = createAvatar(initial, isMain);
-                    container.appendChild(avatar);
-                }
+                // FIXED: Force play on mobile
+                video.play().catch(err => {
+                    meetingLogger.logError('Video play failed', err);
+                });
             } else {
                 const avatar = createAvatar(initial, isMain);
                 container.appendChild(avatar);
             }
 
+            // Add overlay with name and status
             const overlay = document.createElement('div');
             overlay.className = 'participant-overlay';
             
@@ -1655,16 +1653,18 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     isMuted = false;
                     document.getElementById('muteBtn').classList.remove('active');
                     document.querySelector('#muteBtn i').className = 'fas fa-microphone';
-                    meetingLogger.logMedia('Microphone enabled (unmuted)');
+                    meetingLogger.logMedia('Microphone unmuted');
                 } else {
                     await call.microphone.disable();
                     isMuted = true;
                     document.getElementById('muteBtn').classList.add('active');
                     document.querySelector('#muteBtn i').className = 'fas fa-microphone-slash';
-                    meetingLogger.logMedia('Microphone disabled (muted)');
+                    meetingLogger.logMedia('Microphone muted');
                 }
+                
+                setTimeout(() => renderParticipants(), 300);
             } catch (error) {
-                meetingLogger.logError('Error toggling mute', error);
+                meetingLogger.logError('Toggle mute failed', error);
             }
         }
 
@@ -1677,31 +1677,24 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     isVideoOff = false;
                     document.getElementById('videoBtn').classList.remove('active');
                     document.querySelector('#videoBtn i').className = 'fas fa-video';
-                    meetingLogger.logMedia('Camera enabled (video on)');
-                    
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    meetingLogger.logMedia('Camera on');
                 } else {
                     await call.camera.disable();
                     isVideoOff = true;
                     document.getElementById('videoBtn').classList.add('active');
                     document.querySelector('#videoBtn i').className = 'fas fa-video-slash';
-                    meetingLogger.logMedia('Camera disabled (video off)');
+                    meetingLogger.logMedia('Camera off');
                 }
                 
-                if (isScreenSharing) {
-                    renderScreenSharingLayout();
-                } else {
-                    renderParticipants();
-                }
+                setTimeout(() => renderParticipants(), 500);
             } catch (error) {
-                meetingLogger.logError('Error toggling video', error);
+                meetingLogger.logError('Toggle video failed', error);
             }
         }
 
         async function toggleScreenShare() {
             if (!call || !call.screenShare) {
-                meetingLogger.logError('Screen share not available', new Error('Method not found'));
-                showError('Screen sharing is not available');
+                showError('Screen sharing not available');
                 return;
             }
 
@@ -1710,154 +1703,21 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     await call.screenShare.disable();
                     isScreenSharing = false;
                     document.getElementById('screenBtn').classList.remove('active');
-                    meetingLogger.logMedia('Screen sharing stopped');
-                    
-                    renderParticipants();
+                    meetingLogger.logMedia('Screen share stopped');
                 } else {
                     await call.screenShare.enable();
                     isScreenSharing = true;
                     document.getElementById('screenBtn').classList.add('active');
-                    meetingLogger.logMedia('Screen sharing started');
-                    
-                    renderScreenSharingLayout();
+                    meetingLogger.logMedia('Screen share started');
                 }
+                
+                setTimeout(() => renderParticipants(), 500);
             } catch (error) {
-                meetingLogger.logError('Error toggling screen share', error);
+                meetingLogger.logError('Screen share failed', error);
                 if (error.name !== 'NotAllowedError') {
                     showError('Failed to share screen');
                 }
             }
-        }
-
-        function renderScreenSharingLayout() {
-            const mainScreen = document.getElementById('main-screen');
-            const sidebar = document.getElementById('participants-sidebar');
-            
-            if (!mainScreen || !sidebar) return;
-            
-            const participants = Array.from(call.state.participants.values());
-            const localParticipant = participants.find(p => p.isLocalParticipant);
-            
-            meetingLogger.logUI('Rendering screen sharing layout', { 
-                participantCount: participants.length 
-            });
-
-            mainScreen.innerHTML = '';
-            sidebar.innerHTML = `
-                <div class="sidebar-header">
-                    <span>Participants</span>
-                    <span>${participants.length}</span>
-                </div>
-            `;
-
-            if (localParticipant && localParticipant.screenShareStream) {
-                const screenVideo = document.createElement('video');
-                screenVideo.id = 'screen-share-video';
-                screenVideo.autoplay = true;
-                screenVideo.playsInline = true;
-                screenVideo.style.width = '100%';
-                screenVideo.style.height = '100%';
-                screenVideo.style.objectFit = 'contain';
-                screenVideo.style.backgroundColor = '#000';
-                screenVideo.srcObject = localParticipant.screenShareStream;
-                mainScreen.appendChild(screenVideo);
-                
-                const badge = document.createElement('div');
-                badge.className = 'screen-share-badge';
-                badge.innerHTML = '<i class="fas fa-desktop"></i> You\'re presenting';
-                badge.style.cssText = `
-                    position: absolute;
-                    top: 20px;
-                    left: 20px;
-                    background: rgba(79, 70, 229, 0.95);
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 12px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    z-index: 10;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                    backdrop-filter: blur(10px);
-                `;
-                mainScreen.appendChild(badge);
-
-                if (localParticipant.videoStream) {
-                    const videoTracks = localParticipant.videoStream.getVideoTracks();
-                    const hasVideo = videoTracks && videoTracks.length > 0 && videoTracks[0].enabled;
-                    
-                    const pipContainer = document.createElement('div');
-                    pipContainer.className = 'presenter-pip';
-                    pipContainer.style.cssText = `
-                        position: absolute;
-                        top: 20px;
-                        right: 20px;
-                        width: 240px;
-                        height: 135px;
-                        border-radius: 12px;
-                        overflow: hidden;
-                        background: #1E293B;
-                        border: 3px solid rgba(79, 70, 229, 0.8);
-                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-                        z-index: 10;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    `;
-
-                    if (hasVideo) {
-                        const pipVideo = document.createElement('video');
-                        pipVideo.autoplay = true;
-                        pipVideo.playsInline = true;
-                        pipVideo.muted = true;
-                        pipVideo.style.width = '100%';
-                        pipVideo.style.height = '100%';
-                        pipVideo.style.objectFit = 'cover';
-                        pipVideo.srcObject = localParticipant.videoStream;
-                        pipContainer.appendChild(pipVideo);
-                    } else {
-                        const avatar = document.createElement('div');
-                        avatar.style.cssText = `
-                            width: 60px;
-                            height: 60px;
-                            border-radius: 50%;
-                            background: linear-gradient(135deg, #4F46E5, #7C3AED);
-                            color: white;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 24px;
-                            font-weight: 700;
-                        `;
-                        avatar.textContent = (localParticipant.name || 'You').charAt(0).toUpperCase();
-                        pipContainer.appendChild(avatar);
-                    }
-
-                    const overlay = document.createElement('div');
-                    overlay.style.cssText = `
-                        position: absolute;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-                        padding: 8px 12px;
-                        color: white;
-                        font-size: 12px;
-                        font-weight: 600;
-                    `;
-                    overlay.textContent = 'You';
-                    pipContainer.appendChild(overlay);
-
-                    mainScreen.appendChild(pipContainer);
-                }
-            }
-
-            participants.forEach(participant => {
-                const tile = createVideoElement(participant, false);
-                sidebar.appendChild(tile);
-            });
         }
 
         async function leaveMeeting() {
@@ -1877,7 +1737,7 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                         }
                     });
                 } catch (error) {
-                    meetingLogger.logError('Error notifying backend', error);
+                    meetingLogger.logError('Leave API failed', error);
                 }
             }
 
@@ -1889,7 +1749,7 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             if (headerInfo) {
                 headerInfo.innerHTML = `
                     <span class="status-indicator"></span>
-                    <span>Ready to connect</span>
+                    <span>Ready</span>
                 `;
             }
 
@@ -1902,22 +1762,19 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
         }
 
         function leaveWaitingRoom() {
-            meetingLogger.logUI('Leaving waiting room');
             document.getElementById('waitingRoomModal').classList.remove('active');
             window.location.reload();
         }
 
         function copyText(elementId) {
             const element = document.getElementById(elementId);
-            if (!element) {
-                meetingLogger.logDOMError(elementId, 'copy', new Error('Element not found'));
-                return;
-            }
+            if (!element) return;
             
             const text = element.textContent;
             navigator.clipboard.writeText(text).then(() => {
                 showSuccess('Copied to clipboard!');
-                meetingLogger.logUI('Copied to clipboard', { text: text.substring(0, 20) });
+            }).catch(() => {
+                showError('Failed to copy');
             });
         }
 
@@ -1961,7 +1818,7 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             if (successAlert) successAlert.classList.remove('active');
         }
 
-        // FIXED: Auto-fill meeting ID from URL hash (GitHub Pages compatible)
+        // Auto-fill meeting ID from URL hash
         const urlHash = window.location.hash.substring(1);
         const urlParams = new URLSearchParams(urlHash);
         const meetingIdFromUrl = urlParams.get('meetingId');
@@ -1969,18 +1826,10 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
         if (meetingIdFromUrl) {
             document.getElementById('meetingId').value = meetingIdFromUrl;
             switchTab('join');
-            meetingLogger.logInit('Auto-filled meeting ID from URL hash', { meetingId: meetingIdFromUrl });
+            meetingLogger.logInit('Auto-filled meeting ID', { meetingId: meetingIdFromUrl });
         }
 
-        meetingLogger.logInit('GetStream Video Meeting App Initialized');
-        
-        setTimeout(() => {
-            if (window.getStreamLoaded) {
-                meetingLogger.logInit('✅ GetStream SDK ready to use');
-            } else {
-                meetingLogger.logError('GetStream SDK failed to load', new Error('SDK not ready'));
-            }
-        }, 1000);
+        meetingLogger.logInit('App initialized');
     </script>
 </body>
 </html>
