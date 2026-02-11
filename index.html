@@ -1,10 +1,10 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Video Meeting - Fixed Audio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <title>Video Meeting - WebRTC Direct</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -13,35 +13,11 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            --primary-color: #4F46E5;
-            --primary-dark: #4338CA;
-            --secondary-color: #7C3AED;
-            --success-color: #10B981;
-            --danger-color: #EF4444;
-            --warning-color: #F59E0B;
-            --text-primary: #1F2937;
-            --text-secondary: #6B7280;
-            --bg-primary: #FFFFFF;
-            --bg-secondary: #F9FAFB;
-            --bg-tertiary: #F3F4F6;
-            --border-color: #E5E7EB;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--text-primary);
-            line-height: 1.5;
+            color: #1F2937;
             overflow-x: hidden;
         }
 
@@ -49,63 +25,28 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             padding: 12px 16px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
         }
 
         .header h1 {
-            font-family: 'Manrope', sans-serif;
             font-size: 18px;
-            font-weight: 800;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 700;
+            color: #4F46E5;
         }
 
-        .header .logo {
-            font-size: 22px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header .info {
+        .status {
             font-size: 12px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
             padding: 6px 12px;
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            font-weight: 500;
-            border: 1px solid var(--border-color);
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success-color);
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { 
-                opacity: 1; 
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            }
-            50% { 
-                opacity: 0.8; 
-                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-            }
+            background: #10B981;
+            color: white;
+            border-radius: 20px;
+            font-weight: 600;
         }
 
         .container {
@@ -114,492 +55,253 @@
             padding: 16px;
         }
 
-        .login-container {
-            background: var(--bg-primary);
-            border-radius: 20px;
-            box-shadow: var(--shadow-xl);
-            max-width: 600px;
-            margin: 20px auto;
+        .login-box {
+            background: white;
+            border-radius: 16px;
             padding: 32px 24px;
-            animation: slideUp var(--transition-slow) ease-out;
-            border: 1px solid rgba(229, 231, 235, 0.8);
+            max-width: 500px;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .login-container h2 {
-            font-family: 'Manrope', sans-serif;
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--text-primary);
+        .login-box h2 {
+            font-size: 24px;
             margin-bottom: 8px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #4F46E5;
         }
 
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
+        .login-box p {
+            color: #6B7280;
             margin-bottom: 24px;
-            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4F46E5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .tabs {
             display: flex;
-            gap: 6px;
-            margin-bottom: 24px;
-            background: var(--bg-secondary);
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #F3F4F6;
             padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border-radius: 8px;
         }
 
         .tab {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px;
             background: transparent;
             border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 14px;
+            border-radius: 6px;
             font-weight: 600;
-            transition: all var(--transition-base);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tab i {
-            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
         .tab.active {
-            background: var(--bg-primary);
-            color: var(--primary-color);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
+            background: white;
+            color: #4F46E5;
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn var(--transition-base);
         }
 
         .tab-content.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group small {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 12px;
-            margin-top: 6px;
-            line-height: 1.5;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all var(--transition-fast);
-            background: var(--bg-primary);
-            font-family: 'Inter', sans-serif;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-        }
-
-        .checkbox-group {
-            display: flex;
-            gap: 12px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            padding: 10px 14px;
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            border: 1px solid transparent;
-            transition: all var(--transition-fast);
-            flex: 1;
-            min-width: 140px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--primary-color);
-        }
-
-        button.primary {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            padding: 16px 28px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all var(--transition-base);
-            width: 100%;
-            box-shadow: var(--shadow-md);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        button.primary:active {
-            transform: scale(0.98);
-        }
-
-        button.primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
         .alert {
-            padding: 14px 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
             font-size: 14px;
-            font-weight: 500;
-            animation: slideDown var(--transition-base);
-            align-items: flex-start;
-            gap: 12px;
-            line-height: 1.5;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            display: none;
         }
 
         .alert.active {
-            display: flex;
-        }
-
-        .alert.info {
-            background: rgba(59, 130, 246, 0.08);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            color: #1E40AF;
-        }
-
-        .alert.success {
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            color: #047857;
+            display: block;
         }
 
         .alert.error {
-            background: rgba(239, 68, 68, 0.08);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: #FEE2E2;
             color: #991B1B;
+            border: 1px solid #FCA5A5;
         }
 
-        .alert i {
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: white;
-            display: none;
-            background: rgba(15, 23, 42, 0.8);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            margin: 20px auto;
-            max-width: 500px;
-        }
-
-        .loading.active {
-            display: block;
-            animation: fadeIn var(--transition-base);
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading p {
-            font-size: 16px;
-            font-weight: 500;
-            color: white;
-        }
-
-        .meeting-info {
-            background: var(--bg-primary);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            display: none;
-            box-shadow: var(--shadow-md);
-            animation: slideUp var(--transition-base);
-            border: 1px solid var(--border-color);
-        }
-
-        .meeting-info.active {
-            display: block;
-        }
-
-        .meeting-info h3 {
-            color: var(--text-primary);
-            margin-bottom: 16px;
-            font-weight: 700;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .info-item {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .info-item strong {
-            color: var(--primary-color);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .info-item span {
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 12px;
-            color: var(--text-secondary);
-            word-break: break-all;
-        }
-
-        .copy-btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: 100%;
-        }
-
-        .copy-btn:active {
-            transform: scale(0.95);
+        .alert.success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #6EE7B7;
         }
 
         .video-container {
             display: none;
+            background: #0F172A;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: var(--shadow-xl);
             margin-top: 16px;
-            animation: slideUp var(--transition-slow);
-            border: 1px solid rgba(229, 231, 235, 0.3);
+            height: calc(100vh - 200px);
+            min-height: 500px;
         }
 
         .video-container.active {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 140px);
-            min-height: 400px;
         }
 
-        #video-wrapper {
+        #video-grid {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #0F172A;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #main-screen {
-            flex: 1;
-            position: relative;
-            background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #participants-sidebar {
-            width: 100%;
-            max-height: 180px;
-            background: #0F172A;
-            border-top: 1px solid #1E293B;
-            display: flex;
-            flex-direction: row;
-            padding: 12px;
-            gap: 12px;
-            overflow-x: auto;
-            overflow-y: hidden;
-        }
-
-        #participants-sidebar .sidebar-header {
-            display: none;
-        }
-
-        .participant-tile {
-            position: relative;
+            display: grid;
+            gap: 8px;
+            padding: 16px;
+            overflow-y: auto;
             background: #1E293B;
+        }
+
+        /* Responsive grid - adjusts based on participant count */
+        #video-grid.participants-1 {
+            grid-template-columns: 1fr;
+        }
+
+        #video-grid.participants-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        #video-grid.participants-3,
+        #video-grid.participants-4 {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        #video-grid.participants-5,
+        #video-grid.participants-6 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        #video-grid.participants-7,
+        #video-grid.participants-8,
+        #video-grid.participants-9 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+
+        .video-tile {
+            position: relative;
+            background: #334155;
             border-radius: 12px;
             overflow: hidden;
-            min-width: 120px;
-            height: 150px;
-            border: 2px solid transparent;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            min-height: 200px;
         }
 
-        .participant-tile video {
+        .video-tile video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 12px;
         }
 
-        .participant-tile audio {
+        .video-tile audio {
             display: none;
         }
 
-        .participant-avatar {
-            width: 60px;
-            height: 60px;
+        .video-avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: linear-gradient(135deg, #4F46E5, #7C3AED);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
             color: white;
-            text-transform: uppercase;
+            font-size: 32px;
+            font-weight: 700;
         }
 
-        .participant-overlay {
+        .video-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            padding: 10px;
+            padding: 12px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .participant-name {
-            color: white;
-            font-size: 12px;
+        .video-name {
+            font-size: 14px;
             font-weight: 600;
         }
 
-        .participant-status {
+        .video-status {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .participant-status i {
-            font-size: 12px;
-            color: white;
+        .video-status i {
+            font-size: 14px;
         }
 
         .controls {
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
-            backdrop-filter: blur(10px);
+            background: #0F172A;
             padding: 16px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 16px;
+            border-top: 1px solid #334155;
         }
 
         .control-btn {
@@ -607,15 +309,18 @@
             height: 56px;
             border-radius: 50%;
             border: none;
-            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            color: white;
             font-size: 20px;
-            transition: all var(--transition-base);
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid transparent;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
         }
 
         .control-btn:active {
@@ -623,242 +328,145 @@
         }
 
         .control-btn.active {
-            background: var(--danger-color);
+            background: #EF4444;
         }
 
         .control-btn.leave {
-            background: var(--danger-color);
-            width: 60px;
-            height: 60px;
+            background: #EF4444;
         }
 
-        .main-video-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .main-video-container video {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .main-participant-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #4F46E5, #7C3AED);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            font-weight: 700;
-            color: white;
-            text-transform: uppercase;
-        }
-
-        .debug-panel {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.9);
-            color: #00ff00;
-            padding: 12px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            max-width: 300px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 999;
+        .meeting-info {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
             display: none;
         }
 
-        .debug-panel.active {
+        .meeting-info.active {
             display: block;
         }
 
-        .debug-panel .debug-line {
-            margin-bottom: 4px;
-            line-height: 1.4;
+        .meeting-info h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #4F46E5;
         }
 
-        /* Desktop styles */
-        @media (min-width: 768px) {
-            .header {
-                padding: 16px 24px;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #F9FAFB;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .info-row strong {
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .info-row span {
+            font-size: 12px;
+            color: #6B7280;
+            font-family: monospace;
+        }
+
+        .copy-btn {
+            padding: 6px 12px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            #video-grid {
+                padding: 8px;
+                gap: 6px;
             }
 
+            #video-grid.participants-3,
+            #video-grid.participants-4,
+            #video-grid.participants-5,
+            #video-grid.participants-6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .video-tile {
+                min-height: 150px;
+            }
+
+            .video-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 18px;
+            }
+
+            .controls {
+                gap: 12px;
+            }
+        }
+
+        @media (min-width: 769px) {
             .header h1 {
                 font-size: 24px;
             }
 
-            .header .logo {
-                font-size: 28px;
-            }
-
-            .header .info {
+            .status {
                 font-size: 14px;
-                padding: 8px 16px;
             }
 
-            .container {
-                padding: 24px;
-            }
-
-            .login-container {
+            .login-box {
                 padding: 48px;
-                margin: 40px auto;
             }
 
-            .login-container h2 {
+            .login-box h2 {
                 font-size: 32px;
             }
 
-            .subtitle {
-                font-size: 15px;
-                margin-bottom: 32px;
-            }
-
-            .tabs {
-                gap: 8px;
-                margin-bottom: 32px;
-                padding: 6px;
-            }
-
-            .tab {
-                padding: 14px 24px;
-                font-size: 15px;
-            }
-
-            .tab i {
-                font-size: 18px;
-            }
-
-            .input-group {
-                margin-bottom: 24px;
-            }
-
-            .input-group input {
-                padding: 16px;
-            }
-
-            .checkbox-group {
-                gap: 24px;
-                margin: 28px 0;
-            }
-
-            .checkbox-group label {
-                font-size: 15px;
-                padding: 10px 16px;
-                flex: initial;
-            }
-
-            button.primary {
-                padding: 18px 32px;
-                font-size: 16px;
-            }
-
-            .alert {
-                padding: 18px 20px;
-                font-size: 15px;
-            }
-
-            .meeting-info {
-                padding: 28px;
-                margin-bottom: 24px;
-            }
-
-            .meeting-info h3 {
-                font-size: 18px;
-                margin-bottom: 20px;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 16px;
-            }
-
-            .info-item {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: 20px;
-            }
-
-            .copy-btn {
-                width: auto;
-                padding: 10px 18px;
-            }
-
-            .video-container.active {
+            .video-container {
                 height: calc(100vh - 180px);
-                min-height: 700px;
             }
 
-            #video-wrapper {
-                flex-direction: row;
-            }
-
-            #main-screen {
-                flex: 1;
-            }
-
-            #participants-sidebar {
-                width: 320px;
-                max-height: none;
-                border-left: 1px solid #1E293B;
-                border-top: none;
-                flex-direction: column;
-                padding: 20px;
-                gap: 16px;
-                overflow-x: hidden;
-                overflow-y: auto;
-            }
-
-            #participants-sidebar .sidebar-header {
-                display: flex;
-                color: #94A3B8;
-                font-size: 14px;
-                font-weight: 600;
-                margin-bottom: 8px;
-                justify-content: space-between;
-                align-items: center;
-                padding-bottom: 12px;
-                border-bottom: 1px solid #1E293B;
-            }
-
-            .participant-tile {
-                min-width: auto;
-                width: 100%;
-                height: 200px;
-            }
-
-            .participant-avatar {
-                width: 80px;
-                height: 80px;
-                font-size: 32px;
-            }
-
-            .participant-overlay {
-                padding: 16px;
-            }
-
-            .participant-name {
-                font-size: 14px;
-            }
-
-            .participant-status i {
-                font-size: 14px;
-            }
-
-            .controls {
-                padding: 24px 32px;
-                gap: 20px;
+            .video-tile {
+                min-height: 250px;
             }
 
             .control-btn {
@@ -866,439 +474,112 @@
                 height: 60px;
                 font-size: 22px;
             }
-
-            .control-btn.leave {
-                width: 68px;
-                height: 68px;
-            }
-
-            .main-participant-avatar {
-                width: 200px;
-                height: 200px;
-                font-size: 96px;
-            }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 32px 24px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        .modal-content h2 {
-            margin-bottom: 12px;
-            font-size: 20px;
-            color: var(--text-primary);
-        }
-
-        .modal-content p {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .waiting-spinner {
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @media (min-width: 768px) {
-            .modal-content {
-                padding: 48px;
-                max-width: 500px;
-            }
-
-            .modal-content h2 {
-                font-size: 24px;
-                margin-bottom: 16px;
-            }
-
-            .modal-content p {
-                margin-bottom: 24px;
-                font-size: 15px;
-            }
-
-            .waiting-spinner {
-                margin: 24px auto;
-            }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>
-            <span class="logo"><i class="fas fa-video"></i></span>
-            <span>Video Meeting</span>
-        </h1>
-        <div class="info" id="headerInfo">
-            <span class="status-indicator"></span>
-            <span>Ready</span>
-        </div>
+        <h1>🎥 Video Meeting</h1>
+        <div class="status" id="status">Ready</div>
     </div>
 
     <div class="container">
-        <div class="login-container" id="loginSection">
-            <h2>Join a Meeting</h2>
-            <p class="subtitle">Create a new meeting or join an existing one.</p>
+        <div class="login-box" id="loginBox">
+            <h2>Join Meeting</h2>
+            <p>Create or join a video meeting</p>
 
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('create')">
-                    <i class="fas fa-plus-circle"></i>
-                    Create
-                </button>
-                <button class="tab" onclick="switchTab('join')">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Join
-                </button>
-            </div>
-
-            <div class="input-group">
-                <label for="jwtToken">
-                    <i class="fas fa-key"></i>
-                    JWT Token
-                </label>
-                <input type="password" id="jwtToken" placeholder="Paste your JWT token here...">
-                <small>Get this from your authentication response</small>
-            </div>
-
-            <div class="tab-content active" id="createTab">
-                <div class="alert info active">
-                    <i class="fas fa-lightbulb"></i>
-                    <div>Create a new instant meeting and share the link with others.</div>
-                </div>
-
-                <div class="input-group">
-                    <label for="meetingTitle">
-                        <i class="fas fa-heading"></i>
-                        Meeting Title
-                    </label>
-                    <input type="text" id="meetingTitle" placeholder="e.g., Team Sync" value="Quick Meeting">
-                </div>
-
-                <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" id="waitingRoom">
-                        <span><i class="fas fa-door-closed"></i> Waiting Room</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" id="recording">
-                        <span><i class="fas fa-record-vinyl"></i> Recording</span>
-                    </label>
-                </div>
-
-                <button class="primary" onclick="createMeeting()">
-                    <i class="fas fa-video"></i>
-                    Create & Join Meeting
-                </button>
-            </div>
-
-            <div class="tab-content" id="joinTab">
-                <div class="alert info active">
-                    <i class="fas fa-lightbulb"></i>
-                    <div>Enter the Meeting ID to join an existing meeting.</div>
-                </div>
-
-                <div class="input-group">
-                    <label for="meetingId">
-                        <i class="fas fa-hashtag"></i>
-                        Meeting ID
-                    </label>
-                    <input type="number" id="meetingId" placeholder="e.g., 12345">
-                </div>
-
-                <button class="primary" onclick="joinMeeting()">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Join Meeting
-                </button>
+                <button class="tab active" onclick="switchTab('create')">Create</button>
+                <button class="tab" onclick="switchTab('join')">Join</button>
             </div>
 
             <div class="alert error" id="errorAlert"></div>
             <div class="alert success" id="successAlert"></div>
+
+            <div class="input-group">
+                <label>JWT Token</label>
+                <input type="password" id="jwtToken" placeholder="Enter your JWT token">
+            </div>
+
+            <div class="tab-content active" id="createTab">
+                <div class="input-group">
+                    <label>Meeting Title</label>
+                    <input type="text" id="meetingTitle" value="My Meeting">
+                </div>
+                <button class="btn" onclick="createMeeting()">Create & Join</button>
+            </div>
+
+            <div class="tab-content" id="joinTab">
+                <div class="input-group">
+                    <label>Meeting ID</label>
+                    <input type="number" id="meetingId" placeholder="Enter meeting ID">
+                </div>
+                <button class="btn" onclick="joinMeeting()">Join Meeting</button>
+            </div>
         </div>
 
-        <div class="loading" id="loadingSection">
+        <div class="loading" id="loading">
             <div class="spinner"></div>
             <p>Connecting...</p>
         </div>
 
         <div class="meeting-info" id="meetingInfo">
-            <h3><i class="fas fa-info-circle"></i> Meeting Info</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div style="flex: 1;">
-                        <strong><i class="fas fa-hashtag"></i> Meeting ID:</strong>
-                        <span id="displayMeetingId">-</span>
-                    </div>
-                    <button class="copy-btn" onclick="copyText('displayMeetingId')">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
+            <h3>Meeting Information</h3>
+            <div class="info-row">
+                <strong>Meeting ID:</strong>
+                <div>
+                    <span id="displayMeetingId">-</span>
+                    <button class="copy-btn" onclick="copyText('displayMeetingId')">Copy</button>
                 </div>
-                <div class="info-item">
-                    <div style="flex: 1;">
-                        <strong><i class="fas fa-link"></i> Meeting Link:</strong>
-                        <span id="displayMeetingLink">-</span>
-                    </div>
-                    <button class="copy-btn" onclick="copyText('displayMeetingLink')">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
+            </div>
+            <div class="info-row">
+                <strong>Share Link:</strong>
+                <div>
+                    <span id="displayLink" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">-</span>
+                    <button class="copy-btn" onclick="copyText('displayLink')">Copy</button>
                 </div>
             </div>
         </div>
 
         <div class="video-container" id="videoContainer">
-            <div id="video-wrapper">
-                <div id="main-screen"></div>
-                <div id="participants-sidebar">
-                    <div class="sidebar-header">
-                        <span>Participants</span>
-                        <span id="participantCount">0</span>
-                    </div>
-                </div>
-            </div>
-
+            <div id="video-grid" class="participants-1"></div>
+            
             <div class="controls">
-                <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Mute/Unmute">
+                <button class="control-btn" id="muteBtn" onclick="toggleMute()" title="Mute">
                     <i class="fas fa-microphone"></i>
                 </button>
-                <button class="control-btn" id="videoBtn" onclick="toggleVideo()" title="Camera On/Off">
+                <button class="control-btn" id="videoBtn" onclick="toggleVideo()" title="Video">
                     <i class="fas fa-video"></i>
                 </button>
-                <button class="control-btn" id="screenBtn" onclick="toggleScreenShare()" title="Share Screen">
-                    <i class="fas fa-desktop"></i>
-                </button>
-                <button class="control-btn leave" onclick="leaveMeeting()" title="Leave Meeting">
+                <button class="control-btn leave" onclick="leaveMeeting()" title="Leave">
                     <i class="fas fa-phone-slash"></i>
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="waitingRoomModal">
-        <div class="modal-content">
-            <h2>Waiting for Host</h2>
-            <p>Please wait while the host admits you to the meeting...</p>
-            <div class="waiting-spinner"></div>
-            <button class="primary" onclick="leaveWaitingRoom()" style="max-width: 200px; margin: 0 auto;">
-                <i class="fas fa-times"></i>
-                Leave
-            </button>
-        </div>
-    </div>
-
-    <!-- Debug Panel -->
-    <div class="debug-panel" id="debugPanel">
-        <div style="margin-bottom: 8px; font-weight: bold; color: #ffff00;">🔍 DEBUG LOG</div>
-        <div id="debugContent"></div>
-    </div>
-
-    <!-- Logger Script -->
-    <script>
-class MeetingLogger {
-    constructor(config = {}) {
-        this.config = {
-            enableConsole: config.enableConsole !== false,
-            logLevel: config.logLevel || 'debug',
-            categoryColors: {
-                init: '#4F46E5',
-                error: '#EF4444',
-                media: '#10B981',
-                participant: '#F59E0B',
-                network: '#3B82F6',
-                ui: '#8B5CF6'
-            }
-        };
-
-        this.logs = [];
-        this.sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        this.startTime = Date.now();
-        
-        this.logLevels = {
-            debug: 0,
-            info: 1,
-            warn: 2,
-            error: 3
-        };
-
-        this.log('init', 'Logger initialized', { sessionId: this.sessionId });
-    }
-
-    shouldLog(level) {
-        return this.logLevels[level] >= this.logLevels[this.config.logLevel];
-    }
-
-    log(category, message, data = null, level = 'info') {
-        if (!this.shouldLog(level)) return;
-
-        const logEntry = {
-            timestamp: new Date().toISOString(),
-            category,
-            level,
-            message,
-            data,
-            elapsed: Date.now() - this.startTime
-        };
-
-        this.logs.push(logEntry);
-
-        if (this.config.enableConsole) {
-            this.logToConsole(logEntry);
-        }
-
-        this.logToDebugPanel(logEntry);
-
-        return logEntry;
-    }
-
-    logToConsole(entry) {
-        const color = this.config.categoryColors[entry.category] || '#6B7280';
-        const prefix = `%c[${entry.category.toUpperCase()}]`;
-        const style = `color: ${color}; font-weight: bold;`;
-
-        const consoleMethod = entry.level === 'error' ? 'error' : 
-                            entry.level === 'warn' ? 'warn' : 'log';
-
-        if (entry.data) {
-            console[consoleMethod](prefix, style, entry.message, entry.data);
-        } else {
-            console[consoleMethod](prefix, style, entry.message);
-        }
-    }
-
-    logToDebugPanel(entry) {
-        const debugContent = document.getElementById('debugContent');
-        if (!debugContent) return;
-
-        const line = document.createElement('div');
-        line.className = 'debug-line';
-        
-        const color = entry.level === 'error' ? '#ff4444' : 
-                     entry.level === 'warn' ? '#ffaa00' :
-                     entry.level === 'info' ? '#00ff00' : '#888888';
-        
-        line.style.color = color;
-        line.textContent = `[${entry.category}] ${entry.message}`;
-        
-        debugContent.appendChild(line);
-        
-        // Keep only last 50 lines
-        while (debugContent.children.length > 50) {
-            debugContent.removeChild(debugContent.firstChild);
-        }
-        
-        // Auto-scroll
-        debugContent.parentElement.scrollTop = debugContent.parentElement.scrollHeight;
-    }
-
-    logInit(message, data) {
-        return this.log('init', message, data, 'info');
-    }
-
-    logError(message, error, context = {}) {
-        const errorData = {
-            message: error?.message || error,
-            name: error?.name,
-            ...context
-        };
-        return this.log('error', message, errorData, 'error');
-    }
-
-    logMedia(message, data) {
-        return this.log('media', message, data, 'info');
-    }
-
-    logParticipant(message, data) {
-        return this.log('participant', message, data, 'info');
-    }
-
-    logUI(message, data) {
-        return this.log('ui', message, data, 'debug');
-    }
-}
-
-window.meetingLogger = new MeetingLogger({
-    enableConsole: true,
-    logLevel: 'debug'
-});
-
-// Toggle debug panel with Ctrl+D
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === 'd') {
-        e.preventDefault();
-        const panel = document.getElementById('debugPanel');
-        panel.classList.toggle('active');
-    }
-});
-
-console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', 'color: #4F46E5; font-weight: bold; font-size: 14px;');
-    </script>
-
-    <!-- Load GetStream SDK -->
     <script type="module">
         import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1.9.1';
-        
         window.StreamVideoClient = StreamVideoClient;
-        window.getStreamLoaded = true;
-        window.meetingLogger.logInit('GetStream SDK loaded');
-        
-        window.dispatchEvent(new Event('sdkready'));
+        window.sdkLoaded = true;
+        console.log('✅ SDK Loaded');
     </script>
 
     <script>
-        const API_BASE_URL = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev';
+        const API_URL = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev';
         
-        let streamClient = null;
+        let client = null;
         let call = null;
-        let currentMeetingId = null;
-        let currentToken = null;
-        let currentUserId = null;
-        let currentUserName = null;
+        let localStream = null;
         let isMuted = false;
         let isVideoOff = false;
-        let isScreenSharing = false;
-        
-        // Store remote participant audio elements
-        const remoteAudioElements = new Map();
+        const participants = new Map(); // participantId -> { video, audio, stream }
 
-        function waitForSDK() {
-            return new Promise((resolve) => {
-                if (window.getStreamLoaded) {
-                    resolve();
-                } else {
-                    window.addEventListener('sdkready', resolve, { once: true });
-                    setTimeout(resolve, 5000);
-                }
-            });
+        function log(msg, data = null) {
+            console.log(`[APP] ${msg}`, data || '');
         }
 
         function switchTab(tab) {
-            meetingLogger.logUI('Switching tab', { tab });
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             
@@ -1309,26 +590,22 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', '
                 document.querySelectorAll('.tab')[1].classList.add('active');
                 document.getElementById('joinTab').classList.add('active');
             }
-            hideAlerts();
         }
 
         async function createMeeting() {
-            const token = document.getElementById('jwtToken').value;
-            const title = document.getElementById('meetingTitle').value;
-            const waitingRoom = document.getElementById('waitingRoom').checked;
-            const recording = document.getElementById('recording').checked;
+            const token = document.getElementById('jwtToken').value.trim();
+            const title = document.getElementById('meetingTitle').value.trim();
 
             if (!token) {
-                showError('Please enter your JWT token');
+                showError('Please enter JWT token');
                 return;
             }
 
             showLoading(true);
-            hideAlerts();
-            meetingLogger.logInit('Creating meeting', { title });
+            log('Creating meeting...');
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/meetings/instant`, {
+                const res = await fetch(`${API_URL}/api/meetings/instant`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1337,56 +614,40 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', '
                     },
                     body: JSON.stringify({
                         title: title,
-                        waitingRoomEnabled: waitingRoom,
-                        recordingEnabled: recording
+                        waitingRoomEnabled: false,
+                        recordingEnabled: false
                     })
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to create meeting');
-                }
+                if (!res.ok) throw new Error('Failed to create meeting');
 
-                const data = await response.json();
-                meetingLogger.logInit('Meeting created', { meetingId: data.meetingId });
+                const data = await res.json();
+                log('Meeting created', data);
 
-                showSuccess(`Meeting created! ID: ${data.meetingId}`);
-                currentMeetingId = data.meetingId;
-                currentToken = token;
+                await initCall(data.callCredentials, data.meetingId);
 
-                await initializeGetStream(data.callCredentials);
-                
-                const currentUrl = window.location.href.split('#')[0].split('?')[0];
-                const shareableLink = `${currentUrl}#meetingId=${data.meetingId}`;
-                
-                updateMeetingInfo({
-                    meetingId: data.meetingId,
-                    meetingLink: shareableLink
-                });
-
-            } catch (error) {
-                meetingLogger.logError('Failed to create meeting', error);
-                showError(error.message);
+            } catch (err) {
+                log('Error creating meeting', err);
+                showError(err.message);
             } finally {
                 showLoading(false);
             }
         }
 
         async function joinMeeting() {
-            const token = document.getElementById('jwtToken').value;
-            const meetingId = document.getElementById('meetingId').value;
+            const token = document.getElementById('jwtToken').value.trim();
+            const meetingId = document.getElementById('meetingId').value.trim();
 
             if (!token || !meetingId) {
-                showError('Please enter both JWT token and Meeting ID');
+                showError('Please enter JWT token and Meeting ID');
                 return;
             }
 
             showLoading(true);
-            hideAlerts();
-            meetingLogger.logInit('Joining meeting', { meetingId });
+            log('Joining meeting...');
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/meetings/${meetingId}/join`, {
+                const res = await fetch(`${API_URL}/api/meetings/${meetingId}/join`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1395,433 +656,280 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', '
                     }
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to join meeting');
-                }
+                if (!res.ok) throw new Error('Failed to join meeting');
 
-                const data = await response.json();
-                meetingLogger.logInit('Joined meeting', { meetingId });
+                const data = await res.json();
+                log('Joined meeting', data);
 
-                currentMeetingId = meetingId;
-                currentToken = token;
+                await initCall(data.callCredentials, meetingId);
 
-                await initializeGetStream(data.callCredentials);
-                
-                const currentUrl = window.location.href.split('#')[0].split('?')[0];
-                const shareableLink = `${currentUrl}#meetingId=${meetingId}`;
-                
-                updateMeetingInfo({
-                    meetingId: meetingId,
-                    meetingLink: shareableLink
-                });
-
-            } catch (error) {
-                meetingLogger.logError('Failed to join meeting', error);
-                showError(error.message);
+            } catch (err) {
+                log('Error joining meeting', err);
+                showError(err.message);
             } finally {
                 showLoading(false);
             }
         }
 
-        async function initializeGetStream(credentials) {
+        async function initCall(credentials, meetingId) {
             try {
-                await waitForSDK();
-                
+                // Wait for SDK
+                await new Promise(resolve => {
+                    if (window.sdkLoaded) resolve();
+                    else setTimeout(resolve, 2000);
+                });
+
                 if (!window.StreamVideoClient) {
-                    throw new Error('GetStream SDK not available');
+                    throw new Error('SDK not loaded');
                 }
 
-                const { apiKey, userId, userName, token: userToken, callId } = credentials;
-
-                // Request media permissions
-                meetingLogger.logMedia('Requesting media permissions');
+                log('Getting local media...');
                 
-                const mediaConstraints = {
+                // Get local media FIRST
+                localStream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 30, max: 60 },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
                         facingMode: 'user'
                     },
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        autoGainControl: true,
-                        sampleRate: 48000,
-                        channelCount: 1
+                        autoGainControl: true
                     }
-                };
-
-                const localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-                
-                meetingLogger.logMedia('Media obtained', {
-                    videoTracks: localStream.getVideoTracks().length,
-                    audioTracks: localStream.getAudioTracks().length,
-                    videoSettings: localStream.getVideoTracks()[0]?.getSettings(),
-                    audioSettings: localStream.getAudioTracks()[0]?.getSettings()
                 });
 
-                currentUserId = userId;
-                currentUserName = userName || 'You';
+                log('Local media obtained', {
+                    video: localStream.getVideoTracks().length,
+                    audio: localStream.getAudioTracks().length
+                });
 
-                // Create GetStream client
-                meetingLogger.logInit('Creating StreamVideoClient');
-                streamClient = new window.StreamVideoClient({
+                // Create client
+                const { apiKey, userId, userName, token, callId } = credentials;
+                
+                log('Creating client...');
+                client = new window.StreamVideoClient({
                     apiKey: apiKey,
-                    user: {
-                        id: userId,
-                        name: userName || 'User'
-                    },
-                    token: userToken
+                    user: { id: userId, name: userName || 'User' },
+                    token: token
                 });
 
-                // Create and join call
-                call = streamClient.call('default', callId);
-                
-                meetingLogger.logInit('Joining call', { callId });
-                await call.join({ create: true });
-                meetingLogger.logInit('Call joined successfully', { callId, userId });
+                log('Creating call...');
+                call = client.call('default', callId);
 
-                // Setup event listeners BEFORE enabling media
+                log('Joining call...');
+                await call.join({ create: true });
+                
+                log('✅ Joined call successfully');
+
+                // Enable local media
+                await call.camera.enable();
+                await call.microphone.enable();
+                
+                log('✅ Media enabled');
+
+                // Setup event listeners
                 setupEventListeners();
 
-                // Enable media devices
-                await enableMediaDevices();
-
-                showVideoUI();
-
-            } catch (error) {
-                meetingLogger.logError('Initialization failed', error);
-                showError('Failed to connect: ' + error.message);
-                throw error;
-            }
-        }
-
-        async function enableMediaDevices() {
-            try {
-                meetingLogger.logMedia('Enabling camera and microphone');
-                
-                // Enable camera
-                await call.camera.enable();
-                isVideoOff = false;
-                meetingLogger.logMedia('Camera enabled');
-                
-                // Enable microphone  
-                await call.microphone.enable();
-                isMuted = false;
-                meetingLogger.logMedia('Microphone enabled');
-                
-                // Update UI buttons
-                const muteBtn = document.getElementById('muteBtn');
-                const videoBtn = document.getElementById('videoBtn');
-                
-                if (muteBtn) {
-                    muteBtn.classList.remove('active');
-                    muteBtn.querySelector('i').className = 'fas fa-microphone';
-                }
-                
-                if (videoBtn) {
-                    videoBtn.classList.remove('active');
-                    videoBtn.querySelector('i').className = 'fas fa-video';
-                }
-                
-                // Wait longer for tracks to publish and stabilize
+                // Wait for streams to stabilize
                 await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                meetingLogger.logMedia('Media enabled, rendering participants');
-                renderParticipants();
-                
-            } catch (error) {
-                meetingLogger.logError('Media enable failed', error);
-                showError('Please allow camera and microphone access');
+
+                // Render initial participants
+                renderAllParticipants();
+
+                // Show UI
+                showVideoUI(meetingId);
+
+            } catch (err) {
+                log('Init failed', err);
+                showError('Failed to initialize: ' + err.message);
+                throw err;
             }
         }
 
         function setupEventListeners() {
-            meetingLogger.logInit('Setting up event listeners');
-            
-            // Listen for participant changes
-            call.state.participants$.subscribe((participants) => {
-                meetingLogger.logParticipant('Participants changed', { 
-                    count: participants.length,
-                    participants: Array.from(participants.values()).map(p => ({
-                        userId: p.userId,
-                        name: p.name,
-                        isLocal: p.isLocalParticipant,
-                        hasVideo: !!p.videoStream,
-                        hasAudio: !!p.audioStream
-                    }))
-                });
+            log('Setting up listeners...');
+
+            // Participant list changes
+            call.state.participants$.subscribe((participantList) => {
+                log('Participants changed', { count: participantList.length });
                 
-                // Re-render with delay to allow streams to stabilize
-                setTimeout(() => renderParticipants(), 500);
+                // Delay to allow streams to attach
+                setTimeout(() => {
+                    renderAllParticipants();
+                }, 1000);
             });
 
-            // Track published event
+            // Track published
             call.on('track.published', (event) => {
-                meetingLogger.logMedia('Track published', { 
-                    type: event.type,
-                    participant: event.participant?.userId 
-                });
-                setTimeout(() => renderParticipants(), 800);
+                log('Track published', event);
+                setTimeout(() => renderAllParticipants(), 1000);
             });
 
-            // Track unpublished event
+            // Track unpublished
             call.on('track.unpublished', (event) => {
-                meetingLogger.logMedia('Track unpublished', { 
-                    type: event.type,
-                    participant: event.participant?.userId 
-                });
-                setTimeout(() => renderParticipants(), 500);
+                log('Track unpublished', event);
+                setTimeout(() => renderAllParticipants(), 500);
             });
 
-            // Participant joined event
+            // Participant joined
             call.on('participant.joined', (event) => {
-                meetingLogger.logParticipant('Participant joined', {
-                    userId: event.participant?.userId,
-                    name: event.participant?.name
-                });
+                log('Participant joined', event.participant);
+                setTimeout(() => renderAllParticipants(), 1500);
             });
 
-            // Participant left event
+            // Participant left
             call.on('participant.left', (event) => {
-                meetingLogger.logParticipant('Participant left', {
-                    userId: event.participant?.userId
-                });
+                log('Participant left', event.participant);
                 
-                // Clean up audio element
-                const audioElement = remoteAudioElements.get(event.participant?.userId);
-                if (audioElement) {
-                    audioElement.srcObject = null;
-                    audioElement.remove();
-                    remoteAudioElements.delete(event.participant?.userId);
+                // Cleanup
+                const id = event.participant?.userId;
+                if (participants.has(id)) {
+                    const p = participants.get(id);
+                    if (p.video) p.video.srcObject = null;
+                    if (p.audio) p.audio.srcObject = null;
+                    participants.delete(id);
                 }
+                
+                renderAllParticipants();
             });
+
+            log('✅ Event listeners setup');
         }
 
-        function renderParticipants() {
-            const mainScreen = document.getElementById('main-screen');
-            const sidebar = document.getElementById('participants-sidebar');
+        function renderAllParticipants() {
+            if (!call) return;
+
+            const grid = document.getElementById('video-grid');
+            const participantList = Array.from(call.state.participants.values());
             
-            if (!mainScreen || !sidebar || !call) {
-                meetingLogger.logError('Cannot render', new Error('Elements or call missing'));
-                return;
-            }
-            
-            const participants = Array.from(call.state.participants.values());
-            
-            meetingLogger.logUI('Rendering participants', { 
-                count: participants.length,
-                participants: participants.map(p => ({
-                    userId: p.userId,
+            log('Rendering participants', { 
+                count: participantList.length,
+                participants: participantList.map(p => ({
+                    id: p.userId,
                     name: p.name,
                     isLocal: p.isLocalParticipant,
                     hasVideo: !!p.videoStream,
-                    hasAudio: !!p.audioStream,
-                    videoTracks: p.videoStream?.getVideoTracks().length || 0,
-                    audioTracks: p.audioStream?.getAudioTracks().length || 0
+                    hasAudio: !!p.audioStream
                 }))
             });
 
-            const countElement = document.getElementById('participantCount');
-            if (countElement) {
-                countElement.textContent = participants.length;
-            }
+            // Clear grid
+            grid.innerHTML = '';
 
-            mainScreen.innerHTML = '';
-            sidebar.innerHTML = `
-                <div class="sidebar-header">
-                    <span>Participants</span>
-                    <span>${participants.length}</span>
-                </div>
-            `;
+            // Update grid class for responsive layout
+            grid.className = `participants-${Math.min(participantList.length, 9)}`;
 
-            if (participants.length === 0) {
-                mainScreen.innerHTML = '<p style="color: #94A3B8;">Waiting for participants...</p>';
-                return;
-            }
-
-            // Find local participant
-            const localParticipant = participants.find(p => p.isLocalParticipant);
-            const mainParticipant = localParticipant || participants[0];
-            
-            if (mainParticipant) {
-                const mainVideo = createVideoElement(mainParticipant, true);
-                mainScreen.appendChild(mainVideo);
-            }
-
-            // Render all other participants in sidebar
-            participants.forEach((participant) => {
-                if (participant !== mainParticipant) {
-                    const tile = createVideoElement(participant, false);
-                    sidebar.appendChild(tile);
-                }
+            // Render each participant
+            participantList.forEach(participant => {
+                const tile = createParticipantTile(participant);
+                grid.appendChild(tile);
             });
+
+            log(`✅ Rendered ${participantList.length} participants`);
         }
 
-        function createVideoElement(participant, isMain = false) {
-            const container = document.createElement('div');
-            container.className = isMain ? 'main-video-container' : 'participant-tile';
-            container.id = `participant-${participant.userId}`;
+        function createParticipantTile(participant) {
+            const tile = document.createElement('div');
+            tile.className = 'video-tile';
+            tile.id = `tile-${participant.userId}`;
 
             const name = participant.name || participant.userId || 'Guest';
             const initial = name.charAt(0).toUpperCase();
+            const isLocal = participant.isLocalParticipant;
 
-            // Check for video stream
+            // Get streams
             const videoStream = participant.videoStream;
-            const videoTracks = videoStream?.getVideoTracks() || [];
-            const hasVideo = videoTracks.length > 0 && 
-                           videoTracks[0].enabled && 
-                           videoTracks[0].readyState === 'live';
-            
-            // Check for audio stream
             const audioStream = participant.audioStream;
-            const audioTracks = audioStream?.getAudioTracks() || [];
-            const hasAudio = audioTracks.length > 0 && 
-                           audioTracks[0].enabled && 
-                           audioTracks[0].readyState === 'live';
 
-            meetingLogger.logMedia('Creating video element', {
-                participant: name,
-                userId: participant.userId,
-                isMain,
-                isLocal: participant.isLocalParticipant,
-                hasVideo,
-                hasAudio,
-                videoTracksCount: videoTracks.length,
-                audioTracksCount: audioTracks.length,
-                videoTrackState: videoTracks[0]?.readyState,
-                audioTrackState: audioTracks[0]?.readyState
-            });
+            const hasVideo = videoStream && 
+                            videoStream.getVideoTracks().length > 0 &&
+                            videoStream.getVideoTracks()[0].enabled &&
+                            videoStream.getVideoTracks()[0].readyState === 'live';
 
-            // CRITICAL FIX: Create video element for video stream
+            const hasAudio = audioStream && 
+                            audioStream.getAudioTracks().length > 0 &&
+                            audioStream.getAudioTracks()[0].enabled &&
+                            audioStream.getAudioTracks()[0].readyState === 'live';
+
+            log(`Creating tile for ${name}`, { hasVideo, hasAudio, isLocal });
+
+            // VIDEO element
             if (hasVideo) {
                 const video = document.createElement('video');
                 video.autoplay = true;
                 video.playsInline = true;
-                video.muted = participant.isLocalParticipant; // Mute local to prevent echo
-                video.style.width = '100%';
-                video.style.height = '100%';
-                video.style.objectFit = isMain ? 'contain' : 'cover';
-                video.style.backgroundColor = '#1E293B';
-                video.id = `video-${participant.userId}`;
-
+                video.muted = isLocal; // Mute local to prevent echo
                 video.srcObject = videoStream;
-                container.appendChild(video);
+                video.id = `video-${participant.userId}`;
+                
+                tile.appendChild(video);
 
-                // Force play
                 video.play().catch(err => {
-                    meetingLogger.logError('Video play failed', err, { userId: participant.userId });
+                    log('Video play failed', err);
                 });
 
-                meetingLogger.logMedia('Video element created', { userId: participant.userId });
+                log(`✅ Video added for ${name}`);
             } else {
-                const avatar = createAvatar(initial, isMain);
-                container.appendChild(avatar);
+                // Show avatar
+                const avatar = document.createElement('div');
+                avatar.className = 'video-avatar';
+                avatar.textContent = initial;
+                tile.appendChild(avatar);
             }
 
-            // CRITICAL FIX: Create SEPARATE audio element for remote audio
-            if (hasAudio && !participant.isLocalParticipant) {
-                let audioElement = remoteAudioElements.get(participant.userId);
+            // AUDIO element - SEPARATE, only for REMOTE participants
+            if (hasAudio && !isLocal) {
+                const audio = document.createElement('audio');
+                audio.autoplay = true;
+                audio.srcObject = audioStream;
+                audio.id = `audio-${participant.userId}`;
                 
-                if (!audioElement) {
-                    audioElement = document.createElement('audio');
-                    audioElement.autoplay = true;
-                    audioElement.id = `audio-${participant.userId}`;
-                    remoteAudioElements.set(participant.userId, audioElement);
-                    container.appendChild(audioElement);
-                    
-                    meetingLogger.logMedia('Audio element created', { userId: participant.userId });
-                }
+                tile.appendChild(audio);
 
-                audioElement.srcObject = audioStream;
-                
-                // Force play with error handling
-                audioElement.play().catch(err => {
-                    meetingLogger.logError('Audio play failed', err, { userId: participant.userId });
+                audio.play().catch(err => {
+                    log('Audio play failed', err);
                     
-                    // Try again after user interaction
-                    document.addEventListener('click', () => {
-                        audioElement.play().catch(e => {
-                            meetingLogger.logError('Audio play retry failed', e);
-                        });
-                    }, { once: true });
+                    // Retry on user interaction
+                    const retryPlay = () => {
+                        audio.play().catch(e => log('Audio retry failed', e));
+                        document.removeEventListener('click', retryPlay);
+                    };
+                    document.addEventListener('click', retryPlay, { once: true });
                 });
 
-                meetingLogger.logMedia('Audio stream attached', { 
-                    userId: participant.userId,
-                    audioTracks: audioTracks.length
-                });
+                log(`✅ Audio added for ${name}`);
             }
 
-            // Add overlay with name and status
+            // Overlay with name and status
             const overlay = document.createElement('div');
-            overlay.className = 'participant-overlay';
-            
-            const nameSpan = document.createElement('div');
-            nameSpan.className = 'participant-name';
-            nameSpan.textContent = `${name}${participant.isLocalParticipant ? ' (You)' : ''}`;
-            
+            overlay.className = 'video-overlay';
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'video-name';
+            nameDiv.textContent = name + (isLocal ? ' (You)' : '');
+
             const statusDiv = document.createElement('div');
-            statusDiv.className = 'participant-status';
-            
-            // Audio status
-            if (hasAudio) {
-                const micIcon = document.createElement('i');
-                micIcon.className = 'fas fa-microphone';
-                statusDiv.appendChild(micIcon);
-            } else {
-                const micIcon = document.createElement('i');
-                micIcon.className = 'fas fa-microphone-slash';
-                micIcon.style.color = '#EF4444';
-                statusDiv.appendChild(micIcon);
-            }
-            
-            // Video status
+            statusDiv.className = 'video-status';
+
+            // Mic icon
+            const micIcon = document.createElement('i');
+            micIcon.className = hasAudio ? 'fas fa-microphone' : 'fas fa-microphone-slash';
+            if (!hasAudio) micIcon.style.color = '#EF4444';
+            statusDiv.appendChild(micIcon);
+
+            // Video icon
             if (hasVideo) {
-                const videoIcon = document.createElement('i');
-                videoIcon.className = 'fas fa-video';
-                statusDiv.appendChild(videoIcon);
+                const vidIcon = document.createElement('i');
+                vidIcon.className = 'fas fa-video';
+                statusDiv.appendChild(vidIcon);
             }
-            
-            overlay.appendChild(nameSpan);
+
+            overlay.appendChild(nameDiv);
             overlay.appendChild(statusDiv);
-            container.appendChild(overlay);
+            tile.appendChild(overlay);
 
-            return container;
-        }
-
-        function createAvatar(initial, isMain = false) {
-            const avatar = document.createElement('div');
-            avatar.className = isMain ? 'main-participant-avatar' : 'participant-avatar';
-            avatar.textContent = initial;
-            return avatar;
-        }
-
-        function showVideoUI() {
-            meetingLogger.logUI('Showing video UI');
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('videoContainer').classList.add('active');
-            document.getElementById('meetingInfo').classList.add('active');
-        }
-
-        function updateMeetingInfo(data) {
-            meetingLogger.logUI('Updating meeting info', data);
-            
-            const meetingIdElement = document.getElementById('displayMeetingId');
-            const meetingLinkElement = document.getElementById('displayMeetingLink');
-            
-            if (meetingIdElement) meetingIdElement.textContent = data.meetingId;
-            if (meetingLinkElement) meetingLinkElement.textContent = data.meetingLink;
-            
-            const headerInfo = document.getElementById('headerInfo');
-            if (headerInfo) {
-                headerInfo.innerHTML = `
-                    <span class="status-indicator"></span>
-                    <span>In meeting</span>
-                `;
-            }
+            return tile;
         }
 
         async function toggleMute() {
@@ -1833,18 +941,18 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', '
                     isMuted = false;
                     document.getElementById('muteBtn').classList.remove('active');
                     document.querySelector('#muteBtn i').className = 'fas fa-microphone';
-                    meetingLogger.logMedia('Microphone unmuted');
+                    log('Unmuted');
                 } else {
                     await call.microphone.disable();
                     isMuted = true;
                     document.getElementById('muteBtn').classList.add('active');
                     document.querySelector('#muteBtn i').className = 'fas fa-microphone-slash';
-                    meetingLogger.logMedia('Microphone muted');
+                    log('Muted');
                 }
-                
-                setTimeout(() => renderParticipants(), 300);
-            } catch (error) {
-                meetingLogger.logError('Toggle mute failed', error);
+
+                setTimeout(() => renderAllParticipants(), 300);
+            } catch (err) {
+                log('Toggle mute failed', err);
             }
         }
 
@@ -1857,166 +965,108 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', '
                     isVideoOff = false;
                     document.getElementById('videoBtn').classList.remove('active');
                     document.querySelector('#videoBtn i').className = 'fas fa-video';
-                    meetingLogger.logMedia('Camera on');
+                    log('Video on');
                 } else {
                     await call.camera.disable();
                     isVideoOff = true;
                     document.getElementById('videoBtn').classList.add('active');
                     document.querySelector('#videoBtn i').className = 'fas fa-video-slash';
-                    meetingLogger.logMedia('Camera off');
+                    log('Video off');
                 }
-                
-                setTimeout(() => renderParticipants(), 500);
-            } catch (error) {
-                meetingLogger.logError('Toggle video failed', error);
-            }
-        }
 
-        async function toggleScreenShare() {
-            if (!call || !call.screenShare) {
-                showError('Screen sharing not available');
-                return;
-            }
-
-            try {
-                if (isScreenSharing) {
-                    await call.screenShare.disable();
-                    isScreenSharing = false;
-                    document.getElementById('screenBtn').classList.remove('active');
-                    meetingLogger.logMedia('Screen share stopped');
-                } else {
-                    await call.screenShare.enable();
-                    isScreenSharing = true;
-                    document.getElementById('screenBtn').classList.add('active');
-                    meetingLogger.logMedia('Screen share started');
-                }
-                
-                setTimeout(() => renderParticipants(), 500);
-            } catch (error) {
-                meetingLogger.logError('Screen share failed', error);
-                if (error.name !== 'NotAllowedError') {
-                    showError('Failed to share screen');
-                }
+                setTimeout(() => renderAllParticipants(), 500);
+            } catch (err) {
+                log('Toggle video failed', err);
             }
         }
 
         async function leaveMeeting() {
-            meetingLogger.logInit('Leaving meeting');
-            
-            // Clean up audio elements
-            remoteAudioElements.forEach((audioElement, userId) => {
-                audioElement.srcObject = null;
-                audioElement.remove();
+            log('Leaving meeting...');
+
+            // Cleanup
+            participants.forEach((p) => {
+                if (p.video) p.video.srcObject = null;
+                if (p.audio) p.audio.srcObject = null;
             });
-            remoteAudioElements.clear();
-            
+            participants.clear();
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+
             if (call) {
                 await call.leave();
             }
 
-            if (currentMeetingId && currentToken) {
-                try {
-                    await fetch(`${API_BASE_URL}/api/meetings/${currentMeetingId}/leave`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${currentToken}`,
-                            'ngrok-skip-browser-warning': 'true'
-                        }
-                    });
-                } catch (error) {
-                    meetingLogger.logError('Leave API failed', error);
-                }
-            }
-
+            // Reset UI
             document.getElementById('videoContainer').classList.remove('active');
             document.getElementById('meetingInfo').classList.remove('active');
-            document.getElementById('loginSection').style.display = 'block';
-            
-            const headerInfo = document.getElementById('headerInfo');
-            if (headerInfo) {
-                headerInfo.innerHTML = `
-                    <span class="status-indicator"></span>
-                    <span>Ready</span>
-                `;
-            }
+            document.getElementById('loginBox').style.display = 'block';
+            document.getElementById('status').textContent = 'Ready';
 
-            streamClient = null;
+            client = null;
             call = null;
-            currentMeetingId = null;
-            currentToken = null;
-            
-            setTimeout(() => location.reload(), 500);
+            localStream = null;
+
+            log('✅ Left meeting');
         }
 
-        function leaveWaitingRoom() {
-            document.getElementById('waitingRoomModal').classList.remove('active');
-            window.location.reload();
-        }
+        function showVideoUI(meetingId) {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('videoContainer').classList.add('active');
+            document.getElementById('meetingInfo').classList.add('active');
+            document.getElementById('status').textContent = 'In Meeting';
 
-        function copyText(elementId) {
-            const element = document.getElementById(elementId);
-            if (!element) return;
+            const url = window.location.href.split('#')[0];
+            const link = `${url}#meetingId=${meetingId}`;
             
-            const text = element.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                showSuccess('Copied to clipboard!');
-            }).catch(() => {
-                showError('Failed to copy');
-            });
+            document.getElementById('displayMeetingId').textContent = meetingId;
+            document.getElementById('displayLink').textContent = link;
+
+            log('✅ Video UI shown');
         }
 
         function showLoading(show) {
-            const loadingSection = document.getElementById('loadingSection');
-            const loginSection = document.getElementById('loginSection');
-            
-            if (loadingSection) loadingSection.classList.toggle('active', show);
-            
+            document.getElementById('loading').classList.toggle('active', show);
             if (show) {
-                if (loginSection) loginSection.style.display = 'none';
+                document.getElementById('loginBox').style.display = 'none';
             } else {
-                if (!document.getElementById('videoContainer').classList.contains('active')) {
-                    if (loginSection) loginSection.style.display = 'block';
-                }
+                document.getElementById('loginBox').style.display = 'block';
             }
         }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorAlert');
-            if (errorDiv) {
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i><div>${message}</div>`;
-                errorDiv.classList.add('active');
-                setTimeout(() => errorDiv.classList.remove('active'), 5000);
-            }
+        function showError(msg) {
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = msg;
+            alert.classList.add('active');
+            setTimeout(() => alert.classList.remove('active'), 5000);
         }
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successAlert');
-            if (successDiv) {
-                successDiv.innerHTML = `<i class="fas fa-check-circle"></i><div>${message}</div>`;
-                successDiv.classList.add('active');
-                setTimeout(() => successDiv.classList.remove('active'), 3000);
-            }
+        function showSuccess(msg) {
+            const alert = document.getElementById('successAlert');
+            alert.textContent = msg;
+            alert.classList.add('active');
+            setTimeout(() => alert.classList.remove('active'), 3000);
         }
 
-        function hideAlerts() {
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
-            if (errorAlert) errorAlert.classList.remove('active');
-            if (successAlert) successAlert.classList.remove('active');
+        function copyText(id) {
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showSuccess('Copied!');
+            });
         }
 
-        // Auto-fill meeting ID from URL hash
-        const urlHash = window.location.hash.substring(1);
-        const urlParams = new URLSearchParams(urlHash);
-        const meetingIdFromUrl = urlParams.get('meetingId');
-        
-        if (meetingIdFromUrl) {
-            document.getElementById('meetingId').value = meetingIdFromUrl;
+        // Auto-join from URL
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const meetingId = params.get('meetingId');
+        if (meetingId) {
+            document.getElementById('meetingId').value = meetingId;
             switchTab('join');
-            meetingLogger.logInit('Auto-filled meeting ID', { meetingId: meetingIdFromUrl });
+            log('Auto-filled meeting ID', meetingId);
         }
 
-        meetingLogger.logInit('App initialized - Press Ctrl+D for debug panel');
+        log('✅ App initialized');
     </script>
 </body>
-    </html>
+</html>
