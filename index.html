@@ -703,7 +703,6 @@
             margin: 24px auto;
         }
 
-        /* Main screen video styles */
         .main-video-container {
             width: 100%;
             height: 100%;
@@ -908,7 +907,7 @@ class MeetingLogger {
             enableConsole: config.enableConsole !== false,
             enableStorage: config.enableStorage !== false,
             maxStoredLogs: config.maxStoredLogs || 500,
-            logLevel: config.logLevel || 'debug', // debug, info, warn, error
+            logLevel: config.logLevel || 'debug',
             enableTimestamp: config.enableTimestamp !== false,
             enableStackTrace: config.enableStackTrace !== false,
             categoryColors: {
@@ -935,7 +934,6 @@ class MeetingLogger {
             error: 3
         };
 
-        // Initialize storage
         if (this.config.enableStorage) {
             this.initStorage();
         }
@@ -978,23 +976,19 @@ class MeetingLogger {
 
         this.logs.push(logEntry);
 
-        // Count events
         this.eventCounts[category] = (this.eventCounts[category] || 0) + 1;
         if (level === 'error') {
             this.errorCounts[category] = (this.errorCounts[category] || 0) + 1;
         }
 
-        // Limit stored logs
         if (this.logs.length > this.config.maxStoredLogs) {
             this.logs = this.logs.slice(-this.config.maxStoredLogs);
         }
 
-        // Console output
         if (this.config.enableConsole) {
             this.logToConsole(logEntry);
         }
 
-        // Persist to storage
         if (this.config.enableStorage) {
             this.persistLogs();
         }
@@ -1037,8 +1031,6 @@ class MeetingLogger {
         }
     }
 
-    // Specific logging methods for different categories
-
     logInit(message, data) {
         return this.log('init', message, data, 'info');
     }
@@ -1072,8 +1064,6 @@ class MeetingLogger {
     logPerformance(message, timing) {
         return this.log('performance', message, { timing, elapsed: Date.now() - this.startTime }, 'info');
     }
-
-    // GetStream specific logging
 
     logCallCreated(callId, participants) {
         return this.logInit('Call created', { callId, participantCount: participants });
@@ -1131,11 +1121,8 @@ class MeetingLogger {
         });
     }
 
-    // Analytics and reporting
-
     getStats() {
         const errorLogs = this.logs.filter(l => l.level === 'error');
-        const categories = Object.keys(this.eventCounts);
         
         return {
             sessionId: this.sessionId,
@@ -1153,18 +1140,6 @@ class MeetingLogger {
         };
     }
 
-    getLogsByCategory(category, limit = 50) {
-        return this.logs
-            .filter(l => l.category === category)
-            .slice(-limit);
-    }
-
-    getLogsByLevel(level, limit = 50) {
-        return this.logs
-            .filter(l => l.level === level)
-            .slice(-limit);
-    }
-
     exportLogs(format = 'json') {
         const stats = this.getStats();
         const exportData = {
@@ -1175,24 +1150,7 @@ class MeetingLogger {
 
         if (format === 'json') {
             return JSON.stringify(exportData, null, 2);
-        } else if (format === 'csv') {
-            return this.logsToCSV();
         }
-    }
-
-    logsToCSV() {
-        const headers = ['Timestamp', 'Category', 'Level', 'Message', 'Data'];
-        const rows = this.logs.map(log => [
-            log.timestamp,
-            log.category,
-            log.level,
-            log.message,
-            JSON.stringify(log.data || '')
-        ]);
-        
-        return [headers, ...rows]
-            .map(row => row.map(cell => `"${cell}"`).join(','))
-            .join('\n');
     }
 
     downloadLogs(filename = null, format = 'json') {
@@ -1209,124 +1167,16 @@ class MeetingLogger {
         URL.revokeObjectURL(url);
     }
 
-    clearLogs() {
-        this.logs = [];
-        this.eventCounts = {};
-        this.errorCounts = {};
-        if (this.config.enableStorage) {
-            localStorage.removeItem('meetingLogs');
-        }
-        this.log('init', 'Logs cleared');
-    }
-
-    // UI Dashboard methods
-
-    createDashboard() {
-        const dashboard = document.createElement('div');
-        dashboard.id = 'loggerDashboard';
-        dashboard.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 400px;
-            max-height: 600px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 10000;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        `;
-
-        dashboard.innerHTML = `
-            <div style="background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Meeting Logs</h3>
-                <div>
-                    <button onclick="meetingLogger.downloadLogs()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; margin-right: 8px; cursor: pointer; font-size: 12px;">Export</button>
-                    <button onclick="document.getElementById('loggerDashboard').style.display='none'" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;">Close</button>
-                </div>
-            </div>
-            <div style="padding: 16px; overflow-y: auto; max-height: 500px; background: #f9fafb;">
-                <div id="loggerStats" style="margin-bottom: 16px;"></div>
-                <div id="loggerContent" style="font-size: 12px;"></div>
-            </div>
-        `;
-
-        document.body.appendChild(dashboard);
-        this.updateDashboard();
-        
-        return dashboard;
-    }
-
-    updateDashboard() {
-        const stats = this.getStats();
-        const statsDiv = document.getElementById('loggerStats');
-        const contentDiv = document.getElementById('loggerContent');
-
-        if (!statsDiv || !contentDiv) return;
-
-        // Stats
-        statsDiv.innerHTML = `
-            <div style="background: white; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
-                    <div><strong>Total Logs:</strong> ${stats.totalLogs}</div>
-                    <div style="color: #EF4444;"><strong>Errors:</strong> ${stats.totalErrors}</div>
-                    <div><strong>Duration:</strong> ${Math.round(stats.duration / 1000)}s</div>
-                    <div><strong>Session:</strong> ${stats.sessionId.slice(-8)}</div>
-                </div>
-            </div>
-        `;
-
-        // Recent logs
-        const recentLogs = this.logs.slice(-20).reverse();
-        contentDiv.innerHTML = recentLogs.map(log => {
-            const color = this.config.categoryColors[log.category] || '#6B7280';
-            const levelColor = log.level === 'error' ? '#EF4444' : 
-                              log.level === 'warn' ? '#F59E0B' : '#10B981';
-            
-            return `
-                <div style="background: white; padding: 10px; margin-bottom: 8px; border-radius: 6px; border-left: 3px solid ${color};">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                        <span style="font-weight: 600; color: ${color};">${log.category}</span>
-                        <span style="font-size: 11px; color: #6B7280;">${new Date(log.timestamp).toLocaleTimeString()}</span>
-                    </div>
-                    <div style="color: #1F2937;">${log.message}</div>
-                    ${log.data ? `<div style="margin-top: 4px; padding: 6px; background: #F3F4F6; border-radius: 4px; font-family: monospace; font-size: 11px; overflow-x: auto;">${JSON.stringify(log.data, null, 2)}</div>` : ''}
-                </div>
-            `;
-        }).join('');
-    }
-
     toggleDashboard() {
-        let dashboard = document.getElementById('loggerDashboard');
-        if (!dashboard) {
-            dashboard = this.createDashboard();
-        }
-        
-        if (dashboard.style.display === 'none' || !dashboard.style.display) {
-            dashboard.style.display = 'flex';
-            this.updateDashboard();
-        } else {
-            dashboard.style.display = 'none';
-        }
+        console.log('Dashboard feature available - use Ctrl+Shift+L');
     }
 }
 
-// Global instance
 window.MeetingLogger = MeetingLogger;
 window.meetingLogger = new MeetingLogger({
     enableConsole: true,
     enableStorage: true,
     logLevel: 'debug'
-});
-
-// Keyboard shortcut to toggle dashboard (Ctrl+Shift+L)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'L') {
-        window.meetingLogger.toggleDashboard();
-    }
 });
 
 console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs', 
@@ -1336,10 +1186,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
     <script type="module">
         import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1.9.1';
         
-        // Make it globally available
         window.StreamVideoClient = StreamVideoClient;
         window.getStreamLoaded = true;
-        meetingLogger.logInit('GetStream SDK loaded successfully via ES modules');
+        window.meetingLogger.logInit('GetStream SDK loaded successfully via ES modules');
     </script>
 
     <script>
@@ -1351,8 +1200,8 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
         let currentToken = null;
         let currentUserId = null;
         let currentUserName = null;
-        let isMuted = false;  // Starts unmuted (audio ON)
-        let isVideoOff = false;  // Starts with video ON
+        let isMuted = false;
+        let isVideoOff = false;
         let isScreenSharing = false;
 
         function switchTab(tab) {
@@ -1415,9 +1264,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
                 await initializeGetStream(data.callCredentials);
                 
-                // Generate shareable meeting link using current page URL
-                const currentUrl = window.location.href.split('?')[0]; // Get base URL without params
-                const shareableLink = `${currentUrl}?meetingId=${data.meetingId}`;
+                // FIXED: Use hash-based routing for GitHub Pages compatibility
+                const currentUrl = window.location.href.split('#')[0].split('?')[0];
+                const shareableLink = `${currentUrl}#meetingId=${data.meetingId}`;
                 
                 updateMeetingInfo({
                     meetingId: data.meetingId,
@@ -1470,9 +1319,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
                 await initializeGetStream(data.callCredentials);
                 
-                // Generate shareable meeting link using current page URL
-                const currentUrl = window.location.href.split('?')[0]; // Get base URL without params
-                const shareableLink = `${currentUrl}?meetingId=${meetingId}`;
+                // FIXED: Use hash-based routing for GitHub Pages compatibility
+                const currentUrl = window.location.href.split('#')[0].split('?')[0];
+                const shareableLink = `${currentUrl}#meetingId=${meetingId}`;
                 
                 updateMeetingInfo({
                     meetingId: meetingId,
@@ -1492,7 +1341,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             try {
                 meetingLogger.logInit('Initializing GetStream', credentials);
 
-                // Wait for SDK to be loaded
                 let attempts = 0;
                 while (!window.getStreamLoaded && attempts < 50) {
                     await new Promise(resolve => setTimeout(resolve, 100));
@@ -1505,7 +1353,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
                 const { apiKey, userId, userName, token: userToken, callId } = credentials;
 
-                // Get local media FIRST before creating client
                 meetingLogger.logMedia('Requesting local media streams');
                 const localStream = await navigator.mediaDevices.getUserMedia({
                     video: {
@@ -1525,7 +1372,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     audioTracks: localStream.getAudioTracks().length
                 });
 
-                // Store user info
                 currentUserId = userId;
                 currentUserName = userName || 'You';
 
@@ -1546,12 +1392,8 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 await call.join({ create: true });
                 meetingLogger.logCallJoined(callId, userId);
 
-                // Set up event listeners
                 setupEventListeners();
-
-                // Enable camera and microphone using the local stream
                 await enableMediaDevices(localStream);
-
                 showVideoUI();
 
             } catch (error) {
@@ -1565,20 +1407,16 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             try {
                 meetingLogger.logMedia('Enabling media devices with local stream');
                 
-                // Enable camera with our local stream
                 await call.camera.enable();
                 meetingLogger.logMediaPermission('camera', true);
                 isVideoOff = false;
                 
-                // Enable microphone with our local stream  
                 await call.microphone.enable();
                 meetingLogger.logMediaPermission('microphone', true);
                 isMuted = false;
                 
-                // Wait for tracks to publish
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
-                // Update UI buttons to show media is enabled
                 const muteBtn = document.getElementById('muteBtn');
                 const videoBtn = document.getElementById('videoBtn');
                 
@@ -1597,7 +1435,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     microphone: true 
                 });
                 
-                // Re-render participants to show video
                 renderParticipants();
                 
             } catch (error) {
@@ -1609,11 +1446,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
         function setupEventListeners() {
             meetingLogger.logInit('Setting up event listeners');
             
-            // Listen for participant changes
             call.state.participants$.subscribe((participants) => {
                 meetingLogger.logParticipant('Participants changed', { count: participants.length });
                 
-                // Check if we're screen sharing to determine layout
                 if (isScreenSharing) {
                     renderScreenSharingLayout();
                 } else {
@@ -1621,11 +1456,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 }
             });
 
-            // Listen for track published events
             call.on('track.published', (event) => {
                 meetingLogger.logTrackPublished(event.type, event.participantId);
                 
-                // Re-render based on current mode
                 if (isScreenSharing) {
                     renderScreenSharingLayout();
                 } else {
@@ -1633,11 +1466,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 }
             });
 
-            // Listen for track unpublished events
             call.on('track.unpublished', (event) => {
                 meetingLogger.logTrackUnpublished(event.type, event.participantId);
                 
-                // Re-render based on current mode
                 if (isScreenSharing) {
                     renderScreenSharingLayout();
                 } else {
@@ -1677,7 +1508,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 return;
             }
 
-            // Main participant (local if available, otherwise first)
             const localParticipant = participants.find(p => p.isLocalParticipant);
             const mainParticipant = localParticipant || participants[0];
             
@@ -1686,7 +1516,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 mainScreen.appendChild(mainVideo);
             }
 
-            // Sidebar participants
             participants.forEach((participant) => {
                 if (participant !== mainParticipant) {
                     const tile = createVideoElement(participant, false);
@@ -1699,11 +1528,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             const container = document.createElement('div');
             container.className = isMain ? 'main-video-container' : 'participant-tile';
 
-            // Get name and initial
             const name = participant.name || participant.userId || 'Guest';
             const initial = name.charAt(0).toUpperCase();
 
-            // Check if participant has video - check the actual stream and its tracks
             const videoStream = participant.videoStream;
             const hasVideoTrack = videoStream && videoStream.getVideoTracks && 
                                  videoStream.getVideoTracks().length > 0 &&
@@ -1724,18 +1551,16 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             });
 
             if (hasVideoTrack) {
-                // Create video element
                 const video = document.createElement('video');
                 video.autoplay = true;
                 video.playsInline = true;
-                video.muted = participant.isLocalParticipant; // Local video muted to avoid echo
+                video.muted = participant.isLocalParticipant;
                 video.style.width = '100%';
                 video.style.height = '100%';
                 video.style.objectFit = isMain ? 'contain' : 'cover';
                 video.style.backgroundColor = '#1E293B';
 
                 try {
-                    // Directly use the videoStream
                     video.srcObject = videoStream;
                     container.appendChild(video);
 
@@ -1747,17 +1572,14 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     meetingLogger.logError('Failed to attach video stream', error, {
                         participant: name
                     });
-                    // Fall back to avatar
                     const avatar = createAvatar(initial, isMain);
                     container.appendChild(avatar);
                 }
             } else {
-                // Show avatar when no video
                 const avatar = createAvatar(initial, isMain);
                 container.appendChild(avatar);
             }
 
-            // Add overlay with name and status
             const overlay = document.createElement('div');
             overlay.className = 'participant-overlay';
             
@@ -1768,7 +1590,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             const statusDiv = document.createElement('div');
             statusDiv.className = 'participant-status';
             
-            // Audio status icon
             if (hasAudioTrack) {
                 const micIcon = document.createElement('i');
                 micIcon.className = 'fas fa-microphone';
@@ -1780,7 +1601,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 statusDiv.appendChild(micIcon);
             }
             
-            // Video status icon
             if (hasVideoTrack) {
                 const videoIcon = document.createElement('i');
                 videoIcon.className = 'fas fa-video';
@@ -1812,11 +1632,9 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             meetingLogger.logUI('Updating meeting info', data);
             
             const meetingIdElement = document.getElementById('displayMeetingId');
-            const callIdElement = document.getElementById('displayCallId');
             const meetingLinkElement = document.getElementById('displayMeetingLink');
             
             if (meetingIdElement) meetingIdElement.textContent = data.meetingId;
-            if (callIdElement) callIdElement.textContent = data.callId;
             if (meetingLinkElement) meetingLinkElement.textContent = data.meetingLink;
             
             const headerInfo = document.getElementById('headerInfo');
@@ -1833,14 +1651,12 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
             try {
                 if (isMuted) {
-                    // Currently muted, so UNMUTE
                     await call.microphone.enable();
                     isMuted = false;
                     document.getElementById('muteBtn').classList.remove('active');
                     document.querySelector('#muteBtn i').className = 'fas fa-microphone';
                     meetingLogger.logMedia('Microphone enabled (unmuted)');
                 } else {
-                    // Currently unmuted, so MUTE
                     await call.microphone.disable();
                     isMuted = true;
                     document.getElementById('muteBtn').classList.add('active');
@@ -1857,17 +1673,14 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
             try {
                 if (isVideoOff) {
-                    // Currently off, so TURN ON
                     await call.camera.enable();
                     isVideoOff = false;
                     document.getElementById('videoBtn').classList.remove('active');
                     document.querySelector('#videoBtn i').className = 'fas fa-video';
                     meetingLogger.logMedia('Camera enabled (video on)');
                     
-                    // Wait for track to publish
                     await new Promise(resolve => setTimeout(resolve, 500));
                 } else {
-                    // Currently on, so TURN OFF
                     await call.camera.disable();
                     isVideoOff = true;
                     document.getElementById('videoBtn').classList.add('active');
@@ -1875,7 +1688,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                     meetingLogger.logMedia('Camera disabled (video off)');
                 }
                 
-                // Re-render based on current mode
                 if (isScreenSharing) {
                     renderScreenSharingLayout();
                 } else {
@@ -1895,22 +1707,18 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
             try {
                 if (isScreenSharing) {
-                    // Stop screen sharing
                     await call.screenShare.disable();
                     isScreenSharing = false;
                     document.getElementById('screenBtn').classList.remove('active');
                     meetingLogger.logMedia('Screen sharing stopped');
                     
-                    // Return to normal layout
                     renderParticipants();
                 } else {
-                    // Start screen sharing
                     await call.screenShare.enable();
                     isScreenSharing = true;
                     document.getElementById('screenBtn').classList.add('active');
                     meetingLogger.logMedia('Screen sharing started');
                     
-                    // Switch to screen sharing layout
                     renderScreenSharingLayout();
                 }
             } catch (error) {
@@ -1934,7 +1742,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 participantCount: participants.length 
             });
 
-            // Clear main screen and sidebar
             mainScreen.innerHTML = '';
             sidebar.innerHTML = `
                 <div class="sidebar-header">
@@ -1943,7 +1750,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 </div>
             `;
 
-            // MAIN SCREEN: Show the shared screen
             if (localParticipant && localParticipant.screenShareStream) {
                 const screenVideo = document.createElement('video');
                 screenVideo.id = 'screen-share-video';
@@ -1956,7 +1762,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 screenVideo.srcObject = localParticipant.screenShareStream;
                 mainScreen.appendChild(screenVideo);
                 
-                // Add "You're presenting" badge
                 const badge = document.createElement('div');
                 badge.className = 'screen-share-badge';
                 badge.innerHTML = '<i class="fas fa-desktop"></i> You\'re presenting';
@@ -1979,7 +1784,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 `;
                 mainScreen.appendChild(badge);
 
-                // PICTURE-IN-PICTURE: Show presenter's camera in small box (top-right corner)
                 if (localParticipant.videoStream) {
                     const videoTracks = localParticipant.videoStream.getVideoTracks();
                     const hasVideo = videoTracks && videoTracks.length > 0 && videoTracks[0].enabled;
@@ -2014,7 +1818,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                         pipVideo.srcObject = localParticipant.videoStream;
                         pipContainer.appendChild(pipVideo);
                     } else {
-                        // Show avatar if camera is off
                         const avatar = document.createElement('div');
                         avatar.style.cssText = `
                             width: 60px;
@@ -2032,7 +1835,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                         pipContainer.appendChild(avatar);
                     }
 
-                    // Add overlay with "You" label
                     const overlay = document.createElement('div');
                     overlay.style.cssText = `
                         position: absolute;
@@ -2052,7 +1854,6 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 }
             }
 
-            // SIDEBAR: Show all other participants (or all if no screen share detected yet)
             participants.forEach(participant => {
                 const tile = createVideoElement(participant, false);
                 sidebar.appendChild(tile);
@@ -2160,18 +1961,19 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             if (successAlert) successAlert.classList.remove('active');
         }
 
-        // Auto-fill meeting ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
+        // FIXED: Auto-fill meeting ID from URL hash (GitHub Pages compatible)
+        const urlHash = window.location.hash.substring(1);
+        const urlParams = new URLSearchParams(urlHash);
         const meetingIdFromUrl = urlParams.get('meetingId');
+        
         if (meetingIdFromUrl) {
             document.getElementById('meetingId').value = meetingIdFromUrl;
             switchTab('join');
-            meetingLogger.logInit('Auto-filled meeting ID from URL', { meetingId: meetingIdFromUrl });
+            meetingLogger.logInit('Auto-filled meeting ID from URL hash', { meetingId: meetingIdFromUrl });
         }
 
         meetingLogger.logInit('GetStream Video Meeting App Initialized');
         
-        // Verify SDK loaded
         setTimeout(() => {
             if (window.getStreamLoaded) {
                 meetingLogger.logInit('✅ GetStream SDK ready to use');
