@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GetStream Video Meeting</title>
     <script src="https://cdn.jsdelivr.net/npm/@stream-io/video-client@latest/dist/index.umd.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="webrtc-handler.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -101,12 +105,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { 
-                opacity: 1; 
+
+            0%,
+            100% {
+                opacity: 1;
                 box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
             }
-            50% { 
-                opacity: 0.8; 
+
+            50% {
+                opacity: 0.8;
                 box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
             }
         }
@@ -136,6 +143,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -214,8 +222,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .input-group {
@@ -346,6 +361,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -411,8 +427,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .loading p {
@@ -593,8 +614,15 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         #main-screen .main-placeholder .main-name {
@@ -744,8 +772,15 @@
         }
 
         @keyframes pulse-border {
-            0%, 100% { border-color: var(--success-color); }
-            50% { border-color: rgba(16, 185, 129, 0.5); }
+
+            0%,
+            100% {
+                border-color: var(--success-color);
+            }
+
+            50% {
+                border-color: rgba(16, 185, 129, 0.5);
+            }
         }
 
         .participant-tile.is-host {
@@ -932,8 +967,15 @@
         }
 
         @keyframes pulse-shadow {
-            0%, 100% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.2); }
-            50% { box-shadow: 0 0 0 12px rgba(79, 70, 229, 0.1); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 0 12px rgba(79, 70, 229, 0.1);
+            }
         }
 
         .control-btn.leave {
@@ -1104,16 +1146,16 @@
             #participants-sidebar {
                 width: 260px;
             }
-            
+
             .screen-sharing #participants-sidebar {
                 width: 240px;
             }
-            
+
             #presenter-pip {
                 width: 240px;
                 height: 135px;
             }
-            
+
             .grid-tile {
                 aspect-ratio: 4/3;
             }
@@ -1123,15 +1165,15 @@
             .video-container.active {
                 height: calc(100vh - 140px);
             }
-            
+
             #video-wrapper {
                 flex-direction: column;
             }
-            
+
             #main-screen {
                 height: 60%;
             }
-            
+
             #participants-sidebar {
                 width: 100%;
                 height: 40%;
@@ -1142,17 +1184,17 @@
                 overflow-y: hidden;
                 padding: 16px;
             }
-            
+
             .participant-tile {
                 min-width: 180px;
                 height: 100%;
             }
-            
+
             .screen-sharing #participants-sidebar {
                 width: 100%;
                 height: 30%;
             }
-            
+
             #presenter-pip {
                 width: 200px;
                 height: 112px;
@@ -1165,55 +1207,55 @@
             .container {
                 padding: 16px;
             }
-            
+
             .login-container {
                 padding: 32px 24px;
                 margin: 20px auto;
             }
-            
+
             .header h1 {
                 font-size: 20px;
             }
-            
+
             .info-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .controls {
                 padding: 20px 16px;
                 gap: 16px;
             }
-            
+
             .control-btn {
                 width: 52px;
                 height: 52px;
                 font-size: 20px;
             }
-            
+
             .control-btn.leave {
                 width: 56px;
                 height: 56px;
             }
-            
+
             .checkbox-group {
                 flex-direction: column;
                 gap: 12px;
             }
-            
+
             .tabs {
                 flex-direction: column;
             }
-            
+
             .tab {
                 width: 100%;
             }
-            
+
             #main-screen .main-placeholder .main-avatar {
                 width: 140px;
                 height: 140px;
                 font-size: 56px;
             }
-            
+
             #main-screen .main-placeholder .main-name {
                 font-size: 28px;
             }
@@ -1226,28 +1268,28 @@
                 gap: 12px;
                 text-align: center;
             }
-            
+
             .header .info {
                 width: 100%;
                 justify-content: center;
             }
-            
+
             .login-container h2 {
                 font-size: 28px;
             }
-            
+
             .alert {
                 padding: 16px;
                 font-size: 14px;
             }
-            
+
             #presenter-pip {
                 width: 160px;
                 height: 90px;
                 top: 12px;
                 left: 12px;
             }
-            
+
             .control-label {
                 display: none;
             }
@@ -1292,19 +1334,22 @@
         }
 
         .shimmer {
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.1),
+                    transparent);
             background-size: 200% 100%;
             animation: shimmer 2s infinite;
         }
 
         @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
         }
 
         /* ============================================
@@ -1334,8 +1379,15 @@
         }
 
         @keyframes highlight-pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         /* Screen sharing badge */
@@ -1357,6 +1409,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1>
@@ -1373,7 +1426,8 @@
         <!-- Login Section -->
         <div class="login-container" id="loginSection">
             <h2>Join a Meeting</h2>
-            <p class="subtitle">Create a new meeting or join an existing one. Experience professional video conferencing with real-time collaboration.</p>
+            <p class="subtitle">Create a new meeting or join an existing one. Experience professional video conferencing
+                with real-time collaboration.</p>
 
             <!-- Tabs -->
             <div class="tabs">
@@ -1401,7 +1455,8 @@
             <div class="tab-content active" id="createTab">
                 <div class="alert info active">
                     <i class="fas fa-lightbulb"></i>
-                    <div>Create a new instant meeting and get a Meeting ID to share with others. All meetings are encrypted and secure.</div>
+                    <div>Create a new instant meeting and get a Meeting ID to share with others. All meetings are
+                        encrypted and secure.</div>
                 </div>
 
                 <div class="input-group">
@@ -1409,7 +1464,8 @@
                         <i class="fas fa-heading"></i>
                         Meeting Title
                     </label>
-                    <input type="text" id="meetingTitle" placeholder="e.g., Daily Standup, Team Sync, Client Review" value="Quick Meeting">
+                    <input type="text" id="meetingTitle" placeholder="e.g., Daily Standup, Team Sync, Client Review"
+                        value="Quick Meeting">
                 </div>
 
                 <div class="checkbox-group">
@@ -1439,7 +1495,8 @@
             <div class="tab-content" id="joinTab">
                 <div class="alert info active">
                     <i class="fas fa-lightbulb"></i>
-                    <div>Enter the numeric Meeting ID to join an existing meeting. You'll need permission from the host if waiting room is enabled.</div>
+                    <div>Enter the numeric Meeting ID to join an existing meeting. You'll need permission from the host
+                        if waiting room is enabled.</div>
                 </div>
 
                 <div class="input-group">
@@ -1516,7 +1573,7 @@
                         <div class="main-name"></div>
                         <div class="main-status">Waiting for participants...</div>
                     </div>
-                    
+
                     <!-- Presenter PIP (shown when screen sharing) -->
                     <div id="presenter-pip">
                         <video id="pip-video" autoplay muted playsinline></video>
@@ -1550,7 +1607,8 @@
                     <i class="fas fa-video"></i>
                     <span class="control-label">Video <span class="control-shortcut">(V)</span></span>
                 </button>
-                <button class="control-btn screenshare" id="screenBtn" onclick="toggleScreenShare()" aria-label="Share Screen">
+                <button class="control-btn screenshare" id="screenBtn" onclick="toggleScreenShare()"
+                    aria-label="Share Screen">
                     <i class="fas fa-desktop"></i>
                     <span class="control-label">Share Screen <span class="control-shortcut">(S)</span></span>
                 </button>
@@ -1574,7 +1632,7 @@
     <script>
         // CORRECTED API CONFIGURATION
         const API_BASE_URL = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev';
-        
+
         // State management
         let streamClient = null;
         let call = null;
@@ -1593,11 +1651,23 @@
         // UI state
         let layoutMode = 'normal'; // 'normal' or 'screen-sharing'
 
+        // WebRTC State
+        let peerConnections = new Map(); // userId -> RTCPeerConnection
+        let ws = null; // WebSocket for signaling
+        let webrtcHandler = null; // WebRTC Handler instance
+        const ICE_SERVERS = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+        };
+
         function switchTab(tab) {
             // Update tabs
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
+
             if (tab === 'create') {
                 document.querySelectorAll('.tab')[0].classList.add('active');
                 document.getElementById('createTab').classList.add('active');
@@ -1780,11 +1850,65 @@
                 activeSpeakerId = currentUserId;
                 updateLayout();
 
+                // Initialize WebRTC if handler is available
+                if (typeof WebRTCHandler !== 'undefined') {
+                    try {
+                        webrtcHandler = new WebRTCHandler(
+                            meetingId,
+                            currentUserId,
+                            currentUserName,
+                            localStream
+                        );
+
+                        // Set up callbacks
+                        webrtcHandler.onRemoteStream = (userId, stream, track) => {
+                            console.log(`Received remote stream from ${userId}`);
+
+                            // Get or create participant
+                            let participant = participants.get(userId);
+                            if (!participant) {
+                                participant = {
+                                    id: userId,
+                                    name: `User ${userId.substring(0, 8)}`,
+                                    isLocal: false,
+                                    isHost: false,
+                                    stream: stream,
+                                    isMuted: false,
+                                    isVideoOff: false,
+                                    isPresenting: false
+                                };
+                                participants.set(userId, participant);
+                            } else {
+                                // Update existing participant's stream
+                                if (!participant.stream) {
+                                    participant.stream = stream;
+                                } else {
+                                    // Add track to existing stream
+                                    participant.stream.addTrack(track);
+                                }
+                            }
+
+                            updateLayout();
+                        };
+
+                        // Connect to signaling server
+                        const wsUrl = API_BASE_URL.replace('https', 'wss').replace('http', 'ws') + `/ws/meeting/${meetingId}`;
+                        await webrtcHandler.initialize(wsUrl);
+
+                        console.log('WebRTC initialized successfully');
+                    } catch (error) {
+                        console.error('WebRTC initialization failed:', error);
+                        console.log('Continuing in local-only mode');
+                    }
+                } else {
+                    console.log('WebRTC handler not available, running in local-only mode');
+                }
+
                 // Start active speaker detection simulation
                 startActiveSpeakerSimulation();
 
                 console.log('Video meeting initialized successfully');
-                
+
             } catch (error) {
                 console.error('Error initializing video:', error);
                 showError('Failed to access camera/microphone: ' + error.message);
@@ -1826,14 +1950,14 @@
                 layoutMode = 'screen-sharing';
                 videoContainer.classList.add('screen-sharing');
                 currentPresenterId = currentUserId;
-                
+
                 // Main screen shows the screen share
                 if (screenStream) {
                     mainVideo.srcObject = screenStream;
                     mainVideo.muted = true;
                     mainVideo.style.display = 'block';
                     mainPlaceholder.classList.remove('active');
-                    
+
                     // Add screen share badge
                     if (!document.querySelector('.screen-share-badge')) {
                         const badge = document.createElement('div');
@@ -1861,7 +1985,7 @@
                 videoContainer.classList.remove('screen-sharing');
                 presenterPip.classList.remove('active');
                 currentPresenterId = null;
-                
+
                 // Remove screen share badge
                 const badge = document.querySelector('.screen-share-badge');
                 if (badge) badge.remove();
@@ -1875,7 +1999,7 @@
                         mainVideo.muted = activeSpeaker.isLocal;
                         mainVideo.style.display = 'block';
                         mainPlaceholder.classList.remove('active');
-                        
+
                         // Add active speaker highlight
                         if (!activeSpeaker.isLocal) {
                             const highlight = document.createElement('div');
@@ -1888,7 +2012,7 @@
                         mainPlaceholder.classList.add('active');
                         mainAvatar.textContent = activeSpeaker.name.charAt(0).toUpperCase();
                         mainName.textContent = activeSpeaker.name + (activeSpeaker.isLocal ? ' (You)' : '');
-                        
+
                         // Remove highlight if exists
                         const highlight = document.querySelector('.active-speaker-highlight');
                         if (highlight) highlight.remove();
@@ -1909,11 +2033,11 @@
 
         function addParticipantToSidebar(participant) {
             const sidebar = document.getElementById('participants-sidebar');
-            
+
             const tile = document.createElement('div');
             tile.className = 'participant-tile';
             tile.id = `participant-${participant.id}`;
-            
+
             if (participant.id === activeSpeakerId) {
                 tile.classList.add('active-speaker');
             }
@@ -1935,11 +2059,11 @@
             } else {
                 const placeholder = document.createElement('div');
                 placeholder.className = 'video-placeholder';
-                
+
                 const avatar = document.createElement('div');
                 avatar.className = 'avatar';
                 avatar.textContent = participant.name.charAt(0).toUpperCase();
-                
+
                 placeholder.appendChild(avatar);
                 tile.appendChild(placeholder);
             }
@@ -1947,34 +2071,34 @@
             // Participant overlay with info
             const overlay = document.createElement('div');
             overlay.className = 'participant-overlay';
-            
+
             const info = document.createElement('div');
             info.className = 'participant-info';
-            
+
             const name = document.createElement('div');
             name.className = 'participant-name';
             name.innerHTML = `
                 <i class="fas fa-user"></i>
                 <span>${participant.name}${participant.isLocal ? ' (You)' : ''}</span>
             `;
-            
+
             const status = document.createElement('div');
             status.className = 'participant-status';
             status.innerHTML = `
                 <span class="status-icon">${participant.isMuted ? '<i class="fas fa-microphone-slash"></i>' : '<i class="fas fa-microphone"></i>'}</span>
                 <span>${participant.isHost ? 'Host' : 'Participant'}</span>
             `;
-            
+
             info.appendChild(name);
             info.appendChild(status);
             overlay.appendChild(info);
-            
+
             // Audio indicator
             const audioIndicator = document.createElement('div');
             audioIndicator.className = `audio-indicator ${participant.isMuted ? '' : 'active'}`;
             audioIndicator.innerHTML = participant.isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
             overlay.appendChild(audioIndicator);
-            
+
             tile.appendChild(overlay);
 
             // Host badge
@@ -2005,31 +2129,31 @@
             participants.forEach(participant => {
                 const item = document.createElement('div');
                 item.className = 'participant-item';
-                
+
                 const avatar = document.createElement('div');
                 avatar.className = 'participant-avatar';
                 avatar.textContent = participant.name.charAt(0).toUpperCase();
-                
+
                 const info = document.createElement('div');
                 info.className = 'participant-info';
-                
+
                 const name = document.createElement('div');
                 name.className = 'name';
                 name.innerHTML = `
                     ${participant.name}${participant.isLocal ? ' (You)' : ''}
                     ${participant.isHost ? '<i class="fas fa-crown" style="color: #F59E0B;"></i>' : ''}
                 `;
-                
+
                 const status = document.createElement('div');
                 status.className = 'status';
                 status.innerHTML = `
                     <span class="participant-status-icon ${participant.isMuted ? 'muted' : ''} ${participant.isHost ? 'host' : ''}"></span>
                     <span>${participant.isMuted ? 'Muted' : 'Speaking'} • ${participant.isVideoOff ? 'Camera off' : 'Camera on'}</span>
                 `;
-                
+
                 info.appendChild(name);
                 info.appendChild(status);
-                
+
                 item.appendChild(avatar);
                 item.appendChild(info);
                 container.appendChild(item);
@@ -2048,7 +2172,7 @@
                     // Randomly switch active speaker (excluding yourself sometimes)
                     const participantArray = Array.from(participants.keys());
                     const otherParticipants = participantArray.filter(id => id !== currentUserId);
-                    
+
                     if (otherParticipants.length > 0 && Math.random() > 0.7) {
                         const newSpeaker = otherParticipants[Math.floor(Math.random() * otherParticipants.length)];
                         if (newSpeaker !== activeSpeakerId) {
@@ -2071,7 +2195,7 @@
             if (audioTrack) {
                 isMuted = !isMuted;
                 audioTrack.enabled = !isMuted;
-                
+
                 const btn = document.getElementById('muteBtn');
                 btn.classList.toggle('active', isMuted);
                 btn.querySelector('i').className = isMuted ? 'fas fa-microphone-slash' : 'fas fa-microphone';
@@ -2081,6 +2205,11 @@
                 if (localParticipant) {
                     localParticipant.isMuted = isMuted;
                     updateLayout();
+                }
+
+                // Notify other participants via WebRTC
+                if (webrtcHandler) {
+                    webrtcHandler.notifyMediaStateChange(isMuted, isVideoOff);
                 }
             }
         }
@@ -2092,7 +2221,7 @@
             if (videoTrack) {
                 isVideoOff = !isVideoOff;
                 videoTrack.enabled = !isVideoOff;
-                
+
                 const btn = document.getElementById('videoBtn');
                 btn.classList.toggle('active', isVideoOff);
                 btn.querySelector('i').className = isVideoOff ? 'fas fa-video-slash' : 'fas fa-video';
@@ -2102,6 +2231,11 @@
                 if (localParticipant) {
                     localParticipant.isVideoOff = isVideoOff;
                     updateLayout();
+                }
+
+                // Notify other participants via WebRTC
+                if (webrtcHandler) {
+                    webrtcHandler.notifyMediaStateChange(isMuted, isVideoOff);
                 }
             }
         }
@@ -2118,17 +2252,23 @@
                         },
                         audio: false
                     });
-                    
+
                     isScreenSharing = true;
                     document.getElementById('screenBtn').classList.add('active');
-                    
+
                     // Handle when user stops sharing via browser UI
                     screenStream.getVideoTracks()[0].onended = () => {
                         stopScreenShare();
                     };
 
+                    // Add screen share track to WebRTC connections
+                    if (webrtcHandler && screenStream) {
+                        const screenTrack = screenStream.getVideoTracks()[0];
+                        await webrtcHandler.addScreenShareTrack(screenTrack, screenStream);
+                    }
+
                     updateLayout();
-                    
+
                 } else {
                     stopScreenShare();
                 }
@@ -2140,12 +2280,18 @@
             }
         }
 
-        function stopScreenShare() {
+        async function stopScreenShare() {
+            // Remove screen share track from WebRTC connections
+            if (webrtcHandler && screenStream) {
+                const screenTrack = screenStream.getVideoTracks()[0];
+                await webrtcHandler.removeScreenShareTrack(screenTrack);
+            }
+
             if (screenStream) {
                 screenStream.getTracks().forEach(track => track.stop());
                 screenStream = null;
             }
-            
+
             isScreenSharing = false;
             document.getElementById('screenBtn').classList.remove('active');
             updateLayout();
@@ -2158,6 +2304,12 @@
             }
             if (screenStream) {
                 screenStream.getTracks().forEach(track => track.stop());
+            }
+
+            // Close WebRTC connections
+            if (webrtcHandler) {
+                webrtcHandler.close();
+                webrtcHandler = null;
             }
 
             // Notify backend
@@ -2236,7 +2388,7 @@
             const errorDiv = document.getElementById('errorAlert');
             errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i><div>${message}</div>`;
             errorDiv.classList.add('active');
-            
+
             setTimeout(() => {
                 errorDiv.classList.remove('active');
             }, 5000);
@@ -2246,7 +2398,7 @@
             const successDiv = document.getElementById('successAlert');
             successDiv.innerHTML = `<i class="fas fa-check-circle"></i><div>${message}</div>`;
             successDiv.classList.add('active');
-            
+
             setTimeout(() => {
                 successDiv.classList.remove('active');
             }, 3000);
@@ -2283,11 +2435,11 @@
         // Keyboard shortcuts (when in meeting)
         document.addEventListener('keydown', (e) => {
             if (!document.getElementById('videoContainer').classList.contains('active')) return;
-            
+
             // Prevent shortcuts when typing in input fields
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-            switch(e.key.toLowerCase()) {
+            switch (e.key.toLowerCase()) {
                 case 'm':
                     toggleMute();
                     e.preventDefault();
@@ -2311,13 +2463,13 @@
         // Initialize
         console.log('GetStream Video Meeting App Initialized');
         console.log('Keyboard shortcuts: M = mute, V = video, S = screen share, ESC = stop sharing');
-        
+
         // Add demo participants for testing
-        window.addDemoParticipant = function() {
+        window.addDemoParticipant = function () {
             const demoId = 'demo-' + Date.now();
             const names = ['Alex Johnson', 'Sam Wilson', 'Taylor Smith', 'Jordan Lee', 'Casey Brown'];
             const name = names[Math.floor(Math.random() * names.length)];
-            
+
             participants.set(demoId, {
                 id: demoId,
                 name: name,
@@ -2328,10 +2480,11 @@
                 isVideoOff: Math.random() > 0.5,
                 isPresenting: false
             });
-            
+
             updateLayout();
             showSuccess(`Demo participant "${name}" joined`);
         };
     </script>
 </body>
+
 </html>
