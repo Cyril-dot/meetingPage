@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GetStream Video Meeting - Fixed</title>
+    <title>Video Meeting - Fixed Audio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -545,6 +545,10 @@
             object-fit: cover;
         }
 
+        .participant-tile audio {
+            display: none;
+        }
+
         .participant-avatar {
             width: 60px;
             height: 60px;
@@ -655,6 +659,32 @@
             font-weight: 700;
             color: white;
             text-transform: uppercase;
+        }
+
+        .debug-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+        }
+
+        .debug-panel.active {
+            display: block;
+        }
+
+        .debug-panel .debug-line {
+            margin-bottom: 4px;
+            line-height: 1.4;
         }
 
         /* Desktop styles */
@@ -1082,14 +1112,18 @@
         </div>
     </div>
 
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+        <div style="margin-bottom: 8px; font-weight: bold; color: #ffff00;">🔍 DEBUG LOG</div>
+        <div id="debugContent"></div>
+    </div>
+
     <!-- Logger Script -->
     <script>
 class MeetingLogger {
     constructor(config = {}) {
         this.config = {
             enableConsole: config.enableConsole !== false,
-            enableStorage: config.enableStorage !== false,
-            maxStoredLogs: config.maxStoredLogs || 500,
             logLevel: config.logLevel || 'debug',
             categoryColors: {
                 init: '#4F46E5',
@@ -1124,7 +1158,6 @@ class MeetingLogger {
 
         const logEntry = {
             timestamp: new Date().toISOString(),
-            sessionId: this.sessionId,
             category,
             level,
             message,
@@ -1134,13 +1167,11 @@ class MeetingLogger {
 
         this.logs.push(logEntry);
 
-        if (this.logs.length > this.config.maxStoredLogs) {
-            this.logs = this.logs.slice(-this.config.maxStoredLogs);
-        }
-
         if (this.config.enableConsole) {
             this.logToConsole(logEntry);
         }
+
+        this.logToDebugPanel(logEntry);
 
         return logEntry;
     }
@@ -1158,6 +1189,31 @@ class MeetingLogger {
         } else {
             console[consoleMethod](prefix, style, entry.message);
         }
+    }
+
+    logToDebugPanel(entry) {
+        const debugContent = document.getElementById('debugContent');
+        if (!debugContent) return;
+
+        const line = document.createElement('div');
+        line.className = 'debug-line';
+        
+        const color = entry.level === 'error' ? '#ff4444' : 
+                     entry.level === 'warn' ? '#ffaa00' :
+                     entry.level === 'info' ? '#00ff00' : '#888888';
+        
+        line.style.color = color;
+        line.textContent = `[${entry.category}] ${entry.message}`;
+        
+        debugContent.appendChild(line);
+        
+        // Keep only last 50 lines
+        while (debugContent.children.length > 50) {
+            debugContent.removeChild(debugContent.firstChild);
+        }
+        
+        // Auto-scroll
+        debugContent.parentElement.scrollTop = debugContent.parentElement.scrollHeight;
     }
 
     logInit(message, data) {
@@ -1191,18 +1247,26 @@ window.meetingLogger = new MeetingLogger({
     logLevel: 'debug'
 });
 
-console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: bold; font-size: 14px;');
+// Toggle debug panel with Ctrl+D
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        const panel = document.getElementById('debugPanel');
+        panel.classList.toggle('active');
+    }
+});
+
+console.log('%c📊 Meeting Logger initialized! Press Ctrl+D for debug panel', 'color: #4F46E5; font-weight: bold; font-size: 14px;');
     </script>
 
-    <!-- FIXED: Load GetStream SDK before main script -->
+    <!-- Load GetStream SDK -->
     <script type="module">
         import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1.9.1';
         
         window.StreamVideoClient = StreamVideoClient;
         window.getStreamLoaded = true;
-        window.meetingLogger.logInit('GetStream SDK loaded successfully');
+        window.meetingLogger.logInit('GetStream SDK loaded');
         
-        // Trigger SDK ready event
         window.dispatchEvent(new Event('sdkready'));
     </script>
 
@@ -1218,18 +1282,17 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
         let isMuted = false;
         let isVideoOff = false;
         let isScreenSharing = false;
+        
+        // Store remote participant audio elements
+        const remoteAudioElements = new Map();
 
-        // FIXED: Wait for SDK to be ready before proceeding
         function waitForSDK() {
             return new Promise((resolve) => {
                 if (window.getStreamLoaded) {
                     resolve();
                 } else {
                     window.addEventListener('sdkready', resolve, { once: true });
-                    // Timeout fallback
-                    setTimeout(() => {
-                        if (window.getStreamLoaded) resolve();
-                    }, 5000);
+                    setTimeout(resolve, 5000);
                 }
             });
         }
@@ -1363,7 +1426,6 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
 
         async function initializeGetStream(credentials) {
             try {
-                // FIXED: Wait for SDK to be ready
                 await waitForSDK();
                 
                 if (!window.StreamVideoClient) {
@@ -1372,21 +1434,22 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
 
                 const { apiKey, userId, userName, token: userToken, callId } = credentials;
 
-                // FIXED: Request media permissions with better constraints
+                // Request media permissions
                 meetingLogger.logMedia('Requesting media permissions');
                 
                 const mediaConstraints = {
                     video: {
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 },
-                        frameRate: { ideal: 30 },
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 60 },
                         facingMode: 'user'
                     },
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
                         autoGainControl: true,
-                        sampleRate: 48000
+                        sampleRate: 48000,
+                        channelCount: 1
                     }
                 };
 
@@ -1394,7 +1457,9 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
                 
                 meetingLogger.logMedia('Media obtained', {
                     videoTracks: localStream.getVideoTracks().length,
-                    audioTracks: localStream.getAudioTracks().length
+                    audioTracks: localStream.getAudioTracks().length,
+                    videoSettings: localStream.getVideoTracks()[0]?.getSettings(),
+                    audioSettings: localStream.getAudioTracks()[0]?.getSettings()
                 });
 
                 currentUserId = userId;
@@ -1413,13 +1478,15 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
 
                 // Create and join call
                 call = streamClient.call('default', callId);
+                
+                meetingLogger.logInit('Joining call', { callId });
                 await call.join({ create: true });
-                meetingLogger.logInit('Call joined', { callId, userId });
+                meetingLogger.logInit('Call joined successfully', { callId, userId });
 
-                // Setup event listeners
+                // Setup event listeners BEFORE enabling media
                 setupEventListeners();
 
-                // FIXED: Enable media devices properly
+                // Enable media devices
                 await enableMediaDevices();
 
                 showVideoUI();
@@ -1459,9 +1526,10 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
                     videoBtn.querySelector('i').className = 'fas fa-video';
                 }
                 
-                // Wait for tracks to stabilize
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // Wait longer for tracks to publish and stabilize
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 
+                meetingLogger.logMedia('Media enabled, rendering participants');
                 renderParticipants();
                 
             } catch (error) {
@@ -1473,19 +1541,62 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
         function setupEventListeners() {
             meetingLogger.logInit('Setting up event listeners');
             
+            // Listen for participant changes
             call.state.participants$.subscribe((participants) => {
-                meetingLogger.logParticipant('Participants changed', { count: participants.length });
-                renderParticipants();
+                meetingLogger.logParticipant('Participants changed', { 
+                    count: participants.length,
+                    participants: Array.from(participants.values()).map(p => ({
+                        userId: p.userId,
+                        name: p.name,
+                        isLocal: p.isLocalParticipant,
+                        hasVideo: !!p.videoStream,
+                        hasAudio: !!p.audioStream
+                    }))
+                });
+                
+                // Re-render with delay to allow streams to stabilize
+                setTimeout(() => renderParticipants(), 500);
             });
 
+            // Track published event
             call.on('track.published', (event) => {
-                meetingLogger.logMedia('Track published', { type: event.type });
+                meetingLogger.logMedia('Track published', { 
+                    type: event.type,
+                    participant: event.participant?.userId 
+                });
+                setTimeout(() => renderParticipants(), 800);
+            });
+
+            // Track unpublished event
+            call.on('track.unpublished', (event) => {
+                meetingLogger.logMedia('Track unpublished', { 
+                    type: event.type,
+                    participant: event.participant?.userId 
+                });
                 setTimeout(() => renderParticipants(), 500);
             });
 
-            call.on('track.unpublished', (event) => {
-                meetingLogger.logMedia('Track unpublished', { type: event.type });
-                setTimeout(() => renderParticipants(), 500);
+            // Participant joined event
+            call.on('participant.joined', (event) => {
+                meetingLogger.logParticipant('Participant joined', {
+                    userId: event.participant?.userId,
+                    name: event.participant?.name
+                });
+            });
+
+            // Participant left event
+            call.on('participant.left', (event) => {
+                meetingLogger.logParticipant('Participant left', {
+                    userId: event.participant?.userId
+                });
+                
+                // Clean up audio element
+                const audioElement = remoteAudioElements.get(event.participant?.userId);
+                if (audioElement) {
+                    audioElement.srcObject = null;
+                    audioElement.remove();
+                    remoteAudioElements.delete(event.participant?.userId);
+                }
             });
         }
 
@@ -1493,10 +1604,25 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
             const mainScreen = document.getElementById('main-screen');
             const sidebar = document.getElementById('participants-sidebar');
             
-            if (!mainScreen || !sidebar || !call) return;
+            if (!mainScreen || !sidebar || !call) {
+                meetingLogger.logError('Cannot render', new Error('Elements or call missing'));
+                return;
+            }
             
             const participants = Array.from(call.state.participants.values());
-            meetingLogger.logUI('Rendering participants', { count: participants.length });
+            
+            meetingLogger.logUI('Rendering participants', { 
+                count: participants.length,
+                participants: participants.map(p => ({
+                    userId: p.userId,
+                    name: p.name,
+                    isLocal: p.isLocalParticipant,
+                    hasVideo: !!p.videoStream,
+                    hasAudio: !!p.audioStream,
+                    videoTracks: p.videoStream?.getVideoTracks().length || 0,
+                    audioTracks: p.audioStream?.getAudioTracks().length || 0
+                }))
+            });
 
             const countElement = document.getElementById('participantCount');
             if (countElement) {
@@ -1516,6 +1642,7 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
                 return;
             }
 
+            // Find local participant
             const localParticipant = participants.find(p => p.isLocalParticipant);
             const mainParticipant = localParticipant || participants[0];
             
@@ -1524,6 +1651,7 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
                 mainScreen.appendChild(mainVideo);
             }
 
+            // Render all other participants in sidebar
             participants.forEach((participant) => {
                 if (participant !== mainParticipant) {
                     const tile = createVideoElement(participant, false);
@@ -1535,46 +1663,96 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
         function createVideoElement(participant, isMain = false) {
             const container = document.createElement('div');
             container.className = isMain ? 'main-video-container' : 'participant-tile';
+            container.id = `participant-${participant.userId}`;
 
             const name = participant.name || participant.userId || 'Guest';
             const initial = name.charAt(0).toUpperCase();
 
-            // FIXED: Better video track detection
+            // Check for video stream
             const videoStream = participant.videoStream;
-            const hasVideoTrack = videoStream && 
-                                 videoStream.getVideoTracks &&
-                                 videoStream.getVideoTracks().length > 0 &&
-                                 videoStream.getVideoTracks()[0].enabled &&
-                                 videoStream.getVideoTracks()[0].readyState === 'live';
+            const videoTracks = videoStream?.getVideoTracks() || [];
+            const hasVideo = videoTracks.length > 0 && 
+                           videoTracks[0].enabled && 
+                           videoTracks[0].readyState === 'live';
             
-            // FIXED: Better audio track detection
+            // Check for audio stream
             const audioStream = participant.audioStream;
-            const hasAudioTrack = audioStream && 
-                                 audioStream.getAudioTracks &&
-                                 audioStream.getAudioTracks().length > 0 &&
-                                 audioStream.getAudioTracks()[0].enabled &&
-                                 audioStream.getAudioTracks()[0].readyState === 'live';
+            const audioTracks = audioStream?.getAudioTracks() || [];
+            const hasAudio = audioTracks.length > 0 && 
+                           audioTracks[0].enabled && 
+                           audioTracks[0].readyState === 'live';
 
-            if (hasVideoTrack) {
+            meetingLogger.logMedia('Creating video element', {
+                participant: name,
+                userId: participant.userId,
+                isMain,
+                isLocal: participant.isLocalParticipant,
+                hasVideo,
+                hasAudio,
+                videoTracksCount: videoTracks.length,
+                audioTracksCount: audioTracks.length,
+                videoTrackState: videoTracks[0]?.readyState,
+                audioTrackState: audioTracks[0]?.readyState
+            });
+
+            // CRITICAL FIX: Create video element for video stream
+            if (hasVideo) {
                 const video = document.createElement('video');
                 video.autoplay = true;
                 video.playsInline = true;
-                video.muted = participant.isLocalParticipant; // Mute local to avoid echo
+                video.muted = participant.isLocalParticipant; // Mute local to prevent echo
                 video.style.width = '100%';
                 video.style.height = '100%';
                 video.style.objectFit = isMain ? 'contain' : 'cover';
                 video.style.backgroundColor = '#1E293B';
+                video.id = `video-${participant.userId}`;
 
                 video.srcObject = videoStream;
                 container.appendChild(video);
 
-                // FIXED: Force play on mobile
+                // Force play
                 video.play().catch(err => {
-                    meetingLogger.logError('Video play failed', err);
+                    meetingLogger.logError('Video play failed', err, { userId: participant.userId });
                 });
+
+                meetingLogger.logMedia('Video element created', { userId: participant.userId });
             } else {
                 const avatar = createAvatar(initial, isMain);
                 container.appendChild(avatar);
+            }
+
+            // CRITICAL FIX: Create SEPARATE audio element for remote audio
+            if (hasAudio && !participant.isLocalParticipant) {
+                let audioElement = remoteAudioElements.get(participant.userId);
+                
+                if (!audioElement) {
+                    audioElement = document.createElement('audio');
+                    audioElement.autoplay = true;
+                    audioElement.id = `audio-${participant.userId}`;
+                    remoteAudioElements.set(participant.userId, audioElement);
+                    container.appendChild(audioElement);
+                    
+                    meetingLogger.logMedia('Audio element created', { userId: participant.userId });
+                }
+
+                audioElement.srcObject = audioStream;
+                
+                // Force play with error handling
+                audioElement.play().catch(err => {
+                    meetingLogger.logError('Audio play failed', err, { userId: participant.userId });
+                    
+                    // Try again after user interaction
+                    document.addEventListener('click', () => {
+                        audioElement.play().catch(e => {
+                            meetingLogger.logError('Audio play retry failed', e);
+                        });
+                    }, { once: true });
+                });
+
+                meetingLogger.logMedia('Audio stream attached', { 
+                    userId: participant.userId,
+                    audioTracks: audioTracks.length
+                });
             }
 
             // Add overlay with name and status
@@ -1588,7 +1766,8 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
             const statusDiv = document.createElement('div');
             statusDiv.className = 'participant-status';
             
-            if (hasAudioTrack) {
+            // Audio status
+            if (hasAudio) {
                 const micIcon = document.createElement('i');
                 micIcon.className = 'fas fa-microphone';
                 statusDiv.appendChild(micIcon);
@@ -1599,7 +1778,8 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
                 statusDiv.appendChild(micIcon);
             }
             
-            if (hasVideoTrack) {
+            // Video status
+            if (hasVideo) {
                 const videoIcon = document.createElement('i');
                 videoIcon.className = 'fas fa-video';
                 statusDiv.appendChild(videoIcon);
@@ -1723,6 +1903,13 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
         async function leaveMeeting() {
             meetingLogger.logInit('Leaving meeting');
             
+            // Clean up audio elements
+            remoteAudioElements.forEach((audioElement, userId) => {
+                audioElement.srcObject = null;
+                audioElement.remove();
+            });
+            remoteAudioElements.clear();
+            
             if (call) {
                 await call.leave();
             }
@@ -1829,7 +2016,7 @@ console.log('%c📊 Meeting Logger initialized!', 'color: #4F46E5; font-weight: 
             meetingLogger.logInit('Auto-filled meeting ID', { meetingId: meetingIdFromUrl });
         }
 
-        meetingLogger.logInit('App initialized');
+        meetingLogger.logInit('App initialized - Press Ctrl+D for debug panel');
     </script>
 </body>
-</html>
+    </html>
