@@ -1414,7 +1414,16 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
                 currentToken = token;
 
                 await initializeGetStream(data.callCredentials);
-                updateMeetingInfo(data);
+                
+                // Generate shareable meeting link using current page URL
+                const currentUrl = window.location.href.split('?')[0]; // Get base URL without params
+                const shareableLink = `${currentUrl}?meetingId=${data.meetingId}`;
+                
+                updateMeetingInfo({
+                    meetingId: data.meetingId,
+                    meetingLink: shareableLink,
+                    callId: data.callCredentials.callId
+                });
 
             } catch (error) {
                 meetingLogger.logError('Failed to create meeting', error);
@@ -1461,10 +1470,14 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
 
                 await initializeGetStream(data.callCredentials);
                 
-                const shareableLink = `https://cyril-dot.github.io/meetingPage/?meetingId=${meetingId}`;
+                // Generate shareable meeting link using current page URL
+                const currentUrl = window.location.href.split('?')[0]; // Get base URL without params
+                const shareableLink = `${currentUrl}?meetingId=${meetingId}`;
+                
                 updateMeetingInfo({
                     meetingId: meetingId,
-                    meetingLink: shareableLink
+                    meetingLink: shareableLink,
+                    callId: data.callCredentials.callId
                 });
 
             } catch (error) {
@@ -1799,9 +1812,11 @@ console.log('%c📊 Meeting Logger initialized! Press Ctrl+Shift+L to view logs'
             meetingLogger.logUI('Updating meeting info', data);
             
             const meetingIdElement = document.getElementById('displayMeetingId');
+            const callIdElement = document.getElementById('displayCallId');
             const meetingLinkElement = document.getElementById('displayMeetingLink');
             
             if (meetingIdElement) meetingIdElement.textContent = data.meetingId;
+            if (callIdElement) callIdElement.textContent = data.callId;
             if (meetingLinkElement) meetingLinkElement.textContent = data.meetingLink;
             
             const headerInfo = document.getElementById('headerInfo');
