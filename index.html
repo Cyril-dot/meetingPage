@@ -523,13 +523,14 @@
         let isScreenSharing = false;
         let meetingStartTime = null;
         let participants = new Map();
+        let renderTimer = null;
 
         function log(msg, data = '') {
             console.log(`[APP] ${msg}`, data);
         }
 
         // ============================================
-        // WebSocket Connection (Native WebSocket + STOMP)
+        // WebSocket Connection
         // ============================================
 
         async function connectWebSocket() {
@@ -554,7 +555,6 @@
                         log('✅ WebSocket connected');
                         subscribeToMeetingEvents();
                         
-                        // Notify server we joined with our current video state
                         stompClient.publish({
                             destination: `/app/meeting/${currentMeetingId}/join`,
                             body: JSON.stringify({ 
@@ -562,7 +562,7 @@
                             })
                         });
                         
-                        // Send our initial video state
+                        // Send initial state after connection established
                         setTimeout(() => {
                             sendWebSocketMessage(`/app/meeting/${currentMeetingId}/video`, { enabled: !isVideoOff });
                             sendWebSocketMessage(`/app/meeting/${currentMeetingId}/audio`, { enabled: !isMuted });
@@ -615,9 +615,6 @@
                     destination: destination,
                     body: JSON.stringify(payload)
                 });
-                log('WebSocket message sent', { destination, payload });
-            } else {
-                log('⚠️ WebSocket not connected');
             }
         }
 
@@ -642,8 +639,8 @@
                 showNotification('Participant Joined', `${userName} joined the meeting`);
                 updateParticipantCount();
                 
-                // Wait a bit for GetStream to sync, then render
-                setTimeout(() => renderVideo(), 1500);
+                // Wait longer for GetStream to sync streams
+                setTimeout(() => scheduleRender(), 2000);
             }
         }
 
@@ -655,39 +652,36 @@
                 participants.delete(userId);
                 showNotification('Participant Left', `${participant.name} left the meeting`);
                 updateParticipantCount();
-                renderVideo();
+                scheduleRender();
             }
         }
 
         function handleAudioState(event) {
             const { userId, enabled } = event;
-            log('Audio state changed', { userId, enabled });
             const participant = participants.get(userId);
             if (participant) {
                 participant.isMuted = !enabled;
-                setTimeout(() => renderVideo(), 200);
+                scheduleRender();
             }
         }
 
         function handleVideoState(event) {
             const { userId, enabled } = event;
-            log('Video state changed', { userId, enabled });
             const participant = participants.get(userId);
             if (participant) {
                 participant.isVideoOff = !enabled;
-                setTimeout(() => renderVideo(), 200);
+                scheduleRender();
             }
         }
 
         function handleScreenShareState(event) {
             const { userId, enabled } = event;
-            log('Screen share state changed', { userId, enabled });
             const participant = participants.get(userId);
             if (participant) {
                 participant.isScreenSharing = enabled;
                 showNotification('Screen Share', 
                     enabled ? `${participant.name} started sharing` : `${participant.name} stopped sharing`);
-                setTimeout(() => renderVideo(), 500);
+                scheduleRender();
             }
         }
 
@@ -713,12 +707,18 @@
             });
             
             updateParticipantCount();
-            renderVideo();
+            scheduleRender();
         }
 
         function updateParticipantCount() {
             const count = participants.size;
             document.querySelector('#participantCount span').textContent = count;
+        }
+
+        // Debounced rendering to avoid too many re-renders
+        function scheduleRender() {
+            if (renderTimer) clearTimeout(renderTimer);
+            renderTimer = setTimeout(() => renderVideo(), 300);
         }
 
         // ============================================
@@ -783,8 +783,6 @@
                 const { apiKey, userId, userName, token, callId } = credentials;
                 currentUserId = userId;
 
-                log('Creating GetStream client...', { userId, callId });
-
                 // Create GetStream client
                 client = new window.StreamVideoClient({
                     apiKey: apiKey,
@@ -796,18 +794,18 @@
                 call = client.call('default', callId);
                 await call.join({ create: true });
 
-                log('Joined call successfully');
-
                 // Enable camera by default, keep mic muted
                 await call.microphone.disable();
                 await call.camera.enable();
-                
-                log('Camera enabled, mic disabled');
 
-                // Setup participant change listener
-                call.state.participants$.subscribe((participantsList) => {
-                    log('Participants changed in GetStream', participantsList.length);
-                    setTimeout(() => renderVideo(), 300);
+                // Setup real-time participant updates
+                call.state.participants$.subscribe(() => {
+                    scheduleRender();
+                });
+
+                // Also listen to individual stream changes
+                call.state.localParticipant$.subscribe(() => {
+                    scheduleRender();
                 });
 
                 // Connect WebSocket
@@ -864,8 +862,7 @@
                     localParticipant.isMuted = isMuted;
                 }
                 
-                setTimeout(() => renderVideo(), 300);
-                log('Mute toggled', { isMuted });
+                scheduleRender();
             } catch (err) {
                 log('❌ Toggle mute failed', err);
             }
@@ -894,8 +891,7 @@
                     localParticipant.isVideoOff = isVideoOff;
                 }
                 
-                setTimeout(() => renderVideo(), 500);
-                log('Video toggled', { isVideoOff });
+                scheduleRender();
             } catch (err) {
                 log('❌ Toggle video failed', err);
             }
@@ -906,7 +902,6 @@
 
             try {
                 if (!isScreenSharing) {
-                    // Start screen sharing
                     await call.screenShare.enable();
                     isScreenSharing = true;
                     document.getElementById('screenShareBtn').classList.add('sharing');
@@ -918,9 +913,7 @@
                     }
                     
                     sendWebSocketMessage(`/app/meeting/${currentMeetingId}/screenshare`, { enabled: true });
-                    log('Screen share started');
                 } else {
-                    // Stop screen sharing
                     await call.screenShare.disable();
                     isScreenSharing = false;
                     document.getElementById('screenShareBtn').classList.remove('sharing');
@@ -932,10 +925,9 @@
                     }
                     
                     sendWebSocketMessage(`/app/meeting/${currentMeetingId}/screenshare`, { enabled: false });
-                    log('Screen share stopped');
                 }
                 
-                setTimeout(() => renderVideo(), 500);
+                scheduleRender();
             } catch (err) {
                 log('❌ Toggle screen share failed', err);
                 showNotification('Error', 'Failed to share screen. Please check permissions.');
@@ -963,12 +955,12 @@
             
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(input.value).then(() => {
-                    showNotification('Success', 'Meeting link copied to clipboard!');
+                    showNotification('Success', 'Meeting link copied!');
                     closeMeetingLinkModal();
                 });
             } else {
                 document.execCommand('copy');
-                showNotification('Success', 'Meeting link copied to clipboard!');
+                showNotification('Success', 'Meeting link copied!');
                 closeMeetingLinkModal();
             }
         }
@@ -992,33 +984,24 @@
         // ============================================
 
         function renderVideo() {
-            if (!call) {
-                log('Cannot render - no call object');
-                return;
-            }
+            if (!call) return;
 
             const participantList = Array.from(call.state.participants.values());
-            log('Rendering video', { participantCount: participantList.length });
-            
             const grid = document.getElementById('videoGrid');
             grid.innerHTML = '';
             
-            // Check if anyone is screen sharing
+            // Check for screen sharing
             const screenSharingParticipant = participantList.find(p => {
-                const hasScreenShare = p.screenShareStream && 
-                                      p.screenShareStream.getVideoTracks().length > 0 &&
-                                      p.screenShareStream.getVideoTracks()[0].readyState === 'live';
-                log(`Checking screen share for ${p.name}`, { hasScreenShare, stream: p.screenShareStream });
-                return hasScreenShare;
+                return p.screenShareStream && 
+                       p.screenShareStream.active &&
+                       p.screenShareStream.getVideoTracks().length > 0;
             });
             
             if (screenSharingParticipant) {
-                log('Rendering screen share view', screenSharingParticipant.name);
-                // Show screen share prominently
+                // Screen share view: large screen + participant tiles
                 const screenTile = createScreenShareTile(screenSharingParticipant);
                 grid.appendChild(screenTile);
                 
-                // Show all participants (including screen sharer's camera) in smaller tiles
                 participantList.forEach(participant => {
                     const tile = createVideoTile(participant);
                     grid.appendChild(tile);
@@ -1026,8 +1009,7 @@
                 
                 grid.className = `video-grid participants-${Math.min(participantList.length + 1, 6)}`;
             } else {
-                log('Rendering normal grid view');
-                // Normal grid view - show all participants
+                // Normal grid view
                 participantList.forEach(participant => {
                     const tile = createVideoTile(participant);
                     grid.appendChild(tile);
@@ -1044,20 +1026,16 @@
 
             const name = participant.name || 'Guest';
 
-            if (participant.screenShareStream) {
-                const video = document.createElement('video');
-                video.autoplay = true;
-                video.playsInline = true;
-                video.muted = true; // Screen share audio should come from participant's main stream
-                video.srcObject = participant.screenShareStream;
-                tile.appendChild(video);
-                
-                video.onloadedmetadata = () => {
-                    video.play().catch(e => log('Screen share video play failed', e));
-                };
-                
-                log('Created screen share video element', { name, stream: participant.screenShareStream });
-            }
+            const video = document.createElement('video');
+            video.autoplay = true;
+            video.playsInline = true;
+            video.muted = true;
+            video.srcObject = participant.screenShareStream;
+            tile.appendChild(video);
+            
+            video.onloadedmetadata = () => {
+                video.play().catch(() => {});
+            };
 
             const badge = document.createElement('div');
             badge.className = 'screen-share-badge';
@@ -1076,58 +1054,52 @@
             const initial = name.charAt(0).toUpperCase();
             const isLocal = participant.isLocalParticipant;
 
-            // Check for video stream
+            // Get video stream - check both regular and published tracks
             const videoStream = participant.videoStream;
+            const publishedTracks = participant.publishedTracks || [];
+            const videoTrack = publishedTracks.find(t => t === 'video');
+            
             const hasVideo = videoStream && 
+                            videoStream.active &&
                             videoStream.getVideoTracks().length > 0 &&
-                            videoStream.getVideoTracks()[0].enabled &&
-                            videoStream.getVideoTracks()[0].readyState === 'live';
+                            videoStream.getVideoTracks()[0].enabled;
 
-            // Check for audio stream
+            // Get audio stream
             const audioStream = participant.audioStream;
+            const audioTrack = publishedTracks.find(t => t === 'audio');
+            
             const hasAudio = audioStream && 
+                            audioStream.active &&
                             audioStream.getAudioTracks().length > 0 &&
-                            audioStream.getAudioTracks()[0].enabled &&
-                            audioStream.getAudioTracks()[0].readyState === 'live';
-
-            log(`Creating video tile for ${name}`, { 
-                isLocal, 
-                hasVideo, 
-                hasAudio,
-                videoTracks: videoStream?.getVideoTracks().length || 0,
-                audioTracks: audioStream?.getAudioTracks().length || 0
-            });
+                            audioStream.getAudioTracks()[0].enabled;
 
             if (hasVideo) {
                 const video = document.createElement('video');
                 video.autoplay = true;
                 video.playsInline = true;
-                video.muted = isLocal; // Mute own video to avoid echo
+                video.muted = isLocal;
                 video.srcObject = videoStream;
                 tile.appendChild(video);
                 
                 video.onloadedmetadata = () => {
-                    video.play().catch(e => log('Video play failed', e));
+                    video.play().catch(() => {});
                 };
             } else {
-                // Show avatar when no video
                 const avatar = document.createElement('div');
                 avatar.className = 'video-avatar';
                 avatar.textContent = initial;
                 tile.appendChild(avatar);
             }
 
-            // Add audio element for remote participants
+            // Add audio for remote participants
             if (hasAudio && !isLocal) {
                 const audio = document.createElement('audio');
                 audio.autoplay = true;
                 audio.srcObject = audioStream;
                 tile.appendChild(audio);
-                
-                audio.play().catch(e => log('Audio play failed', e));
+                audio.play().catch(() => {});
             }
 
-            // Overlay with name and mic status
             const overlay = document.createElement('div');
             overlay.className = 'video-overlay';
             overlay.innerHTML = `
@@ -1182,7 +1154,6 @@
             }, 1000);
         }
 
-        // Check for meeting ID in URL on page load
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const meetingId = urlParams.get('meeting');
