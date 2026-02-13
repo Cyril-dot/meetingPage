@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova — Join Meeting</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#0d0f14;--surface:#151820;--s2:#1c2030;--border:#252a38;
+              --accent:#4f8eff;--success:#34d399;--danger:#f87171;--text:#e8eaf0;--muted:#6b7280;--r:12px;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+            background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(79,142,255,.09) 0%,transparent 60%),
+                       radial-gradient(ellipse 40% 50% at 80% 80%,rgba(124,92,252,.07) 0%,transparent 60%);}
+        nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;
+            padding:16px 32px;background:var(--surface);border-bottom:1px solid var(--border);}
+        .brand{display:flex;align-items:center;gap:10px;cursor:pointer;}
+        .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+             box-shadow:0 0 12px var(--accent);animation:pulse 2.4s ease-in-out infinite;}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+        .brand-name{font-size:18px;font-weight:600;}
+        .nav-right{display:flex;gap:10px;}
+        .nav-btn{padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;
+                 color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;transition:all .2s;}
+        .nav-btn:hover{border-color:var(--accent);color:var(--text);}
+
+        main{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;
+             justify-content:center;min-height:calc(100vh - 65px);padding:32px 24px;}
+
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;
+              width:100%;max-width:460px;box-shadow:0 24px 80px rgba(0,0,0,.5);}
+        .card-title{font-size:24px;font-weight:600;letter-spacing:-.4px;margin-bottom:6px;}
+        .card-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
+
+        /* mode tabs */
+        .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--s2);
+              border-radius:var(--r);padding:4px;margin-bottom:28px;border:1px solid var(--border);gap:2px;}
+        .tab{padding:9px 6px;border:none;background:transparent;color:var(--muted);
+             font-family:inherit;font-size:13px;font-weight:500;border-radius:9px;cursor:pointer;transition:all .2s;}
+        .tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(79,142,255,.35);}
+
+        .field{margin-bottom:18px;}
+        .field label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px;}
+        .field input{width:100%;padding:13px 16px;background:var(--s2);border:1px solid var(--border);
+                     border-radius:var(--r);color:var(--text);font-family:inherit;font-size:15px;
+                     transition:border-color .2s,box-shadow .2s;}
+        .field input::placeholder{color:#3a4055;}
+        .field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,255,.15);}
+        .field input.mono{font-family:'DM Mono',monospace;letter-spacing:1px;font-size:14px;}
+
+        .btn{width:100%;padding:14px;border:none;border-radius:var(--r);font-family:inherit;
+             font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px;}
+        .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(79,142,255,.3);}
+        .btn-primary:hover:not(:disabled){background:#3a7aee;transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,142,255,.4);}
+        .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+        .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);margin-top:10px;}
+        .btn-ghost:hover{border-color:var(--accent);color:var(--text);}
+
+        .alert{display:none;padding:12px 16px;border-radius:var(--r);font-size:13px;margin-top:16px;}
+        .alert.error  {display:block;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#fca5a5;}
+        .alert.success{display:block;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;}
+
+        .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+                 border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        .logged-in-hint{font-size:13px;color:var(--muted);padding:10px 14px;background:var(--s2);
+                        border:1px solid var(--border);border-radius:var(--r);margin-bottom:18px;display:none;}
+        .logged-in-hint.show{display:block;}
+        .logged-in-hint strong{color:var(--success);}
+
+        .hidden{display:none!important;}
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="brand" onclick="goHome()"><div class="dot"></div><span class="brand-name">Nova</span></div>
+    <div class="nav-right">
+        <button class="nav-btn" id="authNavBtn" onclick="goHome()" style="display:none">← Dashboard</button>
+        <button class="nav-btn" id="loginNavBtn" onclick="location.href='nova-login.html'">Sign In</button>
+    </div>
+</nav>
+
+<main>
+    <div class="card">
+        <h1 class="card-title">Join a Meeting</h1>
+        <p class="card-sub">Enter a meeting code to get started</p>
+
+        <!-- Logged-in user hint -->
+        <div class="logged-in-hint" id="loggedInHint">
+            <strong>✓ Signed in</strong> as <span id="hintName"></span> — joining as yourself.
+        </div>
+
+        <!-- Mode tabs: Auth / Guest / Code Only -->
+        <div class="tabs" id="modeTabs">
+            <button class="tab" id="tabAuth"  onclick="setMode('auth')">Signed In</button>
+            <button class="tab active" id="tabGuest" onclick="setMode('guest')">Guest</button>
+        </div>
+
+        <!-- Meeting code (always shown) -->
+        <div class="field">
+            <label>Meeting Code *</label>
+            <input class="mono" type="text" id="code" placeholder="ABC-DEF-GHI" autocomplete="off">
+        </div>
+
+        <!-- AUTH fields -->
+        <div id="authFields" class="hidden">
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="authEmail" placeholder="you@example.com">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="authPw" placeholder="Your account password">
+            </div>
+        </div>
+
+        <!-- GUEST fields -->
+        <div id="guestFields">
+            <div class="field">
+                <label>Your display name *</label>
+                <input type="text" id="guestName" placeholder="e.g. Alice Johnson">
+            </div>
+            <div class="field">
+                <label>Email <span style="color:#3a4055">(optional)</span></label>
+                <input type="email" id="guestEmail" placeholder="alice@example.com">
+            </div>
+        </div>
+
+        <!-- Meeting password (both modes) -->
+        <div class="field">
+            <label>Meeting password <span style="color:#3a4055">(if required)</span></label>
+            <input type="password" id="meetPw" placeholder="Leave blank if none">
+        </div>
+
+        <button class="btn btn-primary" id="joinBtn" onclick="doJoin()">Join Meeting</button>
+
+        <button class="btn btn-ghost" id="createLink" onclick="location.href='novacreate.html'">
+            Create a meeting instead
+        </button>
+
+        <div class="alert" id="alert"></div>
+    </div>
+</main>
+
+<script src="novaState.js"></script>
+<script>
+    const API = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev/api';
+    let mode = 'guest';
+
+    // ── On load: detect login state & prefill code from URL ────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+        // Pre-fill code from query param or sessionStorage
+        const params = new URLSearchParams(location.search);
+        const preCode = params.get('code') || NovaState.getMeetingCode() || '';
+        if (preCode) document.getElementById('code').value = preCode;
+
+        if (NovaState.isLoggedIn()) {
+            const user = NovaState.getUser();
+            // Show logged-in hint
+            document.getElementById('hintName').textContent = user.name || user.email || 'you';
+            document.getElementById('loggedInHint').classList.add('show');
+            document.getElementById('authNavBtn').style.display = 'inline-block';
+            document.getElementById('loginNavBtn').style.display = 'none';
+            document.getElementById('createLink').textContent = 'Create a meeting instead →';
+            document.getElementById('createLink').onclick = () => location.href = 'novacreate.html';
+            // Auto-select auth tab
+            setMode('auth');
+        } else {
+            setMode('guest');
+        }
+
+        document.getElementById('code').addEventListener('keypress', e => { if (e.key==='Enter') doJoin(); });
+        document.getElementById('authPw').addEventListener('keypress', e => { if (e.key==='Enter') doJoin(); });
+        document.getElementById('guestName').addEventListener('keypress', e => { if (e.key==='Enter') doJoin(); });
+    });
+
+    function goHome() {
+        location.href = NovaState.isLoggedIn() ? 'novaDash.html' : 'novaLogin.html';
+    }
+
+    function setMode(m) {
+        mode = m;
+        document.getElementById('tabAuth').classList.toggle('active',  m==='auth');
+        document.getElementById('tabGuest').classList.toggle('active', m==='guest');
+        document.getElementById('authFields').classList.toggle('hidden',  m!=='auth');
+        document.getElementById('guestFields').classList.toggle('hidden', m!=='guest');
+        clearAlert();
+    }
+
+    function showAlert(msg, type='error') {
+        const el = document.getElementById('alert');
+        el.textContent = msg;
+        el.className = `alert ${type}`;
+    }
+    function clearAlert() { document.getElementById('alert').className = 'alert'; }
+
+    async function doJoin() {
+        clearAlert();
+        const meetingCode = document.getElementById('code').value.trim();
+        const meetPw      = document.getElementById('meetPw').value.trim() || null;
+
+        if (!meetingCode) { showAlert('Please enter a meeting code'); return; }
+
+        const btn = document.getElementById('joinBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Joining…';
+
+        try {
+            if (mode === 'guest') {
+                await joinAsGuest(meetingCode, meetPw);
+            } else {
+                await joinAsAuth(meetingCode, meetPw);
+            }
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Join Meeting';
+        }
+    }
+
+    async function joinAsGuest(meetingCode, meetPw) {
+        const guestName  = document.getElementById('guestName').value.trim();
+        const guestEmail = document.getElementById('guestEmail').value.trim() || null;
+
+        if (!guestName) { showAlert('Please enter your display name'); return; }
+
+        const body = { meetingCode, password: meetPw, guestName, guestEmail };
+        console.log('📤 Guest join:', body);
+
+        let data;
+        try {
+            const res = await fetch(`${API}/meetings/join/guest`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const text = await res.text();
+            try { data = JSON.parse(text); } catch { data = { success: res.ok, message: text }; }
+            console.log('📥 Guest join response:', data);
+        } catch (err) {
+            showAlert('Cannot reach server. Is it running on localhost:8080?');
+            return;
+        }
+
+        if (!data.success) {
+            showAlert(data.message || 'Failed to join meeting');
+            return;
+        }
+
+        // Save guest name as user (no token for guests)
+        NovaState.setUser({ name: guestName, email: guestEmail });
+        NovaState.setMeetingCode(meetingCode);
+        showAlert('Joining…', 'success');
+        setTimeout(() => location.href = 'novaMeeting.html', 600);
+    }
+
+    async function joinAsAuth(meetingCode, meetPw) {
+        let token = NovaState.getToken();
+
+        // If not logged in, try to authenticate first
+        if (!token) {
+            const email = document.getElementById('authEmail').value.trim();
+            const pw    = document.getElementById('authPw').value.trim();
+
+            if (!email || !pw) {
+                showAlert('Please enter your email and password, or switch to Guest mode');
+                return;
+            }
+
+            try {
+                const loginRes  = await fetch(`${API}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password: pw })
+                });
+                const loginData = await loginRes.json();
+                console.log('Login response:', loginData);
+
+                // API returns { accessToken, refreshToken, message } — no success field
+                if (!loginRes.ok) {
+                    showAlert(loginData.message || `Login failed (HTTP ${loginRes.status})`);
+                    return;
+                }
+
+                // Extract from YOUR exact shape: { "accessToken": "eyJ..." }
+                token = loginData?.accessToken || null;
+
+                if (!token) { showAlert('Login succeeded but no accessToken returned'); return; }
+
+                // Decode name from JWT payload
+                let userName = email.split('@')[0];
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    userName = payload?.name || payload?.firstName || payload?.sub?.split('@')[0] || userName;
+                } catch(e) {}
+
+                NovaState.saveLoginResponse(loginData, email);
+
+            } catch (err) {
+                showAlert('Cannot reach server. Is it running on localhost:8080?');
+                return;
+            }
+        }
+
+        // Join the meeting with auth token
+        let data;
+        try {
+            const res = await fetch(`${API}/meetings/join`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ meetingCode, password: meetPw })
+            });
+            const text = await res.text();
+            try { data = JSON.parse(text); } catch { data = { success: res.ok, message: text }; }
+            console.log('📥 Auth join response:', data);
+        } catch (err) {
+            showAlert('Cannot reach server. Is it running on localhost:8080?');
+            return;
+        }
+
+        if (!data.success) {
+            showAlert(data.message || 'Failed to join meeting');
+            return;
+        }
+
+        NovaState.setMeetingCode(meetingCode);
+        showAlert('Joining…', 'success');
+        setTimeout(() => location.href = 'novaMeeting.html', 600);
+    }
+</script>
+</body>
+</html>

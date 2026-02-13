@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova — Create Meeting</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#0d0f14;--surface:#151820;--s2:#1c2030;--border:#252a38;
+              --accent:#4f8eff;--success:#34d399;--danger:#f87171;--text:#e8eaf0;--muted:#6b7280;--r:12px;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+        body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+            background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(79,142,255,.09) 0%,transparent 60%),
+                       radial-gradient(ellipse 40% 50% at 80% 80%,rgba(124,92,252,.07) 0%,transparent 60%);}
+        nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;
+            padding:16px 32px;background:var(--surface);border-bottom:1px solid var(--border);}
+        .brand{display:flex;align-items:center;gap:10px;cursor:pointer;}
+        .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+             box-shadow:0 0 12px var(--accent);animation:pulse 2.4s ease-in-out infinite;}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+        .brand-name{font-size:18px;font-weight:600;}
+        .back-btn{padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;
+                  color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;transition:all .2s;}
+        .back-btn:hover{border-color:var(--accent);color:var(--text);}
+
+        main{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:40px 24px;}
+        .page-title{font-size:26px;font-weight:600;letter-spacing:-.4px;margin-bottom:6px;}
+        .page-sub{font-size:14px;color:var(--muted);margin-bottom:32px;}
+
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+              padding:36px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+
+        .section-label{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+                        color:var(--muted);margin:24px 0 14px;}
+        .section-label:first-child{margin-top:0;}
+
+        .field{margin-bottom:18px;}
+        .field label{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:8px;}
+        .field input,.field textarea{
+            width:100%;padding:13px 16px;background:var(--s2);border:1px solid var(--border);
+            border-radius:var(--r);color:var(--text);font-family:inherit;font-size:15px;
+            transition:border-color .2s,box-shadow .2s;
+        }
+        .field input::placeholder,.field textarea::placeholder{color:#3a4055;}
+        .field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,255,.15);}
+        .field textarea{resize:vertical;min-height:72px;line-height:1.5;}
+        .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+        .toggle-row{display:flex;justify-content:space-between;align-items:center;
+                    padding:12px 0;border-bottom:1px solid var(--border);}
+        .toggle-row:last-of-type{border-bottom:none;}
+        .tl{font-size:14px;} .td{font-size:12px;color:var(--muted);margin-top:2px;}
+        .toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+        .toggle input{opacity:0;width:0;height:0;}
+        .ts{position:absolute;inset:0;background:var(--s2);border:1px solid var(--border);
+            border-radius:22px;cursor:pointer;transition:.2s;}
+        .ts::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;
+                    background:var(--muted);border-radius:50%;transition:.2s;}
+        .toggle input:checked+.ts{background:var(--accent);border-color:var(--accent);}
+        .toggle input:checked+.ts::before{transform:translateX(18px);background:#fff;}
+
+        .btn{width:100%;padding:14px;border:none;border-radius:var(--r);font-family:inherit;
+             font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px;}
+        .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(79,142,255,.3);}
+        .btn-primary:hover:not(:disabled){background:#3a7aee;transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,142,255,.4);}
+        .btn-primary:disabled{opacity:.6;cursor:not-allowed;}
+        .btn-success{background:var(--success);color:#111;box-shadow:0 4px 20px rgba(52,211,153,.3);margin-top:10px;}
+        .btn-success:hover{background:#2ec487;transform:translateY(-1px);}
+
+        .alert{display:none;padding:12px 16px;border-radius:var(--r);font-size:13px;margin-top:16px;}
+        .alert.error  {display:block;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);color:#fca5a5;}
+        .alert.success{display:block;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#6ee7b7;}
+
+        .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
+                 border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* success banner */
+        .success-banner{display:none;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.3);
+                        border-radius:16px;padding:24px;margin-bottom:24px;text-align:center;}
+        .success-banner.show{display:block;}
+        .code-display{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;color:var(--success);
+                      letter-spacing:3px;padding:14px;background:var(--s2);border-radius:10px;
+                      cursor:pointer;transition:background .2s;margin:12px 0;}
+        .code-display:hover{background:rgba(52,211,153,.12);}
+        .code-hint{font-size:12px;color:var(--muted);}
+
+        /* raw debug */
+        .debug-toggle{font-size:12px;color:var(--muted);cursor:pointer;margin-top:16px;display:inline-block;user-select:none;}
+        .debug-toggle:hover{color:var(--text);}
+        .debug-pre{display:none;margin-top:10px;padding:14px;background:var(--s2);
+                   border:1px solid var(--border);border-radius:var(--r);
+                   font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);
+                   overflow-x:auto;white-space:pre-wrap;max-height:220px;overflow-y:auto;}
+        .debug-pre.show{display:block;}
+
+        .hidden{display:none!important;}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="brand" onclick="location.href='novaDash.html'">
+        <div class="dot"></div><span class="brand-name">Nova</span>
+    </div>
+    <button class="back-btn" onclick="location.href='novaDash.html'">← Dashboard</button>
+</nav>
+
+<main>
+    <div class="page-title">New Meeting</div>
+    <div class="page-sub">Configure and launch your meeting instantly.</div>
+
+    <div class="card">
+
+        <!-- ── SUCCESS BANNER (shown after creation) ── -->
+        <div class="success-banner" id="successBanner">
+            <div style="font-size:13px;color:var(--success);font-weight:600;margin-bottom:4px">✓ Meeting created successfully!</div>
+            <div class="code-display" id="codeDisplay" onclick="copyCode()" title="Click to copy">---</div>
+            <div class="code-hint">Click code to copy · Share with participants</div>
+        </div>
+
+        <!-- ── FORM (hidden after creation) ── -->
+        <div id="formSection">
+            <div class="section-label">Meeting Details</div>
+
+            <div class="field">
+                <label>Title *</label>
+                <input type="text" id="title" placeholder="e.g. Weekly team standup">
+            </div>
+            <div class="field">
+                <label>Description <span style="color:#3a4055">(optional)</span></label>
+                <textarea id="desc" placeholder="What's this meeting about?"></textarea>
+            </div>
+            <div class="row2">
+                <div class="field">
+                    <label>Max participants</label>
+                    <input type="number" id="maxP" value="50" min="2" max="500">
+                </div>
+                <div class="field">
+                    <label>Meeting password <span style="color:#3a4055">(opt)</span></label>
+                    <input type="text" id="meetPw" placeholder="Leave blank = open">
+                </div>
+            </div>
+
+            <div class="section-label">Options</div>
+
+            <div class="toggle-row">
+                <div><div class="tl">Allow guests</div><div class="td">Anyone can join without an account</div></div>
+                <label class="toggle"><input type="checkbox" id="optGuests" checked><span class="ts"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div><div class="tl">Video on by default</div></div>
+                <label class="toggle"><input type="checkbox" id="optVideo" checked><span class="ts"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div><div class="tl">Audio on by default</div></div>
+                <label class="toggle"><input type="checkbox" id="optAudio" checked><span class="ts"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div><div class="tl">Enable chat</div></div>
+                <label class="toggle"><input type="checkbox" id="optChat" checked><span class="ts"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div><div class="tl">Screen sharing</div></div>
+                <label class="toggle"><input type="checkbox" id="optScreen" checked><span class="ts"></span></label>
+            </div>
+
+            <button class="btn btn-primary" id="createBtn" onclick="createMeeting()">Create Meeting</button>
+        </div>
+
+        <!-- ── START BUTTON (shown after creation) ── -->
+        <button class="btn btn-success hidden" id="startBtn" onclick="enterMeeting()">
+            Start Meeting Now →
+        </button>
+
+        <div class="alert" id="alert"></div>
+
+        <!-- Raw API response for debugging -->
+        <span class="debug-toggle" id="debugToggle" onclick="toggleDebug()" style="display:none">▶ Show raw API response</span>
+        <pre class="debug-pre" id="debugPre"></pre>
+    </div>
+</main>
+
+<script src="novaState.js"></script>
+<script>
+    const API = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev/api';
+
+    // Must be logged in
+    if (!NovaState.isLoggedIn()) location.href = 'novaLogin.html';
+
+    let createdCode = null;
+
+    function showAlert(msg, type = 'error') {
+        const el = document.getElementById('alert');
+        el.textContent = msg;
+        el.className = `alert ${type}`;
+    }
+
+    function showRawResponse(data) {
+        document.getElementById('debugPre').textContent = JSON.stringify(data, null, 2);
+        document.getElementById('debugToggle').style.display = 'inline-block';
+    }
+
+    function toggleDebug() {
+        const pre = document.getElementById('debugPre');
+        const btn = document.getElementById('debugToggle');
+        pre.classList.toggle('show');
+        btn.textContent = pre.classList.contains('show') ? '▼ Hide raw API response' : '▶ Show raw API response';
+    }
+
+    function copyCode() {
+        if (!createdCode) return;
+        navigator.clipboard.writeText(createdCode).then(() => {
+            document.getElementById('codeDisplay').textContent = '✓ Copied!';
+            setTimeout(() => document.getElementById('codeDisplay').textContent = createdCode, 1400);
+        });
+    }
+
+    async function createMeeting() {
+        const title = document.getElementById('title').value.trim();
+        if (!title) { showAlert('Please enter a meeting title'); return; }
+
+        const token = NovaState.getToken();
+        if (!token) { showAlert('Session expired — please sign in again'); setTimeout(() => location.href = 'nova-login.html', 1500); return; }
+
+        const btn = document.getElementById('createBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Creating…';
+
+        const pw = document.getElementById('meetPw').value.trim();
+
+        // ── Build request body ──────────────────────────────────────────────
+        const body = {
+            title,
+            description:        document.getElementById('desc').value.trim() || null,
+            maxParticipants:    parseInt(document.getElementById('maxP').value) || 50,
+            allowGuests:        document.getElementById('optGuests').checked,
+            requiresPassword:   pw.length > 0,
+            password:           pw || null,
+            videoEnabled:       document.getElementById('optVideo').checked,
+            audioEnabled:       document.getElementById('optAudio').checked,
+            chatEnabled:        document.getElementById('optChat').checked,
+            screenShareEnabled: document.getElementById('optScreen').checked,
+            isPublic:           false
+        };
+
+        console.log('📤 POST /meetings/create', body);
+
+        try {
+            const res = await fetch(`${API}/meetings/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(body)
+            });
+
+            const text = await res.text();
+            let data;
+            try { data = JSON.parse(text); }
+            catch {
+                console.error('Non-JSON response:', text);
+                showAlert(`Server error (HTTP ${res.status}): ${text.slice(0, 120)}`);
+                btn.disabled = false; btn.textContent = 'Create Meeting';
+                return;
+            }
+
+            console.log('📥 Create response:', data);
+            showRawResponse(data);   // always show debug panel option
+
+            if (!res.ok || data.success === false) {
+                showAlert(data.message || data.error || `Failed (HTTP ${res.status}). See raw response below.`);
+                btn.disabled = false; btn.textContent = 'Create Meeting';
+                return;
+            }
+
+            // ── Extract meeting code from any response shape ────────────────
+            // Shape A: { data: { meetingCode: "ABC" } }
+            // Shape B: { data: { code: "ABC" } }
+            // Shape C: { data: { meeting: { meetingCode: "ABC" } } }
+            // Shape D: { meetingCode: "ABC" }
+            createdCode =
+                data?.data?.meetingCode         ||
+                data?.data?.meeting_code        ||
+                data?.data?.code                ||
+                data?.data?.meeting?.meetingCode||
+                data?.data?.meeting?.code       ||
+                data?.meetingCode               ||
+                data?.code                      ||
+                null;
+
+            if (!createdCode) {
+                console.error('No meeting code found. Full response:', JSON.stringify(data, null, 2));
+                showAlert('Meeting may have been created but no code was returned. Check raw response below.');
+                btn.disabled = false; btn.textContent = 'Create Meeting';
+                return;
+            }
+
+            console.log('✅ Meeting created:', createdCode);
+
+            // ── Try to start the meeting (non-fatal if endpoint missing) ────
+            try {
+                const startRes = await fetch(`${API}/meetings/start/${createdCode}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                console.log('Start response status:', startRes.status);
+            } catch (e) {
+                console.warn('Start endpoint not reachable (non-fatal):', e.message);
+            }
+
+            // ── Save to recent meetings ─────────────────────────────────────
+            const recent = JSON.parse(sessionStorage.getItem('nova_recent') || '[]');
+            recent.unshift({
+                code:  createdCode,
+                title: title,
+                date:  new Date().toLocaleDateString()
+            });
+            sessionStorage.setItem('nova_recent', JSON.stringify(recent.slice(0, 10)));
+
+            // ── Show success UI ─────────────────────────────────────────────
+            document.getElementById('codeDisplay').textContent = createdCode;
+            document.getElementById('successBanner').classList.add('show');
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('startBtn').classList.remove('hidden');
+            showAlert(`Meeting "${title}" created!`, 'success');
+
+        } catch (err) {
+            console.error('createMeeting error:', err);
+            showAlert('Unexpected error: ' + err.message);
+            btn.disabled = false;
+            btn.textContent = 'Create Meeting';
+        }
+    }
+
+    function enterMeeting() {
+        if (!createdCode) return;
+        NovaState.setMeetingCode(createdCode);
+        location.href = 'novaMeeting.html';
+    }
+</script>
+</body>
+</html>

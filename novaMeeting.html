@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova — Meeting</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#0d0f14;--surface:#151820;--s2:#1c2030;--border:#252a38;
+              --accent:#4f8eff;--success:#34d399;--danger:#f87171;--text:#e8eaf0;--muted:#6b7280;--r:12px;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+        body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+            background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(79,142,255,.06) 0%,transparent 50%),
+                       radial-gradient(ellipse 40% 40% at 85% 85%,rgba(124,92,252,.05) 0%,transparent 50%);}
+
+        .meeting-screen{display:flex;flex-direction:column;height:100vh;position:relative;z-index:1;}
+
+        /* header */
+        .header{background:var(--surface);border-bottom:1px solid var(--border);
+                padding:13px 24px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+        .header-left{display:flex;align-items:center;gap:16px;}
+        .brand{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;}
+        .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);
+             box-shadow:0 0 10px var(--accent);animation:pulse 2.4s ease-in-out infinite;}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+        .live-badge{font-size:10px;font-weight:600;padding:3px 8px;
+                    background:rgba(248,113,113,.2);border:1px solid rgba(248,113,113,.4);
+                    color:#fca5a5;border-radius:20px;letter-spacing:.5px;}
+        .code-badge{font-family:'DM Mono',monospace;font-size:12px;background:var(--s2);
+                    border:1px solid var(--border);padding:5px 12px;border-radius:8px;
+                    color:var(--accent);cursor:pointer;transition:all .2s;}
+        .code-badge:hover{border-color:var(--accent);background:rgba(79,142,255,.08);}
+        .pcount{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+        .pcount::before{content:'';width:7px;height:7px;border-radius:50%;
+                        background:var(--success);box-shadow:0 0 6px var(--success);}
+        .header-right{display:flex;gap:8px;}
+        .icon-btn{padding:7px 14px;background:var(--s2);border:1px solid var(--border);
+                  border-radius:8px;color:var(--muted);font-family:inherit;font-size:13px;
+                  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+        .icon-btn:hover{border-color:var(--accent);color:var(--text);}
+
+        /* videos */
+        .videos{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+                gap:12px;padding:14px;overflow-y:auto;align-content:start;}
+        .vw{position:relative;background:var(--surface);border:1px solid var(--border);
+            border-radius:16px;overflow:hidden;aspect-ratio:16/9;}
+        video{width:100%;height:100%;object-fit:cover;}
+        .voverlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 40%);pointer-events:none;}
+        .vlabel{position:absolute;bottom:10px;left:12px;font-size:13px;font-weight:500;}
+        .sicons{position:absolute;top:9px;right:9px;display:flex;gap:5px;}
+        .sicon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;
+               justify-content:center;font-size:12px;backdrop-filter:blur(8px);}
+        .sicon.muted{background:rgba(248,113,113,.8);}
+
+        /* no camera placeholder */
+        .no-cam{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+                justify-content:center;gap:10px;color:var(--muted);}
+        .no-cam-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c5cfc);
+                       display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:#fff;}
+        .no-cam-name{font-size:13px;}
+
+        /* controls */
+        .controls{background:var(--surface);border-top:1px solid var(--border);
+                  padding:14px 24px;display:flex;justify-content:center;align-items:center;gap:10px;flex-shrink:0;}
+        .ctrl{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;
+              display:flex;align-items:center;justify-content:center;font-size:19px;
+              transition:all .2s;position:relative;}
+        .ctrl.on {background:var(--s2);border:1px solid var(--border);}
+        .ctrl.off{background:rgba(248,113,113,.2);border:1px solid rgba(248,113,113,.4);}
+        .ctrl.end{background:var(--danger);width:56px;height:56px;font-size:20px;box-shadow:0 4px 16px rgba(248,113,113,.35);}
+        .ctrl:hover{transform:scale(1.08);}
+        .ctrl.end:hover{background:#ef4444;}
+        .ctrl .lbl{position:absolute;bottom:-19px;font-size:10px;color:var(--muted);white-space:nowrap;font-family:'DM Sans',sans-serif;}
+
+        /* chat */
+        .chat-panel{position:fixed;right:-350px;top:0;height:100vh;width:330px;background:var(--surface);
+                    border-left:1px solid var(--border);transition:right .28s cubic-bezier(.4,0,.2,1);
+                    display:flex;flex-direction:column;z-index:200;}
+        .chat-panel.open{right:0;}
+        .chat-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+        .chat-head h3{font-size:15px;font-weight:600;}
+        .close-btn{width:26px;height:26px;border:none;background:var(--s2);border-radius:6px;
+                   color:var(--muted);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+        .msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:9px;}
+        .msg{padding:9px 13px;background:var(--s2);border-radius:10px;border:1px solid var(--border);}
+        .msender{font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px;}
+        .mtext{font-size:14px;line-height:1.5;}
+        .chat-input{padding:14px;border-top:1px solid var(--border);display:flex;gap:8px;}
+        .chat-input input{flex:1;padding:9px 13px;background:var(--s2);border:1px solid var(--border);
+                          border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;}
+        .chat-input input:focus{outline:none;border-color:var(--accent);}
+        .send-btn{padding:9px 13px;background:var(--accent);border:none;border-radius:8px;
+                  color:#fff;cursor:pointer;font-size:15px;transition:background .2s;}
+        .send-btn:hover{background:#3a7aee;}
+
+        .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);
+               background:var(--s2);border:1px solid var(--border);padding:9px 20px;
+               border-radius:20px;font-size:13px;color:var(--success);opacity:0;transition:all .3s;z-index:1000;pointer-events:none;}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    </style>
+</head>
+<body>
+
+<div class="meeting-screen">
+    <div class="header">
+        <div class="header-left">
+            <div class="brand"><div class="dot"></div>Nova<span class="live-badge">LIVE</span></div>
+            <div class="code-badge" id="codeDisplay" onclick="copyCode()" title="Click to copy">---</div>
+            <div class="pcount" id="pcount">1 participant</div>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" onclick="toggleChat()">💬 Chat</button>
+        </div>
+    </div>
+
+    <div class="videos" id="videosGrid">
+        <div class="vw" id="localWrapper">
+            <video id="localVideo" autoplay muted playsinline></video>
+            <div class="voverlay"></div>
+            <div class="vlabel" id="localLabel">You</div>
+            <div class="sicons" id="localIcons"></div>
+            <div class="no-cam hidden" id="noCam">
+                <div class="no-cam-avatar" id="noCamInitial">?</div>
+                <div class="no-cam-name" id="noCamName">You</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div style="position:relative">
+            <button class="ctrl on" id="videoBtn" onclick="toggleVideo()">📹</button>
+            <span class="lbl">Camera</span>
+        </div>
+        <div style="position:relative">
+            <button class="ctrl on" id="audioBtn" onclick="toggleAudio()">🎤</button>
+            <span class="lbl">Mic</span>
+        </div>
+        <div style="position:relative">
+            <button class="ctrl on" id="screenBtn" onclick="toggleScreen()">🖥️</button>
+            <span class="lbl">Share</span>
+        </div>
+        <div style="position:relative">
+            <button class="ctrl end" onclick="leave()">📞</button>
+            <span class="lbl">Leave</span>
+        </div>
+    </div>
+</div>
+
+<div id="chatPanel" class="chat-panel">
+    <div class="chat-head">
+        <h3>In-call messages</h3>
+        <button class="close-btn" onclick="toggleChat()">✕</button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Send a message…">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+</div>
+
+<div class="toast" id="toast">Copied!</div>
+
+<script src="novaState.js"></script>
+<script>
+    const WS_URL = 'ws://localhost:8080/ws/webrtc';
+    const ICE = { iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] };
+
+    // ── Load state from NovaState ──────────────────────────────────────────
+    const token       = NovaState.getToken();
+    const user        = NovaState.getUser();
+    const meetCode    = NovaState.getMeetingCode();
+    const myName      = user?.name || 'Guest';
+    const myPeerId    = 'peer_' + Math.random().toString(36).substr(2,9);
+
+    if (!meetCode) { alert('No meeting code found. Redirecting…'); location.href = 'novaJoin.html'; }
+
+    let localStream = null, screenStream = null, ws = null;
+    let peers = {}, videoOn = true, audioOn = true;
+
+    // ── Init ───────────────────────────────────────────────────────────────
+    document.getElementById('codeDisplay').textContent = meetCode;
+    document.getElementById('localLabel').textContent  = myName;
+
+    // Show avatar initial if no camera
+    const initial = myName.charAt(0).toUpperCase();
+    document.getElementById('noCamInitial').textContent = initial;
+    document.getElementById('noCamName').textContent = myName;
+
+    (async () => {
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ video:{width:1280,height:720}, audio:true });
+            document.getElementById('localVideo').srcObject = localStream;
+        } catch (err) {
+            console.warn('No camera/mic:', err.message);
+            // Show avatar placeholder
+            document.getElementById('localVideo').style.display = 'none';
+            document.getElementById('noCam').classList.remove('hidden');
+            document.getElementById('videoBtn').className = 'ctrl off';
+            document.getElementById('videoBtn').textContent = '🚫';
+            videoOn = false;
+        }
+        connectWS();
+    })();
+
+    // ── WebSocket ──────────────────────────────────────────────────────────
+    function connectWS() {
+        const url = token ? `${WS_URL}?token=${token}` : WS_URL;
+        ws = new WebSocket(url);
+        ws.onopen = () => {
+            console.log('✅ WS open');
+            send({ type:'JOIN', meetingCode:meetCode, fromPeerId:myPeerId });
+        };
+        ws.onmessage = async (e) => {
+            const msg = JSON.parse(e.data);
+            switch(msg.type) {
+                case 'PARTICIPANT_LIST': msg.data.peers.forEach(id => createPC(id, true)); break;
+                case 'JOIN':            updateCount(); break;
+                case 'LEAVE':          peerLeave(msg.fromPeerId); break;
+                case 'OFFER':          await handleOffer(msg); break;
+                case 'ANSWER':         await handleAnswer(msg); break;
+                case 'ICE_CANDIDATE':  await handleICE(msg); break;
+                case 'CHAT_MESSAGE':   addMsg(msg.data.senderName, msg.data.message, false); break;
+                case 'TOGGLE_VIDEO':
+                case 'TOGGLE_AUDIO':   updateMuteIcon(msg); break;
+            }
+        };
+        ws.onerror = e => console.error('WS error', e);
+        ws.onclose = ()  => console.log('WS closed');
+    }
+
+    function send(obj) {
+        if (ws?.readyState === WebSocket.OPEN) {
+            obj.meetingCode = meetCode;
+            obj.fromPeerId  = myPeerId;
+            ws.send(JSON.stringify(obj));
+        }
+    }
+
+    // ── WebRTC ─────────────────────────────────────────────────────────────
+    function createPC(peerId, isInit) {
+        const pc = new RTCPeerConnection(ICE);
+        peers[peerId] = pc;
+        if (localStream) localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+        pc.ontrack = e => addRemoteVideo(peerId, e.streams[0]);
+        pc.onicecandidate = e => { if(e.candidate) send({type:'ICE_CANDIDATE',toPeerId:peerId,data:e.candidate}); };
+        pc.onconnectionstatechange = () => { if(['disconnected','failed'].includes(pc.connectionState)) peerLeave(peerId); };
+        if (isInit) pc.createOffer().then(o=>pc.setLocalDescription(o)).then(()=>send({type:'OFFER',toPeerId:peerId,data:pc.localDescription})).catch(console.error);
+        return pc;
+    }
+    async function handleOffer(msg) {
+        const id = msg.fromPeerId;
+        if (!peers[id]) createPC(id, false);
+        await peers[id].setRemoteDescription(new RTCSessionDescription(msg.data));
+        const ans = await peers[id].createAnswer();
+        await peers[id].setLocalDescription(ans);
+        send({type:'ANSWER',toPeerId:id,data:peers[id].localDescription});
+    }
+    async function handleAnswer(msg) { if(peers[msg.fromPeerId]) await peers[msg.fromPeerId].setRemoteDescription(new RTCSessionDescription(msg.data)); }
+    async function handleICE(msg)    { if(peers[msg.fromPeerId]) await peers[msg.fromPeerId].addIceCandidate(new RTCIceCandidate(msg.data)); }
+    function peerLeave(id) { peers[id]?.close(); delete peers[id]; document.getElementById(`vw-${id}`)?.remove(); updateCount(); }
+
+    function addRemoteVideo(id, stream) {
+        if (document.getElementById(`vw-${id}`)) { document.querySelector(`#vw-${id} video`).srcObject = stream; return; }
+        const w = document.createElement('div'); w.className='vw'; w.id=`vw-${id}`;
+        const v = document.createElement('video'); v.srcObject=stream; v.autoplay=true; v.playsinline=true;
+        const ov = document.createElement('div'); ov.className='voverlay';
+        const lb = document.createElement('div'); lb.className='vlabel'; lb.textContent=`Peer ${id.slice(-4)}`;
+        const ic = document.createElement('div'); ic.className='sicons'; ic.id=`ic-${id}`;
+        w.append(v,ov,lb,ic);
+        document.getElementById('videosGrid').appendChild(w);
+        updateCount();
+    }
+
+    function updateMuteIcon(msg) {
+        const ic = document.getElementById(`ic-${msg.fromPeerId}`); if(!ic) return;
+        const eid = `${msg.type==='TOGGLE_AUDIO'?'ai':'vi'}-${msg.fromPeerId}`;
+        let el = document.getElementById(eid);
+        if (!msg.data.enabled) {
+            if (!el) { el=document.createElement('div'); el.id=eid; el.className='sicon muted'; el.textContent=msg.type==='TOGGLE_AUDIO'?'🔇':'🚫'; ic.appendChild(el); }
+        } else { el?.remove(); }
+    }
+
+    function updateCount() {
+        const n = Object.keys(peers).length + 1;
+        document.getElementById('pcount').textContent = `${n} participant${n!==1?'s':''}`;
+    }
+
+    // ── Media controls ──────────────────────────────────────────────────────
+    function toggleVideo() {
+        if (!localStream) return;
+        videoOn = !videoOn;
+        localStream.getVideoTracks().forEach(t => t.enabled = videoOn);
+        document.getElementById('videoBtn').className = `ctrl ${videoOn?'on':'off'}`;
+        document.getElementById('videoBtn').textContent = videoOn ? '📹' : '🚫';
+        document.getElementById('localVideo').style.display = videoOn ? 'block' : 'none';
+        document.getElementById('noCam').classList.toggle('hidden', videoOn);
+        send({type:'TOGGLE_VIDEO', data:{enabled:videoOn}});
+    }
+
+    function toggleAudio() {
+        if (!localStream) return;
+        audioOn = !audioOn;
+        localStream.getAudioTracks().forEach(t => t.enabled = audioOn);
+        document.getElementById('audioBtn').className = `ctrl ${audioOn?'on':'off'}`;
+        document.getElementById('audioBtn').textContent = audioOn ? '🎤' : '🔇';
+        send({type:'TOGGLE_AUDIO', data:{enabled:audioOn}});
+    }
+
+    async function toggleScreen() {
+        if (screenStream) {
+            screenStream.getTracks().forEach(t=>t.stop()); screenStream = null;
+            document.getElementById('screenBtn').className = 'ctrl on';
+            if (localStream) {
+                const vt = localStream.getVideoTracks()[0];
+                Object.values(peers).forEach(pc => { const s=pc.getSenders().find(s=>s.track?.kind==='video'); if(s&&vt) s.replaceTrack(vt); });
+            }
+            send({type:'SCREEN_SHARE_STOP'});
+        } else {
+            try {
+                screenStream = await navigator.mediaDevices.getDisplayMedia({video:true});
+                document.getElementById('screenBtn').className = 'ctrl off';
+                const st = screenStream.getVideoTracks()[0];
+                Object.values(peers).forEach(pc => { const s=pc.getSenders().find(s=>s.track?.kind==='video'); if(s) s.replaceTrack(st); });
+                st.onended = toggleScreen;
+                send({type:'SCREEN_SHARE_START'});
+            } catch(e) { console.error('Screen share:', e); }
+        }
+    }
+
+    // ── Chat ────────────────────────────────────────────────────────────────
+    function toggleChat() { document.getElementById('chatPanel').classList.toggle('open'); }
+
+    function sendMsg() {
+        const inp = document.getElementById('chatInput');
+        const txt = inp.value.trim(); if (!txt) return;
+        addMsg(myName, txt, true);
+        send({type:'CHAT_MESSAGE', data:{message:txt, senderName:myName, timestamp:Date.now()}});
+        inp.value = '';
+    }
+
+    function addMsg(sender, text, isSelf) {
+        const div = document.createElement('div'); div.className='msg';
+        const s = document.createElement('div'); s.className='msender'; s.textContent = isSelf?`${sender} (you)`:sender;
+        const t = document.createElement('div'); t.className='mtext';   t.textContent = text;
+        div.append(s,t);
+        const box = document.getElementById('msgs');
+        box.appendChild(div); box.scrollTop = box.scrollHeight;
+    }
+
+    // ── Copy code ────────────────────────────────────────────────────────────
+    function copyCode() {
+        navigator.clipboard.writeText(meetCode).then(()=>{
+            const t=document.getElementById('toast'); t.textContent='Code copied!'; t.classList.add('show');
+            setTimeout(()=>t.classList.remove('show'),2200);
+        });
+    }
+
+    // ── Leave ────────────────────────────────────────────────────────────────
+    function leave() {
+        if (!confirm('Leave this meeting?')) return;
+        localStream?.getTracks().forEach(t=>t.stop());
+        screenStream?.getTracks().forEach(t=>t.stop());
+        Object.values(peers).forEach(pc=>pc.close()); peers={};
+        if (ws) { send({type:'LEAVE'}); ws.close(); }
+        localStream=null; screenStream=null; ws=null;
+        NovaState.clearMeetingCode();
+        location.href = NovaState.isLoggedIn() ? 'novaDash.html' : 'novaJoin.html';
+    }
+
+    // ── Keyboard shortcuts ───────────────────────────────────────────────────
+    document.addEventListener('keydown', e => {
+        if (e.key==='d') toggleVideo();
+        if (e.key==='a') toggleAudio();
+    });
+    document.getElementById('chatInput').addEventListener('keypress', e => { if(e.key==='Enter') sendMsg(); });
+</script>
+</body>
+</html>
