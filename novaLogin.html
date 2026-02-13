@@ -158,11 +158,15 @@
         btn.innerHTML = '<span class="spinner"></span>Signing in…';
 
         try {
-            const res = await fetch(`${API}/auth/login`, {
+             const res = await fetch(`${API}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'ngrok-skip-browser-warning': 'true'  // ✅ ADDED
+                },
                 body: JSON.stringify({ email, password })
             });
+
 
             // Always try to parse as JSON first
             let data;
