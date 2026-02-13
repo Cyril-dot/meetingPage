@@ -1,1168 +1,458 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeetSpace - Video Conferencing</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova · video conferencing</title>
+  <!-- Google Font & simple icons (font awesome alternative via heroicons style) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- minimal icon set – only lock and google g – inline SVG alternative is fine -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        :root {
-            --primary: #0066FF;
-            --danger: #FF3B30;
-            --success: #34C759;
-            --warning: #FF9500;
-            --bg-dark: #1C1C1E;
-            --bg-darker: #000000;
-            --bg-light: #F2F2F7;
-            --border: #E5E5EA;
-            --text-primary: #000000;
-            --text-secondary: #8E8E93;
-            --surface: #FFFFFF;
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(145deg, #f9fcff 0%, #eef3f8 100%);
+      color: #1a2e3b;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg-light);
-            color: var(--text-primary);
-        }
+    /* main container */
+    .wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 2rem;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .prejoin-screen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
+    /* header with subtle nav */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      flex-wrap: wrap;
+    }
 
-        .prejoin-screen.hidden { display: none; }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-        .prejoin-container {
-            background: white;
-            border-radius: 24px;
-            padding: 48px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
+    .logo-icon {
+      background: #0b4f6c;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px -8px rgba(11,79,108,0.2);
+    }
 
-        .prejoin-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 32px;
-            text-align: center;
-        }
+    .logo-icon svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+    }
 
-        .form-group {
-            margin-bottom: 16px;
-        }
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #0b4f6c;
+    }
+    .logo-text span {
+      font-weight: 400;
+      color: #5c8896;
+    }
 
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
+    .nav-login {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
 
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-        }
+    .nav-btn {
+      background: transparent;
+      border: 1px solid #b6ccd4;
+      padding: 0.6rem 1.5rem;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e4a5b;
+      transition: all 0.2s;
+      cursor: pointer;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .nav-btn:hover {
+      background: #f0f6fa;
+      border-color: #5f9ea0;
+    }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
+    /* hero section — main homepage content */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2.5rem 0 2rem;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
 
-        .prejoin-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
+    .hero-left {
+      flex: 1 1 380px;
+    }
 
-        .btn-full {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .badge {
+      background: rgba(11, 79, 108, 0.08);
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #0b4f6c;
+      display: inline-block;
+      margin-bottom: 1.2rem;
+      border: 1px solid rgba(11,79,108,0.1);
+      backdrop-filter: blur(2px);
+    }
 
-        .btn-primary-full {
-            background: var(--primary);
-            color: white;
-        }
+    h1 {
+      font-size: 3.4rem;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: #0a2e3b;
+      margin-bottom: 1.2rem;
+    }
+    .highlight {
+      color: #0f7173;
+      border-bottom: 4px solid rgba(15,113,115,0.25);
+    }
 
-        .btn-secondary-full {
-            background: var(--bg-light);
-            color: var(--text-primary);
-        }
+    .subhead {
+      font-size: 1.25rem;
+      color: #2f5662;
+      max-width: 550px;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+    }
 
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
+    /* button group – primary login & google */
+    .login-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      align-items: center;
+    }
 
-        .loading-screen.hidden { display: none; }
+    .btn {
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
 
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+    .btn-primary {
+      background: #0b4f6c;
+      color: white;
+      box-shadow: 0 10px 18px -8px #0b4f6c;
+    }
+    .btn-primary:hover {
+      background: #0e5f80;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 25px -12px #0b4f6c;
+    }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+    .btn-google {
+      background: white;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      padding: 0.85rem 2rem;
+    }
+    .btn-google:hover {
+      background: #f8f9fa;
+      border-color: #bdc1c6;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.04);
+    }
 
-        .loading-text {
-            margin-top: 24px;
-            font-size: 16px;
-            font-weight: 600;
-        }
+    .btn-large {
+      padding: 0.9rem 2.4rem;
+      font-size: 1.05rem;
+    }
 
-        #meetingUI {
-            display: none;
-            height: 100vh;
-            flex-direction: column;
-        }
+    .hero-right {
+      flex: 1 1 380px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .meeting-header {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* abstract video grid representation */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      border-radius: 36px;
+      box-shadow: 0 30px 40px -25px rgba(0,60,80,0.15);
+      border: 1px solid rgba(255,255,255,0.6);
+      width: 100%;
+      max-width: 440px;
+    }
 
-        .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-        }
+    .grid-tile {
+      background: linear-gradient(145deg, #cbdde2, #b0ccd3);
+      border-radius: 20px;
+      padding: 28px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #0f495a;
+      font-weight: 600;
+      font-size: 1.4rem;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+    }
+    .grid-tile svg {
+      width: 32px;
+      height: 32px;
+      stroke: #0b4f6c;
+      stroke-width: 1.5;
+      margin-bottom: 8px;
+    }
 
-        .meeting-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+    /* features / trust section */
+    .features {
+      display: flex;
+      justify-content: space-between;
+      margin: 3.5rem 0 2rem;
+      flex-wrap: wrap;
+      gap: 1.8rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding-top: 2.5rem;
+    }
 
-        .meeting-time {
-            font-size: 14px;
-            font-weight: 600;
-        }
+    .feature-item {
+      flex: 1 1 180px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #215a6b;
+      font-weight: 500;
+    }
 
-        .participant-count {
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    /* footer / legal micro */
+    .footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      color: #567f8c;
+      font-size: 0.9rem;
+      font-weight: 400;
+      flex-wrap: wrap;
+    }
 
-        .video-area {
-            flex: 1;
-            background: var(--bg-darker);
-            position: relative;
-            overflow: hidden;
-        }
+    a {
+      text-decoration: none;
+      color: #0b4f6c;
+      font-weight: 500;
+    }
 
-        .video-grid {
-            width: 100%;
-            height: 100%;
-            display: grid;
-            gap: 8px;
-            padding: 16px;
-        }
+    a:hover {
+      text-decoration: underline;
+    }
 
-        .video-grid.participants-1 { grid-template-columns: 1fr; }
-        .video-grid.participants-2 { grid-template-columns: repeat(2, 1fr); }
-        .video-grid.participants-3,
-        .video-grid.participants-4 { grid-template-columns: repeat(2, 1fr); }
-        .video-grid.participants-5,
-        .video-grid.participants-6 { grid-template-columns: repeat(3, 1fr); }
+    /* custom google G icon (svg) */
+    .google-icon {
+      width: 20px;
+      height: 20px;
+      display: inline-block;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="%23FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="%23FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="%234CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="%231976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>') no-repeat center;
+      background-size: contain;
+    }
 
-        .video-tile {
-            position: relative;
-            background: var(--bg-dark);
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    /* responsive */
+    @media (max-width: 750px) {
+      h1 { font-size: 2.5rem; }
+      .wrapper { padding: 1.5rem; }
+    }
+    @media (max-width: 500px) {
+      .navbar { flex-direction: column; align-items: start; gap: 1rem; }
+    }
 
-        .video-tile.screen-share {
-            grid-column: 1 / -1;
-            grid-row: 1 / span 2;
-        }
-
-        .video-tile video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .video-tile.screen-share video {
-            object-fit: contain;
-        }
-
-        .video-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #00D4FF);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .video-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 12px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .screen-share-badge {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: var(--danger);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .controls-bar {
-            background: white;
-            border-top: 1px solid var(--border);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .control-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: none;
-            background: var(--bg-light);
-            color: var(--text-primary);
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .control-btn:hover {
-            background: var(--border);
-        }
-
-        .control-btn.active {
-            background: var(--danger);
-            color: white;
-        }
-
-        .control-btn.sharing {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-leave {
-            background: var(--danger);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 24px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .notification {
-            position: fixed;
-            top: 80px;
-            right: 24px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            max-width: 350px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .reaction-overlay {
-            position: absolute;
-            font-size: 60px;
-            pointer-events: none;
-            animation: reactionFloat 3s ease-out forwards;
-        }
-
-        @keyframes reactionFloat {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            10% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -150%) scale(1); opacity: 0; }
-        }
-
-        .meeting-link-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10001;
-        }
-
-        .meeting-link-modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .link-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .link-input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            background: var(--bg-light);
-        }
-
-        .copy-btn {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .modal-close {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-light);
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-    </style>
+    /* additional oauth hint */
+    .info-note {
+      font-size: 0.8rem;
+      color: #50747f;
+      margin-top: 0.75rem;
+    }
+  </style>
 </head>
 <body>
-    <!-- Pre-Join Screen -->
-    <div class="prejoin-screen" id="prejoinScreen">
-        <div class="prejoin-container">
-            <h1 class="prejoin-title">Join Meeting</h1>
-            
-            <div class="form-group">
-                <label class="form-label">JWT Token</label>
-                <input type="password" class="form-input" id="jwtToken" placeholder="Enter your JWT token">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Meeting ID (optional)</label>
-                <input type="text" class="form-input" id="meetingIdInput" placeholder="Leave blank to create new">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Your Name</label>
-                <input type="text" class="form-input" id="userName" placeholder="Enter your name" value="Guest User">
-            </div>
-            
-            <div class="prejoin-actions">
-                <button class="btn-full btn-primary-full" onclick="joinMeeting()">Join / Create</button>
-            </div>
+  <div class="wrapper">
+    <!-- header / navigation with login button (mirror) -->
+    <div class="navbar">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <!-- camera / conference icon -->
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+            <path d="M18 7h-1.5l-.9-1.7c-.4-.8-1.2-1.3-2.1-1.3h-5c-.9 0-1.7.5-2.1 1.3L5.5 7H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-6 8c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z"/>
+            <path d="M22 9.5v5l-3-2.5 3-2.5z" opacity="0.8"/>
+          </svg>
         </div>
+        <span class="logo-text">Nova<span>Meet</span></span>
+      </div>
+      <div class="nav-login">
+        <button class="nav-btn" onclick="window.location.href='novaLogin.html'">Sign in</button>
+        <button class="nav-btn" onclick="window.location.href='https://poikiloblastic-leeanne-gazeless.ngrok-free.dev/api/oauth2/login/google'">Google&nbsp;Sign in</button>
+      </div>
     </div>
 
-    <!-- Loading Screen -->
-    <div class="loading-screen hidden" id="loadingScreen">
-        <div class="spinner"></div>
-        <div class="loading-text">Connecting...</div>
+    <!-- main hero area -->
+    <div class="hero">
+      <div class="hero-left">
+        <span class="badge">✨ trust layer end-to-end encryption</span>
+        <h1>
+          connect <span class="highlight">clearly</span>,<br>collaborate instantly
+        </h1>
+        <div class="subhead">
+          HD video conferencing without the noise. Join with a single click – no downloads required.
+        </div>
+
+        <!-- LOGIN ACTION GROUP — includes direct Google OAuth button with the exact link provided -->
+        <div class="login-buttons">
+          <!-- standard email / password login (points to novaLogin.html as requested) -->
+          <a href="novaLogin.html" style="text-decoration: none;">
+            <button class="btn btn-primary btn-large">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Log in / Sign up
+            </button>
+          </a>
+          <!-- **** GOOGLE LOGIN BUTTON – exact OAuth endpoint **** -->
+          <a href="https://poikiloblastic-leeanne-gazeless.ngrok-free.dev/api/oauth2/login/google" style="text-decoration: none;">
+            <button class="btn btn-google btn-large">
+              <span class="google-icon" style="width:22px; height:22px;"></span>
+              Sign in with Google
+            </button>
+          </a>
+        </div>
+        <div class="info-note">
+          🔐 NovaLogin.html also available — or use Google OAuth
+        </div>
+      </div>
+
+      <!-- right visual — abstract video grid illustration -->
+      <div class="hero-right">
+        <div class="video-grid">
+          <div class="grid-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="8" r="3" stroke-width="1.8"/><path d="M4 20v-2a6 6 0 0 1 12 0v2" stroke-width="1.8"/><path d="M18 14l3 2.5-3 2.5v-5z" stroke-width="1.8"/>
+            </svg>
+            Nova
+          </div>
+          <div class="grid-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="8" r="3" stroke-width="1.8"/><path d="M4 20v-2a6 6 0 0 1 12 0v2" stroke-width="1.8"/>
+            </svg>
+            Guest
+          </div>
+          <div class="grid-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="2" y="4" width="20" height="12" rx="2"/><path d="M8 20h8" stroke-width="1.8"/>
+            </svg>
+            HD
+          </div>
+          <div class="grid-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2v4M12 22v-4M4 12H2h2m16 0h2-2z" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+            4K
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Meeting UI -->
-    <div id="meetingUI">
-        <div class="meeting-header">
-            <div class="logo">MeetSpace</div>
-            <div class="meeting-info">
-                <div class="participant-count" id="participantCount">
-                    <i class="fas fa-users"></i>
-                    <span>1</span>
-                </div>
-                <div class="meeting-time" id="meetingTime">00:00</div>
-            </div>
-        </div>
-
-        <div class="video-area">
-            <div class="video-grid participants-1" id="videoGrid"></div>
-        </div>
-
-        <div class="controls-bar">
-            <button class="control-btn active" id="muteBtn" onclick="toggleMute()" title="Microphone">
-                <i class="fas fa-microphone-slash"></i>
-            </button>
-            <button class="control-btn" id="videoBtn" onclick="toggleVideo()" title="Camera">
-                <i class="fas fa-video"></i>
-            </button>
-            <button class="control-btn" id="screenShareBtn" onclick="toggleScreenShare()" title="Share Screen">
-                <i class="fas fa-desktop"></i>
-            </button>
-            <button class="control-btn" onclick="sendReaction('👍')" title="React">
-                <i class="fas fa-smile"></i>
-            </button>
-            <button class="control-btn" onclick="showMeetingLink()" title="Copy Meeting Link">
-                <i class="fas fa-link"></i>
-            </button>
-            <button class="btn-leave" onclick="leaveMeeting()">
-                <i class="fas fa-phone-slash"></i> Leave
-            </button>
-        </div>
+    <!-- feature highlights (calm professional) -->
+    <div class="features">
+      <div class="feature-item">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f7173" stroke-width="1.8">
+          <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+          <path d="M8 12h8"></path>
+        </svg>
+        No account needed to join
+      </div>
+      <div class="feature-item">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f7173" stroke-width="1.8">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+        60+ min free meetings
+      </div>
+      <div class="feature-item">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f7173" stroke-width="1.8">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        End-to-end encrypted
+      </div>
     </div>
 
-    <!-- Meeting Link Modal -->
-    <div class="meeting-link-modal" id="meetingLinkModal">
-        <div class="modal-content">
-            <h2 class="modal-title">Share Meeting Link</h2>
-            <div class="link-input-group">
-                <input type="text" class="link-input" id="meetingLinkInput" readonly>
-                <button class="copy-btn" onclick="copyMeetingLink()">Copy</button>
-            </div>
-            <button class="modal-close" onclick="closeMeetingLinkModal()">Close</button>
-        </div>
+    <!-- footer / copyright & trust -->
+    <div class="footer">
+      <div>© 2025 NovaMeet — secure video for modern teams</div>
+      <div style="display: flex; gap: 28px;">
+        <a href="novaLogin.html">Login</a>
+        <a href="https://poikiloblastic-leeanne-gazeless.ngrok-free.dev/api/oauth2/login/google">Sign in with Google</a>
+        <a href="#">Privacy</a>
+      </div>
     </div>
-
-    <!-- STOMP.js for WebSocket -->
-    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
-    
-    <!-- GetStream SDK -->
-    <script type="module">
-        import { StreamVideoClient } from 'https://esm.sh/@stream-io/video-client@1.9.1';
-        window.StreamVideoClient = StreamVideoClient;
-        window.sdkLoaded = true;
-        console.log('✅ GetStream SDK Loaded');
-    </script>
-
-    <script>
-        const API_URL = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev';
-        const WS_URL = `wss://poikiloblastic-leeanne-gazeless.ngrok-free.dev/ws-meeting`;
-        
-        let client = null;
-        let call = null;
-        let stompClient = null;
-        let currentMeetingId = null;
-        let currentUserId = null;
-        let jwtToken = null;
-        let isMuted = true;
-        let isVideoOff = false; // Camera ON by default
-        let isScreenSharing = false;
-        let meetingStartTime = null;
-        let participants = new Map();
-        let renderTimer = null;
-
-        function log(msg, data = '') {
-            console.log(`[APP] ${msg}`, data);
-        }
-
-        // ============================================
-        // WebSocket Connection
-        // ============================================
-
-        async function connectWebSocket() {
-            return new Promise((resolve, reject) => {
-                log('Connecting to WebSocket...');
-                
-                try {
-                    const socket = new WebSocket(WS_URL);
-                    
-                    stompClient = new StompJs.Client({
-                        webSocketFactory: () => socket,
-                        connectHeaders: {
-                            'Authorization': `Bearer ${jwtToken}`
-                        },
-                        debug: (str) => console.log('[STOMP]', str),
-                        reconnectDelay: 5000,
-                        heartbeatIncoming: 4000,
-                        heartbeatOutgoing: 4000
-                    });
-
-                    stompClient.onConnect = (frame) => {
-                        log('✅ WebSocket connected');
-                        subscribeToMeetingEvents();
-                        
-                        stompClient.publish({
-                            destination: `/app/meeting/${currentMeetingId}/join`,
-                            body: JSON.stringify({ 
-                                userName: document.getElementById('userName').value 
-                            })
-                        });
-                        
-                        // Send initial state after connection established
-                        setTimeout(() => {
-                            sendWebSocketMessage(`/app/meeting/${currentMeetingId}/video`, { enabled: !isVideoOff });
-                            sendWebSocketMessage(`/app/meeting/${currentMeetingId}/audio`, { enabled: !isMuted });
-                        }, 500);
-                        
-                        resolve();
-                    };
-
-                    stompClient.onStompError = (frame) => {
-                        log('❌ STOMP error', frame);
-                        showNotification('Connection Error', 'WebSocket error');
-                        reject(new Error(frame.headers.message));
-                    };
-
-                    stompClient.onWebSocketClose = () => {
-                        log('⚠️ WebSocket closed');
-                    };
-
-                    stompClient.activate();
-                } catch (error) {
-                    log('❌ WebSocket setup error', error);
-                    reject(error);
-                }
-            });
-        }
-
-        function subscribeToMeetingEvents() {
-            const subscriptions = [
-                { dest: `/topic/meeting/${currentMeetingId}/participant/joined`, handler: handleParticipantJoined },
-                { dest: `/topic/meeting/${currentMeetingId}/participant/left`, handler: handleParticipantLeft },
-                { dest: `/topic/meeting/${currentMeetingId}/participant/audio`, handler: handleAudioState },
-                { dest: `/topic/meeting/${currentMeetingId}/participant/video`, handler: handleVideoState },
-                { dest: `/topic/meeting/${currentMeetingId}/participant/screenshare`, handler: handleScreenShareState },
-                { dest: `/topic/meeting/${currentMeetingId}/meeting/reaction`, handler: handleReaction },
-                { dest: `/user/queue/meeting/participants`, handler: handleParticipantsList }
-            ];
-
-            subscriptions.forEach(({ dest, handler }) => {
-                stompClient.subscribe(dest, (message) => {
-                    handler(JSON.parse(message.body));
-                });
-            });
-
-            log('✅ Subscribed to meeting events');
-        }
-
-        function sendWebSocketMessage(destination, payload) {
-            if (stompClient && stompClient.connected) {
-                stompClient.publish({
-                    destination: destination,
-                    body: JSON.stringify(payload)
-                });
-            }
-        }
-
-        // ============================================
-        // Event Handlers
-        // ============================================
-
-        function handleParticipantJoined(event) {
-            log('Participant joined', event);
-            const { userId, userName } = event;
-            
-            if (!participants.has(userId)) {
-                participants.set(userId, {
-                    id: userId,
-                    name: userName,
-                    isLocal: userId === currentUserId,
-                    isMuted: true,
-                    isVideoOff: true,
-                    isScreenSharing: false
-                });
-                
-                showNotification('Participant Joined', `${userName} joined the meeting`);
-                updateParticipantCount();
-                
-                // Wait longer for GetStream to sync streams
-                setTimeout(() => scheduleRender(), 2000);
-            }
-        }
-
-        function handleParticipantLeft(event) {
-            const { userId } = event;
-            const participant = participants.get(userId);
-            
-            if (participant) {
-                participants.delete(userId);
-                showNotification('Participant Left', `${participant.name} left the meeting`);
-                updateParticipantCount();
-                scheduleRender();
-            }
-        }
-
-        function handleAudioState(event) {
-            const { userId, enabled } = event;
-            const participant = participants.get(userId);
-            if (participant) {
-                participant.isMuted = !enabled;
-                scheduleRender();
-            }
-        }
-
-        function handleVideoState(event) {
-            const { userId, enabled } = event;
-            const participant = participants.get(userId);
-            if (participant) {
-                participant.isVideoOff = !enabled;
-                scheduleRender();
-            }
-        }
-
-        function handleScreenShareState(event) {
-            const { userId, enabled } = event;
-            const participant = participants.get(userId);
-            if (participant) {
-                participant.isScreenSharing = enabled;
-                showNotification('Screen Share', 
-                    enabled ? `${participant.name} started sharing` : `${participant.name} stopped sharing`);
-                scheduleRender();
-            }
-        }
-
-        function handleReaction(event) {
-            const { userId, emoji } = event;
-            showReactionOnVideo(userId, emoji);
-        }
-
-        function handleParticipantsList(participantsList) {
-            log('Participants list received', participantsList);
-            
-            participantsList.forEach(p => {
-                if (!participants.has(p.userId)) {
-                    participants.set(p.userId, {
-                        id: p.userId,
-                        name: p.userName,
-                        isLocal: p.userId === currentUserId,
-                        isMuted: !p.isMuted,
-                        isVideoOff: !p.isVideoOn,
-                        isScreenSharing: false
-                    });
-                }
-            });
-            
-            updateParticipantCount();
-            scheduleRender();
-        }
-
-        function updateParticipantCount() {
-            const count = participants.size;
-            document.querySelector('#participantCount span').textContent = count;
-        }
-
-        // Debounced rendering to avoid too many re-renders
-        function scheduleRender() {
-            if (renderTimer) clearTimeout(renderTimer);
-            renderTimer = setTimeout(() => renderVideo(), 300);
-        }
-
-        // ============================================
-        // Meeting Functions
-        // ============================================
-
-        async function joinMeeting() {
-            const token = document.getElementById('jwtToken').value.trim();
-            const meetingId = document.getElementById('meetingIdInput').value.trim();
-
-            if (!token) {
-                showNotification('Error', 'Please enter JWT token');
-                return;
-            }
-
-            jwtToken = token;
-            document.getElementById('prejoinScreen').classList.add('hidden');
-            document.getElementById('loadingScreen').classList.remove('hidden');
-
-            try {
-                let endpoint = meetingId 
-                    ? `${API_URL}/api/meetings/${meetingId}/join`
-                    : `${API_URL}/api/meetings/instant`;
-
-                const method = 'POST';
-                const body = meetingId ? null : JSON.stringify({
-                    title: 'Video Conference',
-                    waitingRoomEnabled: false,
-                    recordingEnabled: false
-                });
-
-                const res = await fetch(endpoint, {
-                    method,
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': 'true'
-                    },
-                    body
-                });
-
-                if (!res.ok) throw new Error('Failed to join/create meeting');
-
-                const data = await res.json();
-                await initCall(data.callCredentials, data.meetingId);
-            } catch (err) {
-                log('❌ Error', err);
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('prejoinScreen').classList.remove('hidden');
-                showNotification('Error', err.message);
-            }
-        }
-
-        async function initCall(credentials, meetingId) {
-            try {
-                await new Promise(resolve => {
-                    if (window.sdkLoaded) resolve();
-                    else setTimeout(resolve, 2000);
-                });
-
-                currentMeetingId = meetingId;
-                const { apiKey, userId, userName, token, callId } = credentials;
-                currentUserId = userId;
-
-                // Create GetStream client
-                client = new window.StreamVideoClient({
-                    apiKey: apiKey,
-                    user: { id: userId, name: userName || 'Guest' },
-                    token: token
-                });
-
-                // Join call
-                call = client.call('default', callId);
-                await call.join({ create: true });
-
-                // Enable camera by default, keep mic muted
-                await call.microphone.disable();
-                await call.camera.enable();
-
-                // Setup real-time participant updates
-                call.state.participants$.subscribe(() => {
-                    scheduleRender();
-                });
-
-                // Also listen to individual stream changes
-                call.state.localParticipant$.subscribe(() => {
-                    scheduleRender();
-                });
-
-                // Connect WebSocket
-                await connectWebSocket();
-
-                // Show UI
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('meetingUI').style.display = 'flex';
-                startMeetingTimer();
-
-                // Initialize local participant
-                participants.set(currentUserId, {
-                    id: currentUserId,
-                    name: userName || 'Guest',
-                    isLocal: true,
-                    isMuted: isMuted,
-                    isVideoOff: isVideoOff,
-                    isScreenSharing: false
-                });
-                updateParticipantCount();
-
-                // Initial render
-                setTimeout(() => renderVideo(), 1000);
-
-                log('✅ Meeting initialized');
-            } catch (err) {
-                log('❌ Init failed', err);
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('prejoinScreen').classList.remove('hidden');
-                showNotification('Error', 'Failed to initialize: ' + err.message);
-            }
-        }
-
-        async function toggleMute() {
-            if (!call) return;
-
-            try {
-                if (isMuted) {
-                    await call.microphone.enable();
-                    isMuted = false;
-                    document.getElementById('muteBtn').classList.remove('active');
-                    document.querySelector('#muteBtn i').className = 'fas fa-microphone';
-                } else {
-                    await call.microphone.disable();
-                    isMuted = true;
-                    document.getElementById('muteBtn').classList.add('active');
-                    document.querySelector('#muteBtn i').className = 'fas fa-microphone-slash';
-                }
-                
-                sendWebSocketMessage(`/app/meeting/${currentMeetingId}/audio`, { enabled: !isMuted });
-                
-                const localParticipant = participants.get(currentUserId);
-                if (localParticipant) {
-                    localParticipant.isMuted = isMuted;
-                }
-                
-                scheduleRender();
-            } catch (err) {
-                log('❌ Toggle mute failed', err);
-            }
-        }
-
-        async function toggleVideo() {
-            if (!call) return;
-
-            try {
-                if (isVideoOff) {
-                    await call.camera.enable();
-                    isVideoOff = false;
-                    document.getElementById('videoBtn').classList.remove('active');
-                    document.querySelector('#videoBtn i').className = 'fas fa-video';
-                } else {
-                    await call.camera.disable();
-                    isVideoOff = true;
-                    document.getElementById('videoBtn').classList.add('active');
-                    document.querySelector('#videoBtn i').className = 'fas fa-video-slash';
-                }
-                
-                sendWebSocketMessage(`/app/meeting/${currentMeetingId}/video`, { enabled: !isVideoOff });
-                
-                const localParticipant = participants.get(currentUserId);
-                if (localParticipant) {
-                    localParticipant.isVideoOff = isVideoOff;
-                }
-                
-                scheduleRender();
-            } catch (err) {
-                log('❌ Toggle video failed', err);
-            }
-        }
-
-        async function toggleScreenShare() {
-            if (!call) return;
-
-            try {
-                if (!isScreenSharing) {
-                    await call.screenShare.enable();
-                    isScreenSharing = true;
-                    document.getElementById('screenShareBtn').classList.add('sharing');
-                    showNotification('Screen Share', 'You are now sharing your screen');
-                    
-                    const localParticipant = participants.get(currentUserId);
-                    if (localParticipant) {
-                        localParticipant.isScreenSharing = true;
-                    }
-                    
-                    sendWebSocketMessage(`/app/meeting/${currentMeetingId}/screenshare`, { enabled: true });
-                } else {
-                    await call.screenShare.disable();
-                    isScreenSharing = false;
-                    document.getElementById('screenShareBtn').classList.remove('sharing');
-                    showNotification('Screen Share', 'Screen sharing stopped');
-                    
-                    const localParticipant = participants.get(currentUserId);
-                    if (localParticipant) {
-                        localParticipant.isScreenSharing = false;
-                    }
-                    
-                    sendWebSocketMessage(`/app/meeting/${currentMeetingId}/screenshare`, { enabled: false });
-                }
-                
-                scheduleRender();
-            } catch (err) {
-                log('❌ Toggle screen share failed', err);
-                showNotification('Error', 'Failed to share screen. Please check permissions.');
-            }
-        }
-
-        function sendReaction(emoji) {
-            sendWebSocketMessage(`/app/meeting/${currentMeetingId}/reaction`, { emoji });
-            showReactionOnVideo(currentUserId, emoji);
-        }
-
-        function showMeetingLink() {
-            const meetingUrl = `${window.location.origin}${window.location.pathname}?meeting=${currentMeetingId}`;
-            document.getElementById('meetingLinkInput').value = meetingUrl;
-            document.getElementById('meetingLinkModal').classList.add('show');
-        }
-
-        function closeMeetingLinkModal() {
-            document.getElementById('meetingLinkModal').classList.remove('show');
-        }
-
-        function copyMeetingLink() {
-            const input = document.getElementById('meetingLinkInput');
-            input.select();
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(input.value).then(() => {
-                    showNotification('Success', 'Meeting link copied!');
-                    closeMeetingLinkModal();
-                });
-            } else {
-                document.execCommand('copy');
-                showNotification('Success', 'Meeting link copied!');
-                closeMeetingLinkModal();
-            }
-        }
-
-        async function leaveMeeting() {
-            if (confirm('Leave meeting?')) {
-                if (stompClient) {
-                    sendWebSocketMessage(`/app/meeting/${currentMeetingId}/leave`, {});
-                    stompClient.deactivate();
-                }
-                if (isScreenSharing && call) {
-                    await call.screenShare.disable();
-                }
-                if (call) await call.leave();
-                window.location.reload();
-            }
-        }
-
-        // ============================================
-        // Video Rendering
-        // ============================================
-
-        function renderVideo() {
-            if (!call) return;
-
-            const participantList = Array.from(call.state.participants.values());
-            const grid = document.getElementById('videoGrid');
-            grid.innerHTML = '';
-            
-            // Check for screen sharing
-            const screenSharingParticipant = participantList.find(p => {
-                return p.screenShareStream && 
-                       p.screenShareStream.active &&
-                       p.screenShareStream.getVideoTracks().length > 0;
-            });
-            
-            if (screenSharingParticipant) {
-                // Screen share view: large screen + participant tiles
-                const screenTile = createScreenShareTile(screenSharingParticipant);
-                grid.appendChild(screenTile);
-                
-                participantList.forEach(participant => {
-                    const tile = createVideoTile(participant);
-                    grid.appendChild(tile);
-                });
-                
-                grid.className = `video-grid participants-${Math.min(participantList.length + 1, 6)}`;
-            } else {
-                // Normal grid view
-                participantList.forEach(participant => {
-                    const tile = createVideoTile(participant);
-                    grid.appendChild(tile);
-                });
-                
-                grid.className = `video-grid participants-${Math.min(participantList.length, 6)}`;
-            }
-        }
-
-        function createScreenShareTile(participant) {
-            const tile = document.createElement('div');
-            tile.className = 'video-tile screen-share';
-            tile.id = `tile-screen-${participant.userId}`;
-
-            const name = participant.name || 'Guest';
-
-            const video = document.createElement('video');
-            video.autoplay = true;
-            video.playsInline = true;
-            video.muted = true;
-            video.srcObject = participant.screenShareStream;
-            tile.appendChild(video);
-            
-            video.onloadedmetadata = () => {
-                video.play().catch(() => {});
-            };
-
-            const badge = document.createElement('div');
-            badge.className = 'screen-share-badge';
-            badge.innerHTML = `<i class="fas fa-desktop"></i> ${name}'s screen`;
-            tile.appendChild(badge);
-
-            return tile;
-        }
-
-        function createVideoTile(participant) {
-            const tile = document.createElement('div');
-            tile.className = 'video-tile';
-            tile.id = `tile-${participant.userId}`;
-
-            const name = participant.name || 'Guest';
-            const initial = name.charAt(0).toUpperCase();
-            const isLocal = participant.isLocalParticipant;
-
-            // Get video stream - check both regular and published tracks
-            const videoStream = participant.videoStream;
-            const publishedTracks = participant.publishedTracks || [];
-            const videoTrack = publishedTracks.find(t => t === 'video');
-            
-            const hasVideo = videoStream && 
-                            videoStream.active &&
-                            videoStream.getVideoTracks().length > 0 &&
-                            videoStream.getVideoTracks()[0].enabled;
-
-            // Get audio stream
-            const audioStream = participant.audioStream;
-            const audioTrack = publishedTracks.find(t => t === 'audio');
-            
-            const hasAudio = audioStream && 
-                            audioStream.active &&
-                            audioStream.getAudioTracks().length > 0 &&
-                            audioStream.getAudioTracks()[0].enabled;
-
-            if (hasVideo) {
-                const video = document.createElement('video');
-                video.autoplay = true;
-                video.playsInline = true;
-                video.muted = isLocal;
-                video.srcObject = videoStream;
-                tile.appendChild(video);
-                
-                video.onloadedmetadata = () => {
-                    video.play().catch(() => {});
-                };
-            } else {
-                const avatar = document.createElement('div');
-                avatar.className = 'video-avatar';
-                avatar.textContent = initial;
-                tile.appendChild(avatar);
-            }
-
-            // Add audio for remote participants
-            if (hasAudio && !isLocal) {
-                const audio = document.createElement('audio');
-                audio.autoplay = true;
-                audio.srcObject = audioStream;
-                tile.appendChild(audio);
-                audio.play().catch(() => {});
-            }
-
-            const overlay = document.createElement('div');
-            overlay.className = 'video-overlay';
-            overlay.innerHTML = `
-                <div>${name}${isLocal ? ' (You)' : ''}</div>
-                <div>
-                    <i class="fas fa-microphone${hasAudio ? '' : '-slash'}"></i>
-                </div>
-            `;
-            tile.appendChild(overlay);
-
-            return tile;
-        }
-
-        function showReactionOnVideo(userId, emoji) {
-            const tile = document.getElementById(`tile-${userId}`);
-            if (!tile) return;
-
-            const reaction = document.createElement('div');
-            reaction.className = 'reaction-overlay';
-            reaction.textContent = emoji;
-            reaction.style.left = `${30 + Math.random() * 40}%`;
-            reaction.style.top = `${30 + Math.random() * 40}%`;
-            
-            tile.appendChild(reaction);
-            setTimeout(() => reaction.remove(), 3000);
-        }
-
-        // ============================================
-        // Utility Functions
-        // ============================================
-
-        function showNotification(title, message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `
-                <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
-                <div style="font-size: 13px; color: var(--text-secondary);">${message}</div>
-            `;
-            
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 5000);
-        }
-
-        function startMeetingTimer() {
-            meetingStartTime = Date.now();
-            setInterval(() => {
-                const elapsed = Date.now() - meetingStartTime;
-                const minutes = Math.floor(elapsed / 60000);
-                const seconds = Math.floor((elapsed % 60000) / 1000);
-                document.getElementById('meetingTime').textContent = 
-                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const meetingId = urlParams.get('meeting');
-            if (meetingId) {
-                document.getElementById('meetingIdInput').value = meetingId;
-            }
-        });
-
-        log('✅ App initialized');
-    </script>
+  </div>
+
+  <!-- subtle script to reinforce that both login options work; the Google button uses the exact link.
+       Also provides graceful navigation if any button is clicked. -->
+  <script>
+    (function() {
+      // ensure that all google login buttons / links point to the exact provided endpoint.
+      // use case: if any additional google button appears.
+      const googleLinks = document.querySelectorAll('a[href*="oauth2/login/google"]');
+      googleLinks.forEach(link => {
+        link.href = 'https://poikiloblastic-leeanne-gazeless.ngrok-free.dev/api/oauth2/login/google';
+      });
+
+      // the page is 'index.html' but we need a homepage with those two login paths.
+      // directly embed the novaLogin.html relative path — it's valid.
+      console.log('Nova homepage ready — Google OAuth & native login');
+    })();
+  </script>
 </body>
 </html>
