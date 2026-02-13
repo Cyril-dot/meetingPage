@@ -158,15 +158,14 @@
         btn.innerHTML = '<span class="spinner"></span>Signing in…';
 
         try {
-             const res = await fetch(`${API}/auth/login`, {
+            const res = await fetch(`${API}/auth/login`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'  // ✅ ADDED
+                    'ngrok-skip-browser-warning': 'true'
                 },
                 body: JSON.stringify({ email, password })
             });
-
 
             // Always try to parse as JSON first
             let data;
@@ -180,17 +179,12 @@
 
             console.log('Login raw response:', data);
 
-            // ── Your API returns: { accessToken, refreshToken, message }
-            // It does NOT have a success field — treat any 2xx as success,
-            // and any non-2xx or missing accessToken as failure.
             if (!res.ok) {
                 showAlert(data.message || data.error || `Login failed (HTTP ${res.status})`);
                 btn.disabled = false; btn.textContent = 'Sign In';
                 return;
             }
 
-            // ── Extract token from YOUR exact response shape ───────────────
-            // { "accessToken": "eyJ...", "refreshToken": "...", "message": "Login successful" }
             const token = data?.accessToken || null;
 
             if (!token) {
@@ -205,19 +199,12 @@
             try {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 console.log('JWT payload:', payload);
-                // sub is the email in your JWT
                 nameFromJwt = payload?.name || payload?.firstName || payload?.sub?.split('@')[0] || nameFromJwt;
             } catch(e) {}
 
-            const user = {
-                name:   nameFromJwt,
-                email:  email,
-                id:     null, // not returned at login — fetched if needed later
-            };
-
-            // ── Persist to sessionStorage via helper ───────────────────────
+            // Persist to sessionStorage via helper
             NovaState.saveLoginResponse(data, email);
-            const userDetails = NovaState.getUser(); // re-read what was saved
+            const userDetails = NovaState.getUser();
 
             // Show token in debug panel briefly
             document.getElementById('debugToken').textContent = token;
@@ -230,7 +217,7 @@
 
         } catch (err) {
             console.error('Login fetch error:', err);
-            showAlert('Cannot reach server. Is it running on localhost:8080?');
+            showAlert('Cannot reach server. Check ngrok tunnel.');
             btn.disabled = false;
             btn.textContent = 'Sign In';
         }
@@ -238,4 +225,3 @@
 </script>
 </body>
 </html>
-
