@@ -40,11 +40,48 @@
                   cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
         .icon-btn:hover{border-color:var(--accent);color:var(--text);}
 
-        /* videos */
+        /* videos - default grid layout */
         .videos{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-                gap:12px;padding:14px;overflow-y:auto;align-content:start;}
+                gap:12px;padding:14px;overflow-y:auto;align-content:start;transition:all .3s;}
+        
+        /* screen share layout */
+        .videos.screen-share-active{
+            grid-template-columns:1fr 300px;
+            grid-template-rows:1fr;
+        }
+
+        .screen-share-main{
+            grid-column:1;
+            grid-row:1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .participants-sidebar{
+            grid-column:2;
+            grid-row:1;
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            overflow-y:auto;
+        }
+
+        .participants-sidebar .vw{
+            aspect-ratio:16/9;
+        }
+
         .vw{position:relative;background:var(--surface);border:1px solid var(--border);
             border-radius:16px;overflow:hidden;aspect-ratio:16/9;}
+        
+        .vw.screen-share{
+            aspect-ratio:16/9;
+            width:100%;
+            height:100%;
+            border:2px solid var(--accent);
+            box-shadow:0 8px 32px rgba(79,142,255,.2);
+        }
+
         video{width:100%;height:100%;object-fit:cover;}
         .voverlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 40%);pointer-events:none;}
         .vlabel{position:absolute;bottom:10px;left:12px;font-size:13px;font-weight:500;}
@@ -52,6 +89,7 @@
         .sicon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;
                justify-content:center;font-size:12px;backdrop-filter:blur(8px);}
         .sicon.muted{background:rgba(248,113,113,.8);}
+        .sicon.presenting{background:rgba(79,142,255,.8);color:#fff;}
 
         /* no camera placeholder */
         .no-cam{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
@@ -98,6 +136,25 @@
                background:var(--s2);border:1px solid var(--border);padding:9px 20px;
                border-radius:20px;font-size:13px;color:var(--success);opacity:0;transition:all .3s;z-index:1000;pointer-events:none;}
         .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+        .hidden{display:none !important;}
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .videos.screen-share-active{
+                grid-template-columns:1fr;
+                grid-template-rows:1fr auto;
+            }
+            .participants-sidebar{
+                grid-column:1;
+                grid-row:2;
+                flex-direction:row;
+                max-height:200px;
+            }
+            .participants-sidebar .vw{
+                min-width:200px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -163,7 +220,7 @@
 
 <script src="novaState.js"></script>
 <script>
-  const WS_URL = 'wss://poikiloblastic-leeanne-gazeless.ngrok-free.dev/ws/webrtc';
+    const WS_URL = 'wss://poikiloblastic-leeanne-gazeless.ngrok-free.dev/ws/webrtc';
     const ICE = { iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] };
 
     // ── Load state from NovaState ──────────────────────────────────────────
@@ -177,6 +234,8 @@
 
     let localStream = null, screenStream = null, ws = null;
     let peers = {}, videoOn = true, audioOn = true;
+    let activePresenterId = null; // Track who is presenting
+    let peerScreenStreams = {}; // Track screen streams from remote peers
 
     // ── Init ───────────────────────────────────────────────────────────────
     document.getElementById('codeDisplay').textContent = meetCode;
@@ -223,6 +282,8 @@
                 case 'CHAT_MESSAGE':   addMsg(msg.data.senderName, msg.data.message, false); break;
                 case 'TOGGLE_VIDEO':
                 case 'TOGGLE_AUDIO':   updateMuteIcon(msg); break;
+                case 'SCREEN_SHARE_START': handleRemoteScreenStart(msg.fromPeerId); break;
+                case 'SCREEN_SHARE_STOP':  handleRemoteScreenStop(msg.fromPeerId); break;
             }
         };
         ws.onerror = e => console.error('WS error', e);
@@ -258,15 +319,36 @@
     }
     async function handleAnswer(msg) { if(peers[msg.fromPeerId]) await peers[msg.fromPeerId].setRemoteDescription(new RTCSessionDescription(msg.data)); }
     async function handleICE(msg)    { if(peers[msg.fromPeerId]) await peers[msg.fromPeerId].addIceCandidate(new RTCIceCandidate(msg.data)); }
-    function peerLeave(id) { peers[id]?.close(); delete peers[id]; document.getElementById(`vw-${id}`)?.remove(); updateCount(); }
+    function peerLeave(id) { 
+        peers[id]?.close(); 
+        delete peers[id]; 
+        document.getElementById(`vw-${id}`)?.remove(); 
+        if (activePresenterId === id) {
+            handleRemoteScreenStop(id);
+        }
+        updateCount(); 
+    }
 
     function addRemoteVideo(id, stream) {
-        if (document.getElementById(`vw-${id}`)) { document.querySelector(`#vw-${id} video`).srcObject = stream; return; }
-        const w = document.createElement('div'); w.className='vw'; w.id=`vw-${id}`;
-        const v = document.createElement('video'); v.srcObject=stream; v.autoplay=true; v.playsinline=true;
-        const ov = document.createElement('div'); ov.className='voverlay';
-        const lb = document.createElement('div'); lb.className='vlabel'; lb.textContent=`Peer ${id.slice(-4)}`;
-        const ic = document.createElement('div'); ic.className='sicons'; ic.id=`ic-${id}`;
+        if (document.getElementById(`vw-${id}`)) { 
+            document.querySelector(`#vw-${id} video`).srcObject = stream; 
+            return; 
+        }
+        const w = document.createElement('div'); 
+        w.className='vw'; 
+        w.id=`vw-${id}`;
+        const v = document.createElement('video'); 
+        v.srcObject=stream; 
+        v.autoplay=true; 
+        v.playsinline=true;
+        const ov = document.createElement('div'); 
+        ov.className='voverlay';
+        const lb = document.createElement('div'); 
+        lb.className='vlabel'; 
+        lb.textContent=`Peer ${id.slice(-4)}`;
+        const ic = document.createElement('div'); 
+        ic.className='sicons'; 
+        ic.id=`ic-${id}`;
         w.append(v,ov,lb,ic);
         document.getElementById('videosGrid').appendChild(w);
         updateCount();
@@ -286,6 +368,208 @@
         document.getElementById('pcount').textContent = `${n} participant${n!==1?'s':''}`;
     }
 
+    // ── Screen Share Layout Management ─────────────────────────────────────
+    function reorganizeLayout() {
+        const grid = document.getElementById('videosGrid');
+        
+        if (activePresenterId || screenStream) {
+            // Someone is presenting - switch to presentation layout
+            grid.className = 'videos screen-share-active';
+            grid.innerHTML = '';
+            
+            // Create main screen share area
+            const mainArea = document.createElement('div');
+            mainArea.className = 'screen-share-main';
+            
+            // Create sidebar for participants
+            const sidebar = document.createElement('div');
+            sidebar.className = 'participants-sidebar';
+            
+            // Add the screen share to main area
+            if (screenStream) {
+                // Local user is presenting
+                const screenWrapper = createScreenShareWrapper('local-screen', screenStream, `${myName} (presenting)`);
+                mainArea.appendChild(screenWrapper);
+                
+                // Add local camera to sidebar
+                if (localStream) {
+                    const localCam = createParticipantWrapper('local', localStream, myName, true);
+                    sidebar.appendChild(localCam);
+                }
+            } else if (activePresenterId) {
+                // Remote user is presenting
+                const presenterWrapper = document.getElementById(`vw-${activePresenterId}`);
+                if (presenterWrapper) {
+                    presenterWrapper.className = 'vw screen-share';
+                    mainArea.appendChild(presenterWrapper);
+                }
+                
+                // Add local camera to sidebar
+                const localCam = createParticipantWrapper('local', localStream, myName, true);
+                sidebar.appendChild(localCam);
+            }
+            
+            // Add all other participants to sidebar
+            Object.keys(peers).forEach(peerId => {
+                if (peerId !== activePresenterId) {
+                    const existingWrapper = document.getElementById(`vw-${peerId}`);
+                    if (existingWrapper) {
+                        existingWrapper.className = 'vw';
+                        sidebar.appendChild(existingWrapper);
+                    }
+                }
+            });
+            
+            grid.appendChild(mainArea);
+            grid.appendChild(sidebar);
+        } else {
+            // No one presenting - use default grid layout
+            grid.className = 'videos';
+            grid.innerHTML = '';
+            
+            // Add local video
+            const localWrapper = document.createElement('div');
+            localWrapper.className = 'vw';
+            localWrapper.id = 'localWrapper';
+            
+            const localVideo = document.createElement('video');
+            localVideo.id = 'localVideo';
+            localVideo.autoplay = true;
+            localVideo.muted = true;
+            localVideo.playsinline = true;
+            if (localStream) localVideo.srcObject = localStream;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'voverlay';
+            
+            const label = document.createElement('div');
+            label.className = 'vlabel';
+            label.id = 'localLabel';
+            label.textContent = myName;
+            
+            const icons = document.createElement('div');
+            icons.className = 'sicons';
+            icons.id = 'localIcons';
+            
+            const noCam = document.createElement('div');
+            noCam.className = 'no-cam' + (videoOn ? ' hidden' : '');
+            noCam.id = 'noCam';
+            noCam.innerHTML = `
+                <div class="no-cam-avatar" id="noCamInitial">${initial}</div>
+                <div class="no-cam-name" id="noCamName">${myName}</div>
+            `;
+            
+            localWrapper.append(localVideo, overlay, label, icons, noCam);
+            grid.appendChild(localWrapper);
+            
+            // Add all remote participants
+            Object.keys(peers).forEach(peerId => {
+                const existingWrapper = document.getElementById(`vw-${peerId}`);
+                if (existingWrapper) {
+                    grid.appendChild(existingWrapper);
+                }
+            });
+        }
+    }
+
+    function createScreenShareWrapper(id, stream, label) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'vw screen-share';
+        wrapper.id = id;
+        
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsinline = true;
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'voverlay';
+        
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'vlabel';
+        labelDiv.textContent = label;
+        
+        const icons = document.createElement('div');
+        icons.className = 'sicons';
+        const presentIcon = document.createElement('div');
+        presentIcon.className = 'sicon presenting';
+        presentIcon.textContent = '🖥️';
+        icons.appendChild(presentIcon);
+        
+        wrapper.append(video, overlay, labelDiv, icons);
+        return wrapper;
+    }
+
+    function createParticipantWrapper(id, stream, name, isLocal = false) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'vw';
+        wrapper.id = isLocal ? 'localWrapper' : `vw-${id}`;
+        
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.autoplay = true;
+        video.playsinline = true;
+        if (isLocal) {
+            video.id = 'localVideo';
+            video.muted = true;
+        }
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'voverlay';
+        
+        const label = document.createElement('div');
+        label.className = 'vlabel';
+        label.textContent = name;
+        if (isLocal) label.id = 'localLabel';
+        
+        const icons = document.createElement('div');
+        icons.className = 'sicons';
+        icons.id = isLocal ? 'localIcons' : `ic-${id}`;
+        
+        wrapper.append(video, overlay, label, icons);
+        
+        if (isLocal && !videoOn) {
+            video.style.display = 'none';
+            const noCam = document.createElement('div');
+            noCam.className = 'no-cam';
+            noCam.id = 'noCam';
+            noCam.innerHTML = `
+                <div class="no-cam-avatar" id="noCamInitial">${initial}</div>
+                <div class="no-cam-name" id="noCamName">${myName}</div>
+            `;
+            wrapper.appendChild(noCam);
+        }
+        
+        return wrapper;
+    }
+
+    function handleRemoteScreenStart(peerId) {
+        activePresenterId = peerId;
+        
+        // Add presenting icon to the peer
+        const icons = document.getElementById(`ic-${peerId}`);
+        if (icons) {
+            const presentIcon = document.createElement('div');
+            presentIcon.id = `present-${peerId}`;
+            presentIcon.className = 'sicon presenting';
+            presentIcon.textContent = '🖥️';
+            icons.appendChild(presentIcon);
+        }
+        
+        reorganizeLayout();
+    }
+
+    function handleRemoteScreenStop(peerId) {
+        if (activePresenterId === peerId) {
+            activePresenterId = null;
+        }
+        
+        // Remove presenting icon
+        document.getElementById(`present-${peerId}`)?.remove();
+        
+        reorganizeLayout();
+    }
+
     // ── Media controls ──────────────────────────────────────────────────────
     function toggleVideo() {
         if (!localStream) return;
@@ -293,8 +577,14 @@
         localStream.getVideoTracks().forEach(t => t.enabled = videoOn);
         document.getElementById('videoBtn').className = `ctrl ${videoOn?'on':'off'}`;
         document.getElementById('videoBtn').textContent = videoOn ? '📹' : '🚫';
-        document.getElementById('localVideo').style.display = videoOn ? 'block' : 'none';
-        document.getElementById('noCam').classList.toggle('hidden', videoOn);
+        
+        const localVideo = document.getElementById('localVideo');
+        const noCam = document.getElementById('noCam');
+        if (localVideo && noCam) {
+            localVideo.style.display = videoOn ? 'block' : 'none';
+            noCam.classList.toggle('hidden', videoOn);
+        }
+        
         send({type:'TOGGLE_VIDEO', data:{enabled:videoOn}});
     }
 
@@ -309,22 +599,44 @@
 
     async function toggleScreen() {
         if (screenStream) {
-            screenStream.getTracks().forEach(t=>t.stop()); screenStream = null;
+            // Stop screen sharing
+            screenStream.getTracks().forEach(t=>t.stop()); 
+            screenStream = null;
             document.getElementById('screenBtn').className = 'ctrl on';
+            
+            // Replace screen track with camera track for all peers
             if (localStream) {
                 const vt = localStream.getVideoTracks()[0];
-                Object.values(peers).forEach(pc => { const s=pc.getSenders().find(s=>s.track?.kind==='video'); if(s&&vt) s.replaceTrack(vt); });
+                Object.values(peers).forEach(pc => { 
+                    const s=pc.getSenders().find(s=>s.track?.kind==='video'); 
+                    if(s&&vt) s.replaceTrack(vt); 
+                });
             }
+            
             send({type:'SCREEN_SHARE_STOP'});
+            reorganizeLayout();
         } else {
+            // Start screen sharing
             try {
                 screenStream = await navigator.mediaDevices.getDisplayMedia({video:true});
                 document.getElementById('screenBtn').className = 'ctrl off';
+                
                 const st = screenStream.getVideoTracks()[0];
-                Object.values(peers).forEach(pc => { const s=pc.getSenders().find(s=>s.track?.kind==='video'); if(s) s.replaceTrack(st); });
+                
+                // Replace camera track with screen track for all peers
+                Object.values(peers).forEach(pc => { 
+                    const s=pc.getSenders().find(s=>s.track?.kind==='video'); 
+                    if(s) s.replaceTrack(st); 
+                });
+                
+                // Handle screen share stop
                 st.onended = toggleScreen;
+                
                 send({type:'SCREEN_SHARE_START'});
-            } catch(e) { console.error('Screen share:', e); }
+                reorganizeLayout();
+            } catch(e) { 
+                console.error('Screen share:', e); 
+            }
         }
     }
 
