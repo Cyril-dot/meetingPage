@@ -402,15 +402,69 @@
             
             // Add the screen share to main area
             if (screenStream) {
-                // Local user is presenting
-                const screenWrapper = createScreenShareWrapper('local-screen', screenStream, `${myName} (presenting)`);
-                mainArea.appendChild(screenWrapper);
-                
-                // Add local camera to sidebar
-                if (localStream) {
-                    const localCam = createParticipantWrapper('local', localStream, myName, true);
-                    sidebar.appendChild(localCam);
+                // Local user is presenting - show local screen with presenting indicator
+                let localWrapper = document.getElementById('localWrapper');
+                if (!localWrapper) {
+                    localWrapper = document.createElement('div');
+                    localWrapper.className = 'vw screen-share';
+                    localWrapper.id = 'localWrapper';
+                    
+                    const localVideo = document.createElement('video');
+                    localVideo.id = 'localVideo';
+                    localVideo.srcObject = localStream;
+                    localVideo.autoplay = true;
+                    localVideo.muted = true;
+                    localVideo.playsinline = true;
+                    
+                    const overlay = document.createElement('div');
+                    overlay.className = 'voverlay';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'vlabel';
+                    label.id = 'localLabel';
+                    label.textContent = `${myName} (presenting)`;
+                    
+                    const icons = document.createElement('div');
+                    icons.className = 'sicons';
+                    icons.id = 'localIcons';
+                    const presentIcon = document.createElement('div');
+                    presentIcon.className = 'sicon presenting';
+                    presentIcon.textContent = '🖥️';
+                    icons.appendChild(presentIcon);
+                    
+                    const noCam = document.createElement('div');
+                    noCam.className = 'no-cam' + (videoOn ? ' hidden' : '');
+                    noCam.id = 'noCam';
+                    noCam.innerHTML = `
+                        <div class="no-cam-avatar" id="noCamInitial">${initial}</div>
+                        <div class="no-cam-name" id="noCamName">${myName}</div>
+                    `;
+                    
+                    localWrapper.append(localVideo, overlay, label, icons, noCam);
+                } else {
+                    localWrapper.className = 'vw screen-share';
+                    document.getElementById('localLabel').textContent = `${myName} (presenting)`;
+                    
+                    // Add presenting icon if not present
+                    const icons = document.getElementById('localIcons');
+                    if (!icons.querySelector('.presenting')) {
+                        const presentIcon = document.createElement('div');
+                        presentIcon.className = 'sicon presenting';
+                        presentIcon.textContent = '🖥️';
+                        presentIcon.id = 'local-present-icon';
+                        icons.appendChild(presentIcon);
+                    }
                 }
+                mainArea.appendChild(localWrapper);
+                
+                // Add all remote participants to sidebar
+                Object.keys(peers).forEach(peerId => {
+                    const existingWrapper = document.getElementById(`vw-${peerId}`);
+                    if (existingWrapper) {
+                        existingWrapper.className = 'vw';
+                        sidebar.appendChild(existingWrapper);
+                    }
+                });
             } else if (activePresenterId) {
                 // Remote user is presenting
                 const presenterWrapper = document.getElementById(`vw-${activePresenterId}`);
@@ -420,20 +474,23 @@
                 }
                 
                 // Add local camera to sidebar
-                const localCam = createParticipantWrapper('local', localStream, myName, true);
-                sidebar.appendChild(localCam);
-            }
-            
-            // Add all other participants to sidebar
-            Object.keys(peers).forEach(peerId => {
-                if (peerId !== activePresenterId) {
-                    const existingWrapper = document.getElementById(`vw-${peerId}`);
-                    if (existingWrapper) {
-                        existingWrapper.className = 'vw';
-                        sidebar.appendChild(existingWrapper);
-                    }
+                let localWrapper = document.getElementById('localWrapper');
+                if (localWrapper) {
+                    localWrapper.className = 'vw';
+                    sidebar.appendChild(localWrapper);
                 }
-            });
+                
+                // Add all other participants to sidebar
+                Object.keys(peers).forEach(peerId => {
+                    if (peerId !== activePresenterId) {
+                        const existingWrapper = document.getElementById(`vw-${peerId}`);
+                        if (existingWrapper) {
+                            existingWrapper.className = 'vw';
+                            sidebar.appendChild(existingWrapper);
+                        }
+                    }
+                });
+            }
             
             grid.appendChild(mainArea);
             grid.appendChild(sidebar);
@@ -442,45 +499,54 @@
             grid.className = 'videos';
             grid.innerHTML = '';
             
-            // Add local video
-            const localWrapper = document.createElement('div');
-            localWrapper.className = 'vw';
-            localWrapper.id = 'localWrapper';
-            
-            const localVideo = document.createElement('video');
-            localVideo.id = 'localVideo';
-            localVideo.autoplay = true;
-            localVideo.muted = true;
-            localVideo.playsinline = true;
-            if (localStream) localVideo.srcObject = localStream;
-            
-            const overlay = document.createElement('div');
-            overlay.className = 'voverlay';
-            
-            const label = document.createElement('div');
-            label.className = 'vlabel';
-            label.id = 'localLabel';
-            label.textContent = myName;
-            
-            const icons = document.createElement('div');
-            icons.className = 'sicons';
-            icons.id = 'localIcons';
-            
-            const noCam = document.createElement('div');
-            noCam.className = 'no-cam' + (videoOn ? ' hidden' : '');
-            noCam.id = 'noCam';
-            noCam.innerHTML = `
-                <div class="no-cam-avatar" id="noCamInitial">${initial}</div>
-                <div class="no-cam-name" id="noCamName">${myName}</div>
-            `;
-            
-            localWrapper.append(localVideo, overlay, label, icons, noCam);
+            // Re-add local video wrapper
+            let localWrapper = document.getElementById('localWrapper');
+            if (!localWrapper) {
+                localWrapper = document.createElement('div');
+                localWrapper.className = 'vw';
+                localWrapper.id = 'localWrapper';
+                
+                const localVideo = document.createElement('video');
+                localVideo.id = 'localVideo';
+                localVideo.srcObject = localStream;
+                localVideo.autoplay = true;
+                localVideo.muted = true;
+                localVideo.playsinline = true;
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'voverlay';
+                
+                const label = document.createElement('div');
+                label.className = 'vlabel';
+                label.id = 'localLabel';
+                label.textContent = myName;
+                
+                const icons = document.createElement('div');
+                icons.className = 'sicons';
+                icons.id = 'localIcons';
+                
+                const noCam = document.createElement('div');
+                noCam.className = 'no-cam' + (videoOn ? ' hidden' : '');
+                noCam.id = 'noCam';
+                noCam.innerHTML = `
+                    <div class="no-cam-avatar" id="noCamInitial">${initial}</div>
+                    <div class="no-cam-name" id="noCamName">${myName}</div>
+                `;
+                
+                localWrapper.append(localVideo, overlay, label, icons, noCam);
+            } else {
+                localWrapper.className = 'vw';
+                document.getElementById('localLabel').textContent = myName;
+                // Remove presenting icon
+                document.getElementById('local-present-icon')?.remove();
+            }
             grid.appendChild(localWrapper);
             
             // Add all remote participants
             Object.keys(peers).forEach(peerId => {
                 const existingWrapper = document.getElementById(`vw-${peerId}`);
                 if (existingWrapper) {
+                    existingWrapper.className = 'vw';
                     grid.appendChild(existingWrapper);
                 }
             });
