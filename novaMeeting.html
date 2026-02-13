@@ -46,8 +46,9 @@
         
         /* screen share layout */
         .videos.screen-share-active{
-            grid-template-columns:1fr 300px;
-            grid-template-rows:1fr;
+            grid-template-columns:1fr;
+            grid-template-rows:auto 1fr;
+            gap:14px;
         }
 
         .screen-share-main{
@@ -56,19 +57,23 @@
             display:flex;
             align-items:center;
             justify-content:center;
+            min-height:400px;
+            max-height:65vh;
         }
 
         .participants-sidebar{
-            grid-column:2;
-            grid-row:1;
-            display:flex;
-            flex-direction:column;
-            gap:12px;
-            overflow-y:auto;
+            grid-column:1;
+            grid-row:2;
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+            gap:10px;
+            overflow-x:auto;
+            padding-bottom:8px;
         }
 
         .participants-sidebar .vw{
             aspect-ratio:16/9;
+            max-height:140px;
         }
 
         .vw{position:relative;background:var(--surface);border:1px solid var(--border);
@@ -141,18 +146,28 @@
 
         /* Responsive adjustments */
         @media (max-width: 1024px) {
-            .videos.screen-share-active{
-                grid-template-columns:1fr;
-                grid-template-rows:1fr auto;
+            .screen-share-main{
+                min-height:300px;
+                max-height:50vh;
             }
             .participants-sidebar{
-                grid-column:1;
-                grid-row:2;
-                flex-direction:row;
-                max-height:200px;
+                grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
             }
             .participants-sidebar .vw{
-                min-width:200px;
+                max-height:110px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .screen-share-main{
+                min-height:250px;
+                max-height:45vh;
+            }
+            .participants-sidebar{
+                grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+            }
+            .participants-sidebar .vw{
+                max-height:90px;
             }
         }
     </style>
