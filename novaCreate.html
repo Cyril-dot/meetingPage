@@ -221,7 +221,7 @@
         if (!title) { showAlert('Please enter a meeting title'); return; }
 
         const token = NovaState.getToken();
-        if (!token) { showAlert('Session expired — please sign in again'); setTimeout(() => location.href = 'nova-login.html', 1500); return; }
+        if (!token) { showAlert('Session expired — please sign in again'); setTimeout(() => location.href = 'novaLogin.html', 1500); return; }
 
         const btn = document.getElementById('createBtn');
         btn.disabled = true;
@@ -251,7 +251,8 @@
                 method: 'POST',
                 headers: {
                     'Content-Type':  'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'ngrok-skip-browser-warning': 'true'  // ✅ ADDED
                 },
                 body: JSON.stringify(body)
             });
@@ -276,10 +277,6 @@
             }
 
             // ── Extract meeting code from any response shape ────────────────
-            // Shape A: { data: { meetingCode: "ABC" } }
-            // Shape B: { data: { code: "ABC" } }
-            // Shape C: { data: { meeting: { meetingCode: "ABC" } } }
-            // Shape D: { meetingCode: "ABC" }
             createdCode =
                 data?.data?.meetingCode         ||
                 data?.data?.meeting_code        ||
@@ -303,7 +300,10 @@
             try {
                 const startRes = await fetch(`${API}/meetings/start/${createdCode}`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'  // ✅ ADDED
+                    }
                 });
                 console.log('Start response status:', startRes.status);
             } catch (e) {
