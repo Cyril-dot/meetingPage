@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════
-//  nova-state.js  — shared session store
+//  novaState.js — shared session store
 //  All pages read/write through these helpers.
 //
 //  Your login API returns:
