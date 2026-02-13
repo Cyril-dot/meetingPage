@@ -7,9 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root{--bg:#0d0f14;--surface:#151820;--s2:#1c2030;--border:#252a38;
-              --accent:#4f8eff;--success:#34d399;--danger:#f87171;--text:#e8eaf0;--muted:#6b7280;--r:12px;}
+              --accent:#4f8eff;--success:#34d399;--danger:#f87171;--text:#e8eaf0;--muted:#6b7280;}
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
         body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
             background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(79,142,255,.06) 0%,transparent 50%),
                        radial-gradient(ellipse 40% 40% at 85% 85%,rgba(124,92,252,.05) 0%,transparent 50%);}
@@ -40,93 +40,38 @@
                   cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
         .icon-btn:hover{border-color:var(--accent);color:var(--text);}
 
-        /* Professional grid layout - default */
-        .videos{
-            flex:1;
-            display:grid;
-            gap:12px;
-            padding:14px;
-            overflow-y:auto;
-            align-content:start;
-            transition:all .3s;
-        }
-        
-        /* Dynamic grid based on participant count */
+        /* Professional grid layout */
+        .videos{flex:1;display:grid;gap:12px;padding:14px;overflow-y:auto;align-content:start;}
         .videos.count-1{grid-template-columns:1fr;}
         .videos.count-2{grid-template-columns:repeat(2,1fr);}
-        .videos.count-3{grid-template-columns:repeat(2,1fr);}
-        .videos.count-4{grid-template-columns:repeat(2,1fr);}
+        .videos.count-3,.videos.count-4{grid-template-columns:repeat(2,1fr);}
         .videos.count-5,.videos.count-6{grid-template-columns:repeat(3,1fr);}
         .videos.count-7,.videos.count-8,.videos.count-9{grid-template-columns:repeat(3,1fr);}
         .videos.count-10plus{grid-template-columns:repeat(4,1fr);}
 
-        /* Professional screen share layout */
-        .videos.presenting{
-            grid-template-columns:1fr 280px;
-            grid-template-rows:1fr;
-            gap:14px;
-            max-height:calc(100vh - 140px);
-        }
+        /* Screen share layout */
+        .videos.presenting{grid-template-columns:1fr 300px;grid-template-rows:1fr;gap:14px;}
+        .main-stage{grid-column:1;display:flex;align-items:center;justify-content:center;
+                   background:var(--surface);border:2px solid var(--accent);border-radius:16px;
+                   overflow:hidden;box-shadow:0 8px 32px rgba(79,142,255,.2);}
+        .participants-rail{grid-column:2;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding:4px;}
+        .participants-rail .vw{aspect-ratio:16/9;min-height:120px;max-height:160px;}
 
-        .main-stage{
-            grid-column:1;
-            grid-row:1;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            background:var(--surface);
-            border:2px solid var(--accent);
-            border-radius:16px;
-            overflow:hidden;
-            box-shadow:0 8px 32px rgba(79,142,255,.2);
-            position:relative;
-        }
-
-        .participants-rail{
-            grid-column:2;
-            grid-row:1;
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-            overflow-y:auto;
-            padding:4px;
-        }
-
-        .participants-rail .vw{
-            aspect-ratio:16/9;
-            min-height:120px;
-            max-height:160px;
-        }
-
-        .vw{
-            position:relative;
-            background:var(--surface);
-            border:1px solid var(--border);
-            border-radius:16px;
-            overflow:hidden;
-            aspect-ratio:16/9;
-            transition:all .3s;
-        }
-        
-        .vw:hover{
-            border-color:rgba(79,142,255,.5);
-            transform:translateY(-2px);
-        }
-
+        .vw{position:relative;background:var(--surface);border:1px solid var(--border);
+            border-radius:16px;overflow:hidden;aspect-ratio:16/9;}
+        .vw:hover{border-color:rgba(79,142,255,.5);transform:translateY(-2px);}
         video{width:100%;height:100%;object-fit:cover;}
         .voverlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 40%);pointer-events:none;}
-        .vlabel{position:absolute;bottom:10px;left:12px;font-size:13px;font-weight:500;z-index:2;}
+        .vlabel{position:absolute;bottom:10px;left:12px;font-size:13px;font-weight:500;z-index:2;color:#fff;}
         .sicons{position:absolute;top:9px;right:9px;display:flex;gap:5px;z-index:2;}
         .sicon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;
                justify-content:center;font-size:12px;backdrop-filter:blur(8px);}
-        .sicon.muted{background:rgba(248,113,113,.8);}
+        .sicon.muted{background:rgba(248,113,113,.8);color:#fff;}
         .sicon.presenting{background:rgba(79,142,255,.9);color:#fff;animation:presentPulse 2s ease-in-out infinite;}
-        
         @keyframes presentPulse{0%,100%{box-shadow:0 0 0 0 rgba(79,142,255,.7)}50%{box-shadow:0 0 0 6px rgba(79,142,255,0)}}
 
-        /* no camera placeholder */
         .no-cam{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-                justify-content:center;gap:10px;color:var(--muted);background:var(--surface);}
+                justify-content:center;gap:10px;color:var(--muted);background:var(--s2);}
         .no-cam-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7c5cfc);
                        display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600;color:#fff;}
         .no-cam-name{font-size:13px;}
@@ -135,19 +80,17 @@
         .controls{background:var(--surface);border-top:1px solid var(--border);
                   padding:14px 24px;display:flex;justify-content:center;align-items:center;gap:10px;flex-shrink:0;}
         .ctrl{width:50px;height:50px;border-radius:50%;border:none;cursor:pointer;
-              display:flex;align-items:center;justify-content:center;font-size:19px;
-              transition:all .2s;position:relative;}
-        .ctrl.on {background:var(--s2);border:1px solid var(--border);}
+              display:flex;align-items:center;justify-content:center;font-size:19px;transition:all .2s;position:relative;}
+        .ctrl.on{background:var(--s2);border:1px solid var(--border);}
         .ctrl.off{background:rgba(248,113,113,.2);border:1px solid rgba(248,113,113,.4);}
         .ctrl.end{background:var(--danger);width:56px;height:56px;font-size:20px;box-shadow:0 4px 16px rgba(248,113,113,.35);}
         .ctrl:hover{transform:scale(1.08);}
         .ctrl.end:hover{background:#ef4444;}
-        .ctrl .lbl{position:absolute;bottom:-19px;font-size:10px;color:var(--muted);white-space:nowrap;font-family:'DM Sans',sans-serif;}
+        .ctrl .lbl{position:absolute;bottom:-19px;font-size:10px;color:var(--muted);white-space:nowrap;}
 
         /* chat */
         .chat-panel{position:fixed;right:-350px;top:0;height:100vh;width:330px;background:var(--surface);
-                    border-left:1px solid var(--border);transition:right .28s cubic-bezier(.4,0,.2,1);
-                    display:flex;flex-direction:column;z-index:200;}
+                    border-left:1px solid var(--border);transition:right .28s;display:flex;flex-direction:column;z-index:200;}
         .chat-panel.open{right:0;}
         .chat-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
         .chat-head h3{font-size:15px;font-weight:600;}
@@ -162,42 +105,19 @@
                           border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;}
         .chat-input input:focus{outline:none;border-color:var(--accent);}
         .send-btn{padding:9px 13px;background:var(--accent);border:none;border-radius:8px;
-                  color:#fff;cursor:pointer;font-size:15px;transition:background .2s;}
+                  color:#fff;cursor:pointer;font-size:15px;}
         .send-btn:hover{background:#3a7aee;}
 
         .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);
-               background:var(--s2);border:1px solid var(--border);padding:9px 20px;
-               border-radius:20px;font-size:13px;color:var(--success);opacity:0;transition:all .3s;z-index:1000;pointer-events:none;}
+               background:var(--s2);border:1px solid var(--border);padding:9px 20px;border-radius:20px;
+               font-size:13px;color:var(--success);opacity:0;transition:all .3s;z-index:1000;pointer-events:none;}
         .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
         .hidden{display:none !important;}
 
-        /* Responsive adjustments */
         @media (max-width: 1024px) {
-            .videos.presenting{
-                grid-template-columns:1fr;
-                grid-template-rows:1fr auto;
-            }
-            .participants-rail{
-                grid-column:1;
-                grid-row:2;
-                flex-direction:row;
-                overflow-x:auto;
-                padding:8px 4px;
-            }
-            .participants-rail .vw{
-                min-width:160px;
-                max-height:120px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .participants-rail .vw{
-                min-width:140px;
-                max-height:100px;
-            }
-            .videos.count-3,.videos.count-4{grid-template-columns:repeat(1,1fr);}
-            .videos.count-5,.videos.count-6{grid-template-columns:repeat(2,1fr);}
+            .videos.presenting{grid-template-columns:1fr;grid-template-rows:1fr auto;}
+            .participants-rail{grid-column:1;grid-row:2;flex-direction:row;overflow-x:auto;padding:8px 4px;}
+            .participants-rail .vw{min-width:160px;max-height:120px;}
         }
     </style>
 </head>
@@ -207,7 +127,7 @@
     <div class="header">
         <div class="header-left">
             <div class="brand"><div class="dot"></div>Nova<span class="live-badge">LIVE</span></div>
-            <div class="code-badge" id="codeDisplay" onclick="copyCode()" title="Click to copy">---</div>
+            <div class="code-badge" id="codeDisplay" onclick="copyCode()">---</div>
             <div class="pcount" id="pcount">1 participant</div>
         </div>
         <div class="header-right">
@@ -215,9 +135,7 @@
         </div>
     </div>
 
-    <div class="videos count-1" id="videosGrid">
-        <!-- Videos dynamically added here -->
-    </div>
+    <div class="videos count-1" id="videosGrid"></div>
 
     <div class="controls">
         <div style="position:relative">
@@ -251,305 +169,409 @@
     </div>
 </div>
 
-<div class="toast" id="toast">Copied!</div>
+<div class="toast" id="toast"></div>
 
 <script src="novaState.js"></script>
 <script>
     const WS_URL = 'wss://poikiloblastic-leeanne-gazeless.ngrok-free.dev/ws/webrtc';
     const ICE = { iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}] };
 
-    // ── Load state from NovaState ──────────────────────────────────────────
-    const token       = NovaState.getToken();
-    const user        = NovaState.getUser();
-    const meetCode    = NovaState.getMeetingCode();
-    const myName      = user?.name || 'Guest';
-    const myPeerId    = 'peer_' + Math.random().toString(36).substr(2,9);
-
-    if (!meetCode) { alert('No meeting code found. Redirecting…'); location.href = 'novaJoin.html'; }
-
-    let localStream = null, screenStream = null, ws = null;
-    let peers = {}, videoOn = true, audioOn = true;
-    let isScreenSharing = false; // Track if I'm sharing
-    let activePresenterId = null; // Track who is presenting (remote)
-    let cameraStream = null; // Store original camera stream
-
+    // ── State ──────────────────────────────────────────────────────────────
+    const token = NovaState.getToken();
+    const user = NovaState.getUser();
+    const meetCode = NovaState.getMeetingCode();
+    const myName = user?.name || 'Guest';
+    const myPeerId = 'peer_' + Math.random().toString(36).substr(2,9);
     const initial = myName.charAt(0).toUpperCase();
+
+    if (!meetCode) { alert('No meeting code'); location.href = 'novaJoin.html'; }
+
+    let ws = null;
+    let localCameraStream = null;  // Original camera+audio stream
+    let screenStream = null;        // Screen share stream
+    let peers = {};                 // { peerId: RTCPeerConnection }
+    let peerStreams = {};          // { peerId: MediaStream }
+    let videoOn = true, audioOn = true;
+    let isScreenSharing = false;
+    let remotePresenterId = null;  // Who is presenting remotely
 
     // ── Init ───────────────────────────────────────────────────────────────
     document.getElementById('codeDisplay').textContent = meetCode;
 
     (async () => {
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video:{width:1280,height:720}, audio:true });
-            cameraStream = localStream; // Store reference to camera
-            createLocalVideo();
+            localCameraStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { width: 1280, height: 720 }, 
+                audio: { echoCancellation: true, noiseSuppression: true } 
+            });
+            console.log('✅ Got local camera stream:', localCameraStream.id);
         } catch (err) {
-            console.warn('No camera/mic:', err.message);
+            console.warn('⚠️ No camera/mic:', err.message);
             videoOn = false;
             document.getElementById('videoBtn').className = 'ctrl off';
             document.getElementById('videoBtn').textContent = '🚫';
-            createLocalVideo();
         }
+        renderLayout();
         connectWS();
     })();
 
-    // ── Create local video wrapper ─────────────────────────────────────────
-    function createLocalVideo() {
-        const grid = document.getElementById('videosGrid');
-        const wrapper = document.createElement('div');
+    // ── WebSocket ──────────────────────────────────────────────────────────
+    function connectWS() {
+        const url = token ? `${WS_URL}?token=${token}` : WS_URL;
+        ws = new WebSocket(url);
+        
+        ws.onopen = () => {
+            console.log('✅ WebSocket connected');
+            send({ type: 'JOIN', meetingCode: meetCode, fromPeerId: myPeerId });
+        };
+        
+        ws.onmessage = async (e) => {
+            const msg = JSON.parse(e.data);
+            console.log('📩 Received:', msg.type, 'from', msg.fromPeerId);
+            
+            switch(msg.type) {
+                case 'PARTICIPANT_LIST':
+                    console.log('👥 Existing peers:', msg.data.peers);
+                    msg.data.peers.forEach(peerId => {
+                        if (peerId !== myPeerId) {
+                            console.log('🤝 Creating offer for peer:', peerId);
+                            createPeerConnection(peerId, true);
+                        }
+                    });
+                    break;
+                    
+                case 'JOIN':
+                    console.log('👋 New peer joined:', msg.fromPeerId);
+                    renderLayout();
+                    break;
+                    
+                case 'LEAVE':
+                    console.log('👋 Peer left:', msg.fromPeerId);
+                    handlePeerLeave(msg.fromPeerId);
+                    break;
+                    
+                case 'OFFER':
+                    console.log('📞 Received OFFER from:', msg.fromPeerId);
+                    await handleOffer(msg);
+                    break;
+                    
+                case 'ANSWER':
+                    console.log('✅ Received ANSWER from:', msg.fromPeerId);
+                    await handleAnswer(msg);
+                    break;
+                    
+                case 'ICE_CANDIDATE':
+                    await handleICE(msg);
+                    break;
+                    
+                case 'CHAT_MESSAGE':
+                    addMsg(msg.data.senderName, msg.data.message, false);
+                    break;
+                    
+                case 'TOGGLE_VIDEO':
+                case 'TOGGLE_AUDIO':
+                    updatePeerMuteIcon(msg);
+                    break;
+                    
+                case 'SCREEN_SHARE_START':
+                    console.log('🖥️ Peer started screen share:', msg.fromPeerId);
+                    remotePresenterId = msg.fromPeerId;
+                    renderLayout();
+                    break;
+                    
+                case 'SCREEN_SHARE_STOP':
+                    console.log('🖥️ Peer stopped screen share:', msg.fromPeerId);
+                    if (remotePresenterId === msg.fromPeerId) {
+                        remotePresenterId = null;
+                    }
+                    renderLayout();
+                    break;
+            }
+        };
+        
+        ws.onerror = (e) => console.error('❌ WebSocket error:', e);
+        ws.onclose = () => console.log('🔌 WebSocket closed');
+    }
+
+    function send(obj) {
+        if (ws?.readyState === WebSocket.OPEN) {
+            obj.meetingCode = meetCode;
+            obj.fromPeerId = myPeerId;
+            ws.send(JSON.stringify(obj));
+        }
+    }
+
+    // ── WebRTC Peer Connections ───────────────────────────────────────────
+    function createPeerConnection(peerId, shouldCreateOffer) {
+        console.log(`🔗 Creating peer connection for: ${peerId} (offer: ${shouldCreateOffer})`);
+        
+        const pc = new RTCPeerConnection(ICE);
+        peers[peerId] = pc;
+
+        // Add my current stream (camera or screen)
+        const currentStream = isScreenSharing ? screenStream : localCameraStream;
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => {
+                console.log(`➕ Adding ${track.kind} track to peer:`, peerId);
+                pc.addTrack(track, currentStream);
+            });
+        }
+
+        // Handle incoming tracks from remote peer
+        pc.ontrack = (event) => {
+            console.log(`🎥 Received ${event.track.kind} track from:`, peerId, 'stream:', event.streams[0].id);
+            
+            const remoteStream = event.streams[0];
+            peerStreams[peerId] = remoteStream;
+            
+            // Add remote video immediately
+            addOrUpdateRemoteVideo(peerId, remoteStream);
+        };
+
+        // Send ICE candidates
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                send({ 
+                    type: 'ICE_CANDIDATE', 
+                    toPeerId: peerId, 
+                    data: event.candidate 
+                });
+            }
+        };
+
+        // Monitor connection state
+        pc.onconnectionstatechange = () => {
+            console.log(`🔌 Connection state for ${peerId}:`, pc.connectionState);
+            if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
+                handlePeerLeave(peerId);
+            }
+        };
+
+        pc.oniceconnectionstatechange = () => {
+            console.log(`🧊 ICE connection state for ${peerId}:`, pc.iceConnectionState);
+        };
+
+        // Create offer if this is the initiator
+        if (shouldCreateOffer) {
+            pc.createOffer()
+                .then(offer => pc.setLocalDescription(offer))
+                .then(() => {
+                    console.log('📤 Sending OFFER to:', peerId);
+                    send({ 
+                        type: 'OFFER', 
+                        toPeerId: peerId, 
+                        data: pc.localDescription 
+                    });
+                })
+                .catch(err => console.error('❌ Error creating offer:', err));
+        }
+
+        return pc;
+    }
+
+    async function handleOffer(msg) {
+        const peerId = msg.fromPeerId;
+        
+        // Create peer connection if it doesn't exist
+        if (!peers[peerId]) {
+            createPeerConnection(peerId, false);
+        }
+
+        const pc = peers[peerId];
+        
+        try {
+            await pc.setRemoteDescription(new RTCSessionDescription(msg.data));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            
+            console.log('📤 Sending ANSWER to:', peerId);
+            send({ 
+                type: 'ANSWER', 
+                toPeerId: peerId, 
+                data: pc.localDescription 
+            });
+        } catch (err) {
+            console.error('❌ Error handling offer:', err);
+        }
+    }
+
+    async function handleAnswer(msg) {
+        const peerId = msg.fromPeerId;
+        const pc = peers[peerId];
+        
+        if (pc) {
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(msg.data));
+                console.log('✅ Set remote description for:', peerId);
+            } catch (err) {
+                console.error('❌ Error setting remote description:', err);
+            }
+        }
+    }
+
+    async function handleICE(msg) {
+        const peerId = msg.fromPeerId;
+        const pc = peers[peerId];
+        
+        if (pc) {
+            try {
+                await pc.addIceCandidate(new RTCIceCandidate(msg.data));
+            } catch (err) {
+                console.error('❌ Error adding ICE candidate:', err);
+            }
+        }
+    }
+
+    function handlePeerLeave(peerId) {
+        console.log('👋 Cleaning up peer:', peerId);
+        
+        if (peers[peerId]) {
+            peers[peerId].close();
+            delete peers[peerId];
+        }
+        
+        delete peerStreams[peerId];
+        
+        const elem = document.getElementById(`vw-${peerId}`);
+        if (elem) elem.remove();
+        
+        if (remotePresenterId === peerId) {
+            remotePresenterId = null;
+        }
+        
+        renderLayout();
+    }
+
+    function addOrUpdateRemoteVideo(peerId, stream) {
+        let wrapper = document.getElementById(`vw-${peerId}`);
+        
+        if (wrapper) {
+            // Update existing video
+            const video = wrapper.querySelector('video');
+            if (video.srcObject !== stream) {
+                console.log('🔄 Updating video stream for:', peerId);
+                video.srcObject = stream;
+            }
+            return;
+        }
+        
+        // Create new video wrapper
+        console.log('🆕 Creating video element for:', peerId);
+        wrapper = document.createElement('div');
         wrapper.className = 'vw';
-        wrapper.id = 'localWrapper';
+        wrapper.id = `vw-${peerId}`;
         
         const video = document.createElement('video');
-        video.id = 'localVideo';
+        video.srcObject = stream;
         video.autoplay = true;
-        video.muted = true;
         video.playsinline = true;
-        if (localStream) video.srcObject = localStream;
+        video.onloadedmetadata = () => {
+            console.log('✅ Video metadata loaded for:', peerId);
+        };
         
         const overlay = document.createElement('div');
         overlay.className = 'voverlay';
         
         const label = document.createElement('div');
         label.className = 'vlabel';
-        label.id = 'localLabel';
-        label.textContent = myName;
+        label.textContent = `Peer ${peerId.slice(-4)}`;
         
         const icons = document.createElement('div');
         icons.className = 'sicons';
-        icons.id = 'localIcons';
-        
-        const noCam = document.createElement('div');
-        noCam.className = 'no-cam' + (videoOn ? ' hidden' : '');
-        noCam.id = 'noCam';
-        noCam.innerHTML = `
-            <div class="no-cam-avatar">${initial}</div>
-            <div class="no-cam-name">${myName}</div>
-        `;
-        
-        wrapper.append(video, overlay, label, icons, noCam);
-        grid.appendChild(wrapper);
-    }
-
-    // ── WebSocket ──────────────────────────────────────────────────────────
-    function connectWS() {
-        const url = token ? `${WS_URL}?token=${token}` : WS_URL;
-        ws = new WebSocket(url);
-        ws.onopen = () => {
-            console.log('✅ WS open');
-            send({ type:'JOIN', meetingCode:meetCode, fromPeerId:myPeerId });
-        };
-        ws.onmessage = async (e) => {
-            const msg = JSON.parse(e.data);
-            switch(msg.type) {
-                case 'PARTICIPANT_LIST': msg.data.peers.forEach(id => createPC(id, true)); break;
-                case 'JOIN':            updateLayout(); break;
-                case 'LEAVE':          peerLeave(msg.fromPeerId); break;
-                case 'OFFER':          await handleOffer(msg); break;
-                case 'ANSWER':         await handleAnswer(msg); break;
-                case 'ICE_CANDIDATE':  await handleICE(msg); break;
-                case 'CHAT_MESSAGE':   addMsg(msg.data.senderName, msg.data.message, false); break;
-                case 'TOGGLE_VIDEO':
-                case 'TOGGLE_AUDIO':   updateMuteIcon(msg); break;
-                case 'SCREEN_SHARE_START': handleRemoteScreenStart(msg.fromPeerId); break;
-                case 'SCREEN_SHARE_STOP':  handleRemoteScreenStop(msg.fromPeerId); break;
-            }
-        };
-        ws.onerror = e => console.error('WS error', e);
-        ws.onclose = ()  => console.log('WS closed');
-    }
-
-    function send(obj) {
-        if (ws?.readyState === WebSocket.OPEN) {
-            obj.meetingCode = meetCode;
-            obj.fromPeerId  = myPeerId;
-            ws.send(JSON.stringify(obj));
-        }
-    }
-
-    // ── WebRTC ─────────────────────────────────────────────────────────────
-    function createPC(peerId, isInit) {
-        const pc = new RTCPeerConnection(ICE);
-        peers[peerId] = pc;
-        
-        // Add current stream (camera or screen)
-        if (localStream) {
-            localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-        }
-        
-        pc.ontrack = e => addRemoteVideo(peerId, e.streams[0]);
-        pc.onicecandidate = e => { 
-            if(e.candidate) send({type:'ICE_CANDIDATE',toPeerId:peerId,data:e.candidate}); 
-        };
-        pc.onconnectionstatechange = () => { 
-            if(['disconnected','failed'].includes(pc.connectionState)) peerLeave(peerId); 
-        };
-        
-        if (isInit) {
-            pc.createOffer()
-                .then(o=>pc.setLocalDescription(o))
-                .then(()=>send({type:'OFFER',toPeerId:peerId,data:pc.localDescription}))
-                .catch(console.error);
-        }
-        return pc;
-    }
-
-    async function handleOffer(msg) {
-        const id = msg.fromPeerId;
-        if (!peers[id]) createPC(id, false);
-        await peers[id].setRemoteDescription(new RTCSessionDescription(msg.data));
-        const ans = await peers[id].createAnswer();
-        await peers[id].setLocalDescription(ans);
-        send({type:'ANSWER',toPeerId:id,data:peers[id].localDescription});
-    }
-    
-    async function handleAnswer(msg) { 
-        if(peers[msg.fromPeerId]) 
-            await peers[msg.fromPeerId].setRemoteDescription(new RTCSessionDescription(msg.data)); 
-    }
-    
-    async function handleICE(msg) { 
-        if(peers[msg.fromPeerId]) 
-            await peers[msg.fromPeerId].addIceCandidate(new RTCIceCandidate(msg.data)); 
-    }
-    
-    function peerLeave(id) { 
-        peers[id]?.close(); 
-        delete peers[id]; 
-        document.getElementById(`vw-${id}`)?.remove(); 
-        if (activePresenterId === id) {
-            activePresenterId = null;
-        }
-        updateLayout(); 
-    }
-
-    function addRemoteVideo(id, stream) {
-        let wrapper = document.getElementById(`vw-${id}`);
-        
-        if (wrapper) { 
-            const video = wrapper.querySelector('video');
-            video.srcObject = stream;
-            return; 
-        }
-        
-        wrapper = document.createElement('div'); 
-        wrapper.className = 'vw'; 
-        wrapper.id = `vw-${id}`;
-        
-        const video = document.createElement('video'); 
-        video.srcObject = stream; 
-        video.autoplay = true; 
-        video.playsinline = true;
-        
-        const overlay = document.createElement('div'); 
-        overlay.className = 'voverlay';
-        
-        const label = document.createElement('div'); 
-        label.className = 'vlabel'; 
-        label.textContent = `Peer ${id.slice(-4)}`;
-        
-        const icons = document.createElement('div'); 
-        icons.className = 'sicons'; 
-        icons.id = `ic-${id}`;
+        icons.id = `ic-${peerId}`;
         
         wrapper.append(video, overlay, label, icons);
-        document.getElementById('videosGrid').appendChild(wrapper);
-        updateLayout();
+        
+        // Add to appropriate container
+        const grid = document.getElementById('videosGrid');
+        const rail = document.querySelector('.participants-rail');
+        
+        if (rail) {
+            rail.appendChild(wrapper);
+        } else {
+            grid.appendChild(wrapper);
+        }
+        
+        renderLayout();
     }
 
-    function updateMuteIcon(msg) {
-        const ic = document.getElementById(`ic-${msg.fromPeerId}`);
-        if(!ic) return;
+    function updatePeerMuteIcon(msg) {
+        const icons = document.getElementById(`ic-${msg.fromPeerId}`);
+        if (!icons) return;
         
-        const eid = `${msg.type==='TOGGLE_AUDIO'?'ai':'vi'}-${msg.fromPeerId}`;
-        let el = document.getElementById(eid);
+        const iconId = `${msg.type === 'TOGGLE_AUDIO' ? 'ai' : 'vi'}-${msg.fromPeerId}`;
+        let icon = document.getElementById(iconId);
         
         if (!msg.data.enabled) {
-            if (!el) { 
-                el = document.createElement('div'); 
-                el.id = eid; 
-                el.className = 'sicon muted'; 
-                el.textContent = msg.type === 'TOGGLE_AUDIO' ? '🔇' : '🚫'; 
-                ic.appendChild(el); 
+            if (!icon) {
+                icon = document.createElement('div');
+                icon.id = iconId;
+                icon.className = 'sicon muted';
+                icon.textContent = msg.type === 'TOGGLE_AUDIO' ? '🔇' : '🚫';
+                icons.appendChild(icon);
             }
-        } else { 
-            el?.remove(); 
+        } else {
+            icon?.remove();
         }
     }
 
-    // ── Layout Management ──────────────────────────────────────────────────
-    function updateLayout() {
+    // ── Layout Rendering ───────────────────────────────────────────────────
+    function renderLayout() {
         const grid = document.getElementById('videosGrid');
-        const participantCount = Object.keys(peers).length + 1;
+        const peerCount = Object.keys(peers).length;
+        const totalParticipants = peerCount + 1;
+        
+        console.log(`🎨 Rendering layout: ${totalParticipants} participants, presenting: ${isScreenSharing || remotePresenterId}`);
         
         // Update participant count
         document.getElementById('pcount').textContent = 
-            `${participantCount} participant${participantCount !== 1 ? 's' : ''}`;
+            `${totalParticipants} participant${totalParticipants !== 1 ? 's' : ''}`;
         
-        // Check if anyone is presenting
-        const isPresenting = isScreenSharing || activePresenterId;
+        const isPresenting = isScreenSharing || remotePresenterId;
         
         if (isPresenting) {
-            // Presentation layout
+            // Presentation mode
             grid.className = 'videos presenting';
             grid.innerHTML = '';
             
-            // Create main stage
             const mainStage = document.createElement('div');
             mainStage.className = 'main-stage';
             
-            // Create participants rail
             const rail = document.createElement('div');
             rail.className = 'participants-rail';
             
             if (isScreenSharing) {
-                // I'm presenting - show my screen in main stage
-                const screenWrapper = createVideoWrapper(
-                    'screenWrapper',
-                    screenStream,
-                    `${myName} (presenting)`,
-                    true,
-                    true
-                );
+                // I'm presenting
+                const screenWrapper = createVideoElement('screen-wrapper', screenStream, `${myName} (presenting)`, true);
                 mainStage.appendChild(screenWrapper);
                 
                 // Add my camera to rail
-                const cameraWrapper = createVideoWrapper(
-                    'localWrapper',
-                    cameraStream,
-                    myName,
-                    true,
-                    false
-                );
+                const cameraWrapper = createVideoElement('local-camera', localCameraStream, myName, false);
                 rail.appendChild(cameraWrapper);
                 
-                // Add all peers to rail
+                // Add peers to rail
                 Object.keys(peers).forEach(peerId => {
-                    const existingWrapper = document.getElementById(`vw-${peerId}`);
-                    if (existingWrapper) {
-                        rail.appendChild(existingWrapper);
+                    if (peerStreams[peerId]) {
+                        const peerWrapper = createVideoElement(`vw-${peerId}`, peerStreams[peerId], `Peer ${peerId.slice(-4)}`, false);
+                        rail.appendChild(peerWrapper);
                     }
                 });
-            } else if (activePresenterId) {
+            } else if (remotePresenterId) {
                 // Remote peer is presenting
-                const presenterWrapper = document.getElementById(`vw-${activePresenterId}`);
-                if (presenterWrapper) {
+                if (peerStreams[remotePresenterId]) {
+                    const presenterWrapper = createVideoElement(`vw-${remotePresenterId}`, peerStreams[remotePresenterId], `Peer ${remotePresenterId.slice(-4)} (presenting)`, true);
                     mainStage.appendChild(presenterWrapper);
                 }
                 
                 // Add my video to rail
-                const localWrapper = document.getElementById('localWrapper');
-                if (localWrapper) {
-                    rail.appendChild(localWrapper);
-                }
+                const localWrapper = createVideoElement('local-wrapper', localCameraStream, myName, false);
+                rail.appendChild(localWrapper);
                 
                 // Add other peers to rail
                 Object.keys(peers).forEach(peerId => {
-                    if (peerId !== activePresenterId) {
-                        const existingWrapper = document.getElementById(`vw-${peerId}`);
-                        if (existingWrapper) {
-                            rail.appendChild(existingWrapper);
-                        }
+                    if (peerId !== remotePresenterId && peerStreams[peerId]) {
+                        const peerWrapper = createVideoElement(`vw-${peerId}`, peerStreams[peerId], `Peer ${peerId.slice(-4)}`, false);
+                        rail.appendChild(peerWrapper);
                     }
                 });
             }
@@ -557,265 +579,202 @@
             grid.appendChild(mainStage);
             grid.appendChild(rail);
         } else {
-            // Regular grid layout
+            // Regular grid mode
             let countClass = 'count-1';
-            if (participantCount === 2) countClass = 'count-2';
-            else if (participantCount <= 4) countClass = 'count-4';
-            else if (participantCount <= 6) countClass = 'count-6';
-            else if (participantCount <= 9) countClass = 'count-9';
+            if (totalParticipants === 2) countClass = 'count-2';
+            else if (totalParticipants <= 4) countClass = 'count-4';
+            else if (totalParticipants <= 6) countClass = 'count-6';
+            else if (totalParticipants <= 9) countClass = 'count-9';
             else countClass = 'count-10plus';
             
             grid.className = `videos ${countClass}`;
             grid.innerHTML = '';
             
             // Add local video
-            const localWrapper = document.getElementById('localWrapper') || createVideoWrapper(
-                'localWrapper',
-                localStream,
-                myName,
-                true,
-                false
-            );
+            const localWrapper = createVideoElement('local-wrapper', localCameraStream, myName, false);
             grid.appendChild(localWrapper);
             
             // Add all peers
             Object.keys(peers).forEach(peerId => {
-                const existingWrapper = document.getElementById(`vw-${peerId}`);
-                if (existingWrapper) {
-                    grid.appendChild(existingWrapper);
+                if (peerStreams[peerId]) {
+                    const peerWrapper = createVideoElement(`vw-${peerId}`, peerStreams[peerId], `Peer ${peerId.slice(-4)}`, false);
+                    grid.appendChild(peerWrapper);
                 }
             });
         }
     }
 
-    function createVideoWrapper(id, stream, label, isLocal, isPresenting) {
-        let wrapper = document.getElementById(id);
+    function createVideoElement(id, stream, label, isPresenting) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'vw';
+        wrapper.id = id;
         
-        if (!wrapper) {
-            wrapper = document.createElement('div');
-            wrapper.className = 'vw';
-            wrapper.id = id;
-            
+        if (stream) {
             const video = document.createElement('video');
+            video.srcObject = stream;
             video.autoplay = true;
             video.playsinline = true;
-            if (isLocal) {
-                video.id = id === 'localWrapper' ? 'localVideo' : 'screenVideo';
-                video.muted = true;
-            }
-            
-            const overlay = document.createElement('div');
-            overlay.className = 'voverlay';
-            
-            const labelDiv = document.createElement('div');
-            labelDiv.className = 'vlabel';
-            labelDiv.textContent = label;
-            
-            const icons = document.createElement('div');
-            icons.className = 'sicons';
-            icons.id = isLocal ? 'localIcons' : `ic-${id}`;
-            
-            wrapper.append(video, overlay, labelDiv, icons);
-            
-            if (isLocal && id === 'localWrapper' && !videoOn) {
-                const noCam = document.createElement('div');
-                noCam.className = 'no-cam';
-                noCam.id = 'noCam';
-                noCam.innerHTML = `
-                    <div class="no-cam-avatar">${initial}</div>
-                    <div class="no-cam-name">${myName}</div>
-                `;
-                wrapper.appendChild(noCam);
-            }
+            video.muted = id.includes('local') || id.includes('camera') || id === 'screen-wrapper';
+            wrapper.appendChild(video);
+        } else {
+            // No camera placeholder
+            const noCam = document.createElement('div');
+            noCam.className = 'no-cam';
+            noCam.innerHTML = `
+                <div class="no-cam-avatar">${initial}</div>
+                <div class="no-cam-name">${myName}</div>
+            `;
+            wrapper.appendChild(noCam);
         }
         
-        const video = wrapper.querySelector('video');
-        if (stream) video.srcObject = stream;
+        const overlay = document.createElement('div');
+        overlay.className = 'voverlay';
+        wrapper.appendChild(overlay);
         
-        const labelDiv = wrapper.querySelector('.vlabel');
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'vlabel';
         labelDiv.textContent = label;
+        wrapper.appendChild(labelDiv);
         
-        // Handle presenting icon
-        const icons = wrapper.querySelector('.sicons');
-        const existingPresentIcon = icons.querySelector('.presenting');
+        const icons = document.createElement('div');
+        icons.className = 'sicons';
+        icons.id = id.includes('local') || id === 'screen-wrapper' ? 'local-icons' : `ic-${id.replace('vw-', '')}`;
         
-        if (isPresenting && !existingPresentIcon) {
+        if (isPresenting) {
             const presentIcon = document.createElement('div');
             presentIcon.className = 'sicon presenting';
             presentIcon.textContent = '🖥️';
-            presentIcon.id = 'present-icon';
             icons.appendChild(presentIcon);
-        } else if (!isPresenting && existingPresentIcon) {
-            existingPresentIcon.remove();
         }
+        
+        wrapper.appendChild(icons);
         
         return wrapper;
     }
 
-    function handleRemoteScreenStart(peerId) {
-        activePresenterId = peerId;
-        
-        // Add presenting icon to the peer
-        const icons = document.getElementById(`ic-${peerId}`);
-        if (icons && !icons.querySelector('.presenting')) {
-            const presentIcon = document.createElement('div');
-            presentIcon.id = `present-${peerId}`;
-            presentIcon.className = 'sicon presenting';
-            presentIcon.textContent = '🖥️';
-            icons.appendChild(presentIcon);
-        }
-        
-        updateLayout();
-    }
-
-    function handleRemoteScreenStop(peerId) {
-        if (activePresenterId === peerId) {
-            activePresenterId = null;
-        }
-        
-        // Remove presenting icon
-        document.getElementById(`present-${peerId}`)?.remove();
-        
-        updateLayout();
-    }
-
-    // ── Media controls ──────────────────────────────────────────────────────
+    // ── Media Controls ─────────────────────────────────────────────────────
     function toggleVideo() {
-        if (!cameraStream) return;
+        if (!localCameraStream) return;
         
         videoOn = !videoOn;
-        cameraStream.getVideoTracks().forEach(t => t.enabled = videoOn);
+        localCameraStream.getVideoTracks().forEach(t => t.enabled = videoOn);
         
-        document.getElementById('videoBtn').className = `ctrl ${videoOn?'on':'off'}`;
+        document.getElementById('videoBtn').className = `ctrl ${videoOn ? 'on' : 'off'}`;
         document.getElementById('videoBtn').textContent = videoOn ? '📹' : '🚫';
         
-        const noCam = document.getElementById('noCam');
-        if (noCam) {
-            noCam.classList.toggle('hidden', videoOn);
-        }
-        
-        send({type:'TOGGLE_VIDEO', data:{enabled:videoOn}});
+        send({ type: 'TOGGLE_VIDEO', data: { enabled: videoOn } });
+        renderLayout();
     }
 
     function toggleAudio() {
-        if (!localStream && !cameraStream) return;
+        if (!localCameraStream) return;
         
         audioOn = !audioOn;
-        const stream = localStream || cameraStream;
-        stream.getAudioTracks().forEach(t => t.enabled = audioOn);
+        localCameraStream.getAudioTracks().forEach(t => t.enabled = audioOn);
         
-        document.getElementById('audioBtn').className = `ctrl ${audioOn?'on':'off'}`;
+        document.getElementById('audioBtn').className = `ctrl ${audioOn ? 'on' : 'off'}`;
         document.getElementById('audioBtn').textContent = audioOn ? '🎤' : '🔇';
         
-        send({type:'TOGGLE_AUDIO', data:{enabled:audioOn}});
+        send({ type: 'TOGGLE_AUDIO', data: { enabled: audioOn } });
     }
 
     async function toggleScreen() {
         if (isScreenSharing) {
             // Stop screen sharing
+            console.log('🛑 Stopping screen share');
+            
             screenStream.getTracks().forEach(t => t.stop());
             screenStream = null;
             isScreenSharing = false;
             
-            // Switch back to camera stream
-            localStream = cameraStream;
-            
-            // Update button
             document.getElementById('screenBtn').className = 'ctrl on';
             
             // Replace screen track with camera track for all peers
-            const videoTrack = cameraStream.getVideoTracks()[0];
-            Object.values(peers).forEach(pc => { 
-                const sender = pc.getSenders().find(s => s.track?.kind === 'video'); 
+            const videoTrack = localCameraStream?.getVideoTracks()[0];
+            Object.values(peers).forEach(pc => {
+                const sender = pc.getSenders().find(s => s.track?.kind === 'video');
                 if (sender && videoTrack) {
+                    console.log('🔄 Replacing screen track with camera track');
                     sender.replaceTrack(videoTrack);
                 }
             });
             
-            // Update local video to show camera
-            const localVideo = document.getElementById('localVideo');
-            if (localVideo) {
-                localVideo.srcObject = cameraStream;
-            }
-            
-            send({type:'SCREEN_SHARE_STOP'});
-            updateLayout();
+            send({ type: 'SCREEN_SHARE_STOP' });
+            renderLayout();
         } else {
             // Start screen sharing
             try {
+                console.log('🖥️ Starting screen share');
+                
                 screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: {
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    }
+                    video: { width: { ideal: 1920 }, height: { ideal: 1080 } }
                 });
                 
                 isScreenSharing = true;
-                
-                // Update button
                 document.getElementById('screenBtn').className = 'ctrl off';
                 
                 const screenTrack = screenStream.getVideoTracks()[0];
                 
                 // Replace camera track with screen track for all peers
-                Object.values(peers).forEach(pc => { 
-                    const sender = pc.getSenders().find(s => s.track?.kind === 'video'); 
+                Object.values(peers).forEach(pc => {
+                    const sender = pc.getSenders().find(s => s.track?.kind === 'video');
                     if (sender) {
+                        console.log('🔄 Replacing camera track with screen track');
                         sender.replaceTrack(screenTrack);
                     }
                 });
                 
-                // Handle screen share stop (user clicks browser stop button)
+                // Handle screen share stop (browser button)
                 screenTrack.onended = () => {
-                    if (isScreenSharing) {
-                        toggleScreen();
-                    }
+                    console.log('🛑 Screen share ended by user');
+                    if (isScreenSharing) toggleScreen();
                 };
                 
-                send({type:'SCREEN_SHARE_START'});
-                updateLayout();
-            } catch(e) { 
-                console.error('Screen share error:', e);
+                send({ type: 'SCREEN_SHARE_START' });
+                renderLayout();
+                
+            } catch (err) {
+                console.error('❌ Screen share error:', err);
                 showToast('Screen sharing cancelled');
             }
         }
     }
 
-    // ── Chat ────────────────────────────────────────────────────────────────
-    function toggleChat() { 
-        document.getElementById('chatPanel').classList.toggle('open'); 
+    // ── Chat ───────────────────────────────────────────────────────────────
+    function toggleChat() {
+        document.getElementById('chatPanel').classList.toggle('open');
     }
 
     function sendMsg() {
-        const inp = document.getElementById('chatInput');
-        const txt = inp.value.trim(); 
-        if (!txt) return;
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
         
-        addMsg(myName, txt, true);
-        send({type:'CHAT_MESSAGE', data:{message:txt, senderName:myName, timestamp:Date.now()}});
-        inp.value = '';
+        addMsg(myName, text, true);
+        send({ type: 'CHAT_MESSAGE', data: { message: text, senderName: myName } });
+        input.value = '';
     }
 
     function addMsg(sender, text, isSelf) {
-        const div = document.createElement('div'); 
-        div.className = 'msg';
+        const msg = document.createElement('div');
+        msg.className = 'msg';
         
-        const s = document.createElement('div'); 
-        s.className = 'msender'; 
-        s.textContent = isSelf ? `${sender} (you)` : sender;
+        const senderDiv = document.createElement('div');
+        senderDiv.className = 'msender';
+        senderDiv.textContent = isSelf ? `${sender} (you)` : sender;
         
-        const t = document.createElement('div'); 
-        t.className = 'mtext';   
-        t.textContent = text;
+        const textDiv = document.createElement('div');
+        textDiv.className = 'mtext';
+        textDiv.textContent = text;
         
-        div.append(s, t);
+        msg.append(senderDiv, textDiv);
         
         const box = document.getElementById('msgs');
-        box.appendChild(div); 
+        box.appendChild(msg);
         box.scrollTop = box.scrollHeight;
     }
 
-    // ── Copy code ────────────────────────────────────────────────────────────
+    // ── Utilities ──────────────────────────────────────────────────────────
     function copyCode() {
         navigator.clipboard.writeText(meetCode).then(() => {
             showToast('Code copied!');
@@ -829,41 +788,32 @@
         setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
-    // ── Leave ────────────────────────────────────────────────────────────────
     function leave() {
         if (!confirm('Leave this meeting?')) return;
         
-        localStream?.getTracks().forEach(t => t.stop());
+        localCameraStream?.getTracks().forEach(t => t.stop());
         screenStream?.getTracks().forEach(t => t.stop());
-        cameraStream?.getTracks().forEach(t => t.stop());
+        Object.values(peers).forEach(pc => pc.close());
         
-        Object.values(peers).forEach(pc => pc.close()); 
-        peers = {};
-        
-        if (ws) { 
-            send({type:'LEAVE'}); 
-            ws.close(); 
+        if (ws) {
+            send({ type: 'LEAVE' });
+            ws.close();
         }
-        
-        localStream = null; 
-        screenStream = null; 
-        cameraStream = null;
-        ws = null;
         
         NovaState.clearMeetingCode();
         location.href = NovaState.isLoggedIn() ? 'novaDash.html' : 'novaJoin.html';
     }
 
-    // ── Keyboard shortcuts ───────────────────────────────────────────────────
-    document.addEventListener('keydown', e => {
-        if (e.target.tagName === 'INPUT') return; // Don't trigger when typing in chat
+    // ── Keyboard Shortcuts ─────────────────────────────────────────────────
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
         if (e.key === 'd') toggleVideo();
         if (e.key === 'a') toggleAudio();
         if (e.key === 's') toggleScreen();
     });
-    
-    document.getElementById('chatInput').addEventListener('keypress', e => { 
-        if (e.key === 'Enter') sendMsg(); 
+
+    document.getElementById('chatInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMsg();
     });
 </script>
 </body>
